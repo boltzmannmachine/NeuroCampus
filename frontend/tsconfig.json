@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+
+    /* Evita errores de tipado en dependencias (node_modules) */
+    "skipLibCheck": true,
+
+    /* Soporte a Vite y Vitest (evita tus errores  de 'vite/client' y 'vitest/globals') */
+    "types": ["vite/client", "vitest/globals"],
+
+    /* Alias "@/..." → src */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src"]
+}

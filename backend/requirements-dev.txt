@@ -1,0 +1,31 @@
+# --- Desarrollo y pruebas ---
+-r requirements.txt
+
+# Testing
+pytest>=8.2
+httpx>=0.27
+
+# Calidad de código / tipeo
+ruff>=0.5
+# black>=24.8
+# isort>=5.13
+mypy>=1.10
+
+# Notebooks
+# ipykernel>=6.29
+# jupyterlab>=4.2
+
+# NLP / Experimentos
+# transformers>=4.44
+# sentencepiece>=0.2
+# accelerate>=0.34
+
+# Forzar CUDA en dev, sobreescribe aquí (comentado por defecto):
+# --extra-index-url https://download.pytorch.org/whl/cu121
+# torch==2.3.1+cu121
+
+# Documentacion
+sphinx
+myst-parser
+sphinx-rtd-theme
+

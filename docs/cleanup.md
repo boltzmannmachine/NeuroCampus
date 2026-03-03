@@ -1,0 +1,71 @@
+# Limpieza de artefactos y temporales (Días 1–4)
+
+## Comandos
+- `make clean-inventory` — inventario resumido, sin eliminación.
+- `make clean-artifacts-dry-run` — simulación de borrado con `--keep-last` y `--retention-days`.
+
+## Variables
+- `NC_RETENTION_DAYS` (default 90)
+- `NC_KEEP_LAST` (default 3)
+- `NC_DRY_RUN` (true/false)
+
+## Seguridad
+- Artefactos bajo `artifacts/champions/*` están protegidos.
+- En Día 1, el borrado real **está deshabilitado** desde el script.
+
+## Próximos días
+- Día 2–4: borrado real, CLI `--force`, endpoint `POST /admin/cleanup` bajo auth.
+
+# Día 2 — Borrado real seguro
+
+### Comandos
+- `make clean-artifacts-dry-run` — simulación sin mover archivos.
+- `make clean-artifacts` — **mueve a papelera** (requiere `--force` dentro del script, invocado por el target).
+
+### Papelera
+- Ruta: `.trash/YYYYMMDD/<ruta_relativa>`
+- Retención: `NC_TRASH_RETENTION_DAYS` días (default 14).
+
+### Logs
+- CSV en `logs/cleanup.log` con columnas: `timestamp,action,path,size,age_days,reason`.
+
+### Exclusiones
+- `NC_EXCLUDE_GLOBS` (globs separados por coma). Por default protegen `artifacts/champions/**`.
+
+## Día 3 — API de Administración
+
+### Auth
+- `Authorization: Bearer $NC_ADMIN_TOKEN`
+
+### Endpoints
+- **GET** `/admin/cleanup/inventory`
+- **POST** `/admin/cleanup` (usar `{"dry_run":false,"force":true}` para mover a papelera)
+- **GET** `/admin/cleanup/logs?limit=200`
+
+### Ejemplos
+```bash
+make run-admin
+
+curl -H "Authorization: Bearer $NC_ADMIN_TOKEN" \
+  "http://$API_HOST:$API_PORT/admin/cleanup/inventory?retention_days=90&keep_last=3"
+
+curl -X POST -H "Authorization: Bearer $NC_ADMIN_TOKEN" -H "Content-Type: application/json" \
+  -d '{"retention_days":90,"keep_last":3,"dry_run":false,"force":true}' \
+  "http://$API_HOST:$API_PORT/admin/cleanup"
+
+```
+
+## Día 4 — UI de Administración (Frontend)
+
+- Ruta: `/admin/cleanup`
+- Ingresar **Token admin** (NC_ADMIN_TOKEN) en el campo superior. Se guarda en localStorage.
+- Ajustar `retention_days`, `keep_last`, `exclude_globs`.
+- Botones:
+  - **Inventario (dry-run)** — lista candidatos sin mover nada.
+  - **Mover a papelera (force)** — mueve candidatos a `.trash/` y registra en `logs/cleanup.log`.
+  - **Ver logs** — muestra el tail del CSV.
+
+### Dev
+- Backend: `make run-admin`
+- Frontend: `make fe-dev` (VITE_API_BASE en `.env`)
+
