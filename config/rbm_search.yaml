@@ -1,4 +1,4 @@
-# configs/rbm_search.yaml
+# config/rbm_search.yaml
 
 dataset:
   path: data/labeled/evaluaciones_2025_beto.parquet

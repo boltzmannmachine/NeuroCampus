@@ -21,21 +21,22 @@ Incluye pipeline de preprocesamiento, entrenamiento y endpoints de predicción (
 
 ```
 backend/
-  src/neurocampus/
-    app/              # FastAPI, routers, jobs CLI
-    models/           # estrategias RBM, entrenamiento
-    prediction/       # fachada de predicción
-    services/nlp/     # preprocesamiento y teacher (BETO)
-artifacts/
-  jobs/               # corridas de entrenamiento (salida)   ← ignorado por Git
-  champions/          # modelo “campeón” activo              ← ignorado por Git
-  reports/            # reportes agregados                    ← ignorado por Git
-data/
-  processed/          # datasets estandarizados               ← evitar versionar reales
-  labeled/            # etiquetados (teacher/BETO)            ← evitar versionar reales
-examples/
-  reports/            # artefactos dummy versionables
-frontend/             # app web (Vite + React + TS)
+  src/neurocampus/  # Lógica central del sistema
+    app/            # FastAPI, routers, pipelines y jobs CLI
+    models/         # Estrategias RBM, entrenamiento de modelos
+    prediction/     # Fachada de predicción
+    services/nlp/   # Preprocesamiento y teacher (BETO)
+config/             # Configuraciones (e.g. auditoría y búsqueda de hiperparámetros)
+scripts/            # Scripts utilitarios (train models, smoke tests, simuladores)
+frontend/           # Aplicación web (Vite + React + TS + Tailwind)
+tests/              # Pruebas automatizadas (unitarias y API)
+docs/               # Documentación y diagramas
+schemas/            # JSON schemas
+examples/           # Ejemplos versionables y dummy (reportes)
+
+# Carpetas generadas (NO versionadas)
+artifacts/          # Trabajos (jobs), champions (modelos activos), reportes
+data/               # Datasets estandarizados y etiquetados
 ```
 
 ---

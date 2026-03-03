@@ -4,7 +4,7 @@ Auditoría k-fold para RBM_general, RBM_restringido y rbm_pura usando las
 implementaciones existentes en neurocampus.models.strategies.* (no cambia arquitectura; solo mide baseline).
 
 Uso:
-  PYTHONPATH="$PWD/backend/src" python -m neurocampus.models.audit_kfold --config configs/rbm_audit.yaml
+  PYTHONPATH="$PWD/backend/src" python -m neurocampus.models.audit_kfold --config config/rbm_audit.yaml
 """
 
 from __future__ import annotations

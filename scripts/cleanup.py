@@ -1,4 +1,4 @@
-# tools/cleanup.py — NeuroCampus
+# scripts/cleanup.py — NeuroCampus
 # Día 2: Borrado real seguro (mover a papelera), logs y exclusiones
 
 from __future__ import annotations

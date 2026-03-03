@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import time
 
-from tools.cleanup import (
+from scripts.cleanup import (
     FileInfo, select_candidates, SECONDS_PER_DAY,
     parse_exclusions, is_excluded
 )

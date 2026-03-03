@@ -11,7 +11,7 @@ Durante el Día 6 se implementó la integración completa entre los componentes 
 - `backend/src/neurocampus/app/routers/datos.py`: recibe el archivo y reenvía a `run_validations(df, dataset_id)`.
 - `backend/src/neurocampus/data/facades/datos_facade.py`: conecta con el wrapper `validation_wrapper.run_validations()`.
 - `backend/src/neurocampus/validation/validation_wrapper.py`: estandariza la salida {ok, summary, issues}.
-- `tools/cleanup.py` y `/admin/cleanup`: mantienen la limpieza de artefactos e historial.
+- `scripts/cleanup.py` y `/admin/cleanup`: mantienen la limpieza de artefactos e historial.
 
 ---
 

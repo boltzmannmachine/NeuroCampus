@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
 # -----------------------------------------------------------------------------
-# Habilitar import del módulo tools/cleanup.py (vive en la raíz del repo)
+# Habilitar import del módulo scripts/cleanup.py (vive en la raíz del repo)
 # Estructura: backend/src/neurocampus/app/routers/admin_cleanup.py
 # parents[0]=routers, [1]=app, [2]=neurocampus, [3]=src, [4]=backend, [5]=<repo-root>
 # -----------------------------------------------------------------------------
@@ -18,7 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 if str(REPO_ROOT) not in sys.path:
   sys.path.append(str(REPO_ROOT))
 
-from tools.cleanup import run_cleanup, LOG_FILE  # noqa: E402
+from scripts.cleanup import run_cleanup, LOG_FILE  # noqa: E402
 
 router = APIRouter()
 

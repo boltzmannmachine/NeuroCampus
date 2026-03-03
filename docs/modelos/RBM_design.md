@@ -103,7 +103,7 @@ elif name == "rbm_pura":
     from neurocampus.models.strategies.rbm_pura import RBM as RBMPura
 ```
 
-Cada modelo recibe sus parámetros desde `configs/rbm_audit.yaml`, donde el auditor:
+Cada modelo recibe sus parámetros desde `config/rbm_audit.yaml`, donde el auditor:
 
 - Normaliza alias (`hidden_units → n_hidden`, `lr → lr_rbm/lr_head`).
 - Inyecta la dimensión de entrada (`visible_units` o `n_visible`).
@@ -114,7 +114,7 @@ Cada modelo recibe sus parámetros desde `configs/rbm_audit.yaml`, donde el audi
 
 ## 5️⃣ Archivo de configuración YAML
 
-Ubicación: `configs/rbm_audit.yaml` (en la raíz del repo)
+Ubicación: `config/rbm_audit.yaml` (en la raíz del repo)
 
 Ejemplo actual:
 
@@ -182,7 +182,7 @@ artifacts:
 ## 8️⃣ Commit relacionado
 
 ```bash
-git add backend/src/neurocampus/models/strategies/modelo_rbm_general.py         backend/src/neurocampus/models/strategies/rbm_pura.py         backend/src/neurocampus/models/audit_kfold.py         configs/rbm_audit.yaml         Makefile         docs/modelos/RBM_diseno.md
+git add backend/src/neurocampus/models/strategies/modelo_rbm_general.py         backend/src/neurocampus/models/strategies/rbm_pura.py         backend/src/neurocampus/models/audit_kfold.py         config/rbm_audit.yaml         Makefile         docs/modelos/RBM_diseno.md
 git commit -m "D11: Documentación de estructura y comparativa de modelos RBM (general, restringida, pura) + integración auditoría K-Fold"
 ```
 
