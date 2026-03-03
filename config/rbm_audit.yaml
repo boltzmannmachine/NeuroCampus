@@ -1,4 +1,4 @@
-# configs/rbm_audit.yaml  (ubicado en la RAÍZ del repo)
+# config/rbm_audit.yaml  (ubicado en la RAÍZ del repo)
 
 dataset:
   # Elegimos un dataset con etiqueta "teacher" para evitar dudas de target:

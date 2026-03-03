@@ -9,8 +9,8 @@ Columnas:
 - sentiment_label_teacher (neg/neu/pos) consistente con p_* y media(calif)
 
 Uso:
-  python tools/sim/generate_synthetic.py --n 5000 --out data/simulated/evals_sim_5k.parquet
-  python tools/sim/generate_synthetic.py --n 3000 --out data/simulated/evals_sim_3k.csv
+  python scripts/sim/generate_synthetic.py --n 5000 --out data/simulated/evals_sim_5k.parquet
+  python scripts/sim/generate_synthetic.py --n 3000 --out data/simulated/evals_sim_3k.csv
 """
 import argparse
 import os

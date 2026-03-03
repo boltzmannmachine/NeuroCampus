@@ -10,7 +10,7 @@ Este documento resume cómo **generar datos**, **entrenar modelos** y **auditar*
 ## 1) Requisitos previos
 
 - Tener el entorno listo con los requirements de `backend/requirements.txt`.
-- Estar en la raíz del repo (donde está `configs/rbm_audit.yaml`).
+- Estar en la raíz del repo (donde está `config/rbm_audit.yaml`).
 
 ```bash
 python -m pip install -r backend/requirements.txt
@@ -29,7 +29,7 @@ Crea un dataset simulado coherente con el pipeline (columnas `calif_*`, `p_*`, `
 make sim-data
 
 # o directamente con Python (elige .parquet o .csv)
-python tools/sim/generate_synthetic.py --n 5000 --out data/simulated/evals_sim_5k.parquet
+python scripts/sim/generate_synthetic.py --n 5000 --out data/simulated/evals_sim_5k.parquet
 ```
 
 **Salida esperada:** `data/simulated/evals_sim_5k.parquet`
@@ -40,13 +40,13 @@ python tools/sim/generate_synthetic.py --n 5000 --out data/simulated/evals_sim_5
 
 ### 3.1 RBM Pura (no supervisada)
 ```bash
-PYTHONPATH=backend/src python backend/scripts/train_rbm_pura.py   --data data/labeled/evaluaciones_2025_teacher.parquet   --n_hidden 64 --epochs 5 --cd_k 1 --batch_size 64 --lr 0.01
+PYTHONPATH=backend/src python scripts/train_rbm_pura.py   --data data/labeled/evaluaciones_2025_teacher.parquet   --n_hidden 64 --epochs 5 --cd_k 1 --batch_size 64 --lr 0.01
 ```
 **Artefactos:** `artifacts/jobs/rbm_pura_*/H_sample.npy` y `train_meta.json`
 
 ### 3.2 RBM General (cabeza supervisada mínima)
 ```bash
-PYTHONPATH=backend/src python backend/scripts/train_rbm_general.py   --data data/labeled/evaluaciones_2025_teacher.parquet   --target sentiment_label_teacher   --n_hidden 64 --epochs 10 --epochs_rbm 1 --cd_k 1   --batch_size 128 --lr_rbm 0.01 --lr_head 0.01
+PYTHONPATH=backend/src python scripts/train_rbm_general.py   --data data/labeled/evaluaciones_2025_teacher.parquet   --target sentiment_label_teacher   --n_hidden 64 --epochs 10 --epochs_rbm 1 --cd_k 1   --batch_size 128 --lr_rbm 0.01 --lr_head 0.01
 ```
 **Artefactos:** `artifacts/jobs/rbm_general_*/` con `rbm.pt`, `head.pt`, `vectorizer.json`, `job_score.json`
 
@@ -60,7 +60,7 @@ PYTHONPATH=backend/src python backend/scripts/train_rbm_general.py   --data data
 make rbm-audit
 ```
 
-- Lee: `configs/rbm_audit.yaml` (en la **raíz**)
+- Lee: `config/rbm_audit.yaml` (en la **raíz**)
 - Escribe: `artifacts/runs/rbm_audit_*/metrics.json`
 
 Alias útiles (en CI/logs):
@@ -90,14 +90,14 @@ PYTHONPATH=backend/src pytest -q tests/unit/test_rbm_general_api.py
 
 ## 6) Rutas importantes
 
-- **Config auditoría:** `configs/rbm_audit.yaml`
+- **Config auditoría:** `config/rbm_audit.yaml`
 - **Script auditor:** `backend/src/neurocampus/models/audit_kfold.py`
 - **Estrategias:** `backend/src/neurocampus/models/strategies/`
   - `modelo_rbm_general.py`
   - `modelo_rbm_restringida.py`
   - `rbm_pura.py`
-- **Simulación:** `tools/sim/generate_synthetic.py`
-- **Entrenamiento directo:** `backend/scripts/train_rbm_pura.py`, `backend/scripts/train_rbm_general.py`
+- **Simulación:** `scripts/sim/generate_synthetic.py`
+- **Entrenamiento directo:** `scripts/train_rbm_pura.py`, `scripts/train_rbm_general.py`
 - **Artefactos:** `artifacts/runs/` y `artifacts/jobs/`
 
 ---
@@ -113,6 +113,6 @@ PYTHONPATH=backend/src pytest -q tests/unit/test_rbm_general_api.py
 ## 8) Commits sugeridos (resumen Día 11)
 
 ```bash
-git add backend/src/neurocampus/models/audit_kfold.py         backend/src/neurocampus/models/strategies/modelo_rbm_general.py         backend/src/neurocampus/models/strategies/modelo_rbm_restringida.py         backend/src/neurocampus/models/strategies/rbm_pura.py         backend/scripts/train_rbm_pura.py         backend/scripts/train_rbm_general.py         tools/sim/generate_synthetic.py         configs/rbm_audit.yaml         tests/unit/test_rbm_general_api.py         Makefile         docs/modelos/README_D11_uso_rapido.md
+git add backend/src/neurocampus/models/audit_kfold.py         backend/src/neurocampus/models/strategies/modelo_rbm_general.py         backend/src/neurocampus/models/strategies/modelo_rbm_restringida.py         backend/src/neurocampus/models/strategies/rbm_pura.py         scripts/train_rbm_pura.py         scripts/train_rbm_general.py         scripts/sim/generate_synthetic.py         config/rbm_audit.yaml         tests/unit/test_rbm_general_api.py         Makefile         docs/modelos/README_D11_uso_rapido.md
 git commit -m "D11: Uso rápido RBM — simulación de datos, entrenamiento directo y auditoría k-fold (doc + scripts + tests + make)"
 ```

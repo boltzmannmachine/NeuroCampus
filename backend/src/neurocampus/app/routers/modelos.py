@@ -2170,8 +2170,19 @@ def _run_training(job_id: str, req: EntrenarRequest) -> None:
         # Determinar si el warm-start se aplicó realmente (según estrategia)
         ws_obj = final_metrics.get("warm_start")
         ws_applied = False
-        if isinstance(ws_obj, dict):
-            ws_applied = str(ws_obj.get("warm_start") or "").lower() == "ok"
+        if ws_obj is not None:
+            if isinstance(ws_obj, dict):
+                ws_applied = str(ws_obj.get("warm_start") or "").lower() == "ok"
+            elif isinstance(ws_obj, bool):
+                ws_applied = ws_obj
+            elif isinstance(ws_obj, str):
+                ws_applied = ws_obj.lower() == "ok"
+        else:
+            # En caso que la plantilla/estrategia retorne un booleano directo en warm_started
+            # u omita por completo "warm_start", si warm_start_path estaba presente y _ws_trace
+            # indica resolución, podemos inferir success o depender del return
+            ws_applied = final_metrics.get("warm_started", bool(_ws_trace.get("warm_start_path")))
+
         final_metrics["warm_started"] = bool(ws_applied)
 
         # 6) Guardar run en artifacts (fuente de verdad)
@@ -2801,7 +2812,6 @@ def _run_model_sweep(sweep_id: str, req: "ModelSweepRequest") -> dict:
     Devuelve payload del resumen para construir ModelSweepResponse.
     """
     t0 = time.perf_counter()
-    from ...models.utils.metrics_contract import primary_metric_for_family
 
     # Contrato de métricas para esta family
     primary_metric, pm_mode = primary_metric_for_family(str(req.family or ""), task_type="")

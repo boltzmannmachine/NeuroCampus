@@ -40,7 +40,7 @@ DATASETS_DIR = BASE_DIR / "datasets"
 DATA_PROCESSED_DIR = BASE_DIR / "data" / "processed"
 DATA_LABELED_DIR = BASE_DIR / "data" / "labeled"
 
-# Directorio de jobs (compatible con tools/cleanup.py → BASE_DIR / "jobs")
+# Directorio de jobs (compatible con scripts/cleanup.py → BASE_DIR / "jobs")
 JOBS_ROOT = Path(os.getenv("NC_JOBS_DIR", BASE_DIR / "jobs"))
 BETO_JOBS_DIR = JOBS_ROOT / "preproc_beto"
 BETO_JOBS_DIR.mkdir(parents=True, exist_ok=True)
@@ -985,7 +985,7 @@ def _run_rbm_search_job(job_id: str) -> None:
 )
 def launch_rbm_search(background: BackgroundTasks, config: str | None = None) -> RbmSearchJob:
     """
-    Si no se pasa config, usa configs/rbm_search.yaml por defecto.
+    Si no se pasa config, usa config/rbm_search.yaml por defecto.
     """
     base_dir = BASE_DIR  # ya definido arriba
     config_path = Path(config) if config else (base_dir / "configs" / "rbm_search.yaml")

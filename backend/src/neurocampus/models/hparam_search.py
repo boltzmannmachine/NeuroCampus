@@ -5,7 +5,7 @@ existente (run_kfold_audit) y seleccionando un modelo "champion".
 
 Uso:
   PYTHONPATH="$PWD/backend/src" python -m neurocampus.models.hparam_search \
-      --config configs/rbm_search.yaml
+      --config config/rbm_search.yaml
 """
 
 from __future__ import annotations
@@ -78,7 +78,7 @@ def main():
     ap.add_argument(
         "--config",
         required=True,
-        help="Ruta al YAML de configuración de búsqueda (e.g. configs/rbm_search.yaml)",
+        help="Ruta al YAML de configuración de búsqueda (e.g. config/rbm_search.yaml)",
     )
     args = ap.parse_args()
 

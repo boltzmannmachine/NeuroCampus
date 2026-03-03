@@ -52,6 +52,7 @@ __all__ = [
 CANDIDATE_EMBED_PREFIXES: List[str] = [
     "x_text_",
     "text_emb_",
+    "text_embed_",
     "emb_",
     "feat_text_",
     "feat_t_",

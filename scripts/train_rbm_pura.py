@@ -5,7 +5,7 @@ Entrena la RBM Pura (no supervisada) directamente sobre un dataset tabular.
 Guarda artefactos mínimos en artifacts/jobs/<timestamp>.
 
 Uso:
-  PYTHONPATH=backend/src python backend/scripts/train_rbm_pura.py --data data/labeled/evaluaciones_2025_teacher.parquet --out artifacts/jobs/rbm_pura_demo
+  PYTHONPATH=backend/src python scripts/train_rbm_pura.py --data data/labeled/evaluaciones_2025_teacher.parquet --out artifacts/jobs/rbm_pura_demo
 """
 import argparse, os, time, json
 import numpy as np

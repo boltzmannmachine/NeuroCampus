@@ -83,7 +83,7 @@ NeuroCampus está organizado en varias capas bien separadas:
     - ejecutar tests,
     - arrancar backend y frontend,
     - lanzar pipelines de preparación y entrenamiento.
-  - Scripts adicionales en `backend/scripts/` para experimentos y utilidades.
+  - Scripts adicionales en `scripts/` para experimentos y utilidades.
 
 Esta organización permite:
 

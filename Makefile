@@ -262,19 +262,19 @@ train-dbm-manual:
 .PHONY: rbm-audit
 rbm-audit:
 	@mkdir -p artifacts/runs
-	@echo "[audit] Ejecutando auditoría k-fold RBM/BM con configs/rbm_audit.yaml"
+	@echo "[audit] Ejecutando auditoría k-fold RBM/BM con config/rbm_audit.yaml"
 	@PYTHONPATH="$(SRC_DIR)$(PATHSEP)$$PYTHONPATH" \
 	$(PYTHON) -m neurocampus.models.audit_kfold \
-		--config "configs/rbm_audit.yaml"
+		--config "config/rbm_audit.yaml"
 
 # Búsqueda de hiperparámetros RBM/BM
 .PHONY: rbm-search
 rbm-search:
 	@mkdir -p artifacts/runs
-	@echo "[search] Ejecutando búsqueda de hiperparámetros RBM/BM con configs/rbm_search.yaml"
+	@echo "[search] Ejecutando búsqueda de hiperparámetros RBM/BM con config/rbm_search.yaml"
 	@PYTHONPATH="$(SRC_DIR)$(PATHSEP)$$PYTHONPATH" \
 	$(PYTHON) -m neurocampus.models.hparam_search \
-		--config "configs/rbm_search.yaml"
+		--config "config/rbm_search.yaml"
 
 
 # ===========================

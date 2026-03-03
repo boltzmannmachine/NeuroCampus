@@ -5,7 +5,7 @@ Entrena la RBM General (bipartita + cabeza supervisada mínima) con (X,y).
 Guarda artefactos (rbm.pt, head.pt, vectorizer.json, job_meta.json).
 
 Uso:
-  PYTHONPATH=backend/src python backend/scripts/train_rbm_general.py --data data/labeled/evaluaciones_2025_teacher.parquet --target sentiment_label_teacher --out artifacts/jobs/rbm_general_demo
+  PYTHONPATH=backend/src python scripts/train_rbm_general.py --data data/labeled/evaluaciones_2025_teacher.parquet --target sentiment_label_teacher --out artifacts/jobs/rbm_general_demo
 """
 import argparse, os, time, json
 import numpy as np

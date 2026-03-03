@@ -9,7 +9,7 @@ Uso
    make be-dev
 
 2) Ejecuta el smoke test:
-   PYTHONPATH=backend/src python backend/scripts/dashboard_smoke_test.py
+   PYTHONPATH=backend/src python scripts/dashboard_smoke_test.py
 
 Opcionalmente puedes ajustar:
 - Base URL: --base http://localhost:8000
