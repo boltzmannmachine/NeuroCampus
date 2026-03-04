@@ -1,5 +1,22 @@
 # scripts/cleanup.py — NeuroCampus
 # Día 2: Borrado real seguro (mover a papelera), logs y exclusiones
+#
+# Descripción:
+# Script para limpiar artefactos antiguos (modelos, jobs, temporales)
+# generados durante el ciclo de vida de la aplicación. En vez de borrar
+# permanentemente los archivos, los mueve a una "papelera" (.trash) para
+# permitir recuperación durante un período de gracia.
+#
+# Uso:
+#   python scripts/cleanup.py [--days N] [--keep K] [--dry-run]
+#   python scripts/cleanup.py --empty-trash
+#
+# Variables de entorno clave:
+#   - NC_RETENTION_DAYS: Días de retención base antes de purgar un run.
+#   - NC_KEEP_LAST: Mínimo de corridas recientes a retener por familia,
+#                   sin importar su antigüedad.
+#   - NC_TRASH_DIR: Directorio de papelera (def: .trash).
+#   - NC_EXCLUDE_GLOBS: Exclusiones de archivos (def: artifacts/champions/**).
 
 from __future__ import annotations
 import argparse

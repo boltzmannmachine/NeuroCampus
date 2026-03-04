@@ -4,6 +4,18 @@ import type { BetoPreprocJob } from "@/services/jobs";
 import { jobsApi } from "@/features/datos/api";
 import { errMsg } from "./_utils";
 
+/**
+ * Hook de React para consultar periódicamente de manera asíncrona (polling)
+ * el estado y progreso de un proceso (Job) en segundo plano para el
+ * preprocesamiento con el modelo BETO.
+ *
+ * @param jobId - ID del job a rastrear. Si es `null`, la consulta no se ejecuta.
+ * @param opts.intervalMs - Frecuencia de actualización en milisegundos (por defecto 2000ms).
+ * @returns Un objeto que contiene:
+ *  - `job`: Metadatos y el estado más reciente devuelto por el servidor (incluyendo errores o progreso).
+ *  - `loading`: Flag verdadero cuando hay una solicitud HTTP en curso.
+ *  - `error`: Mensaje textual si hubo un fallo a nivel de red o parseo.
+ */
 export function useBetoPreprocJob(jobId: string | null, opts?: { intervalMs?: number }) {
   const intervalMs = opts?.intervalMs ?? 2000;
   const [job, setJob] = useState<BetoPreprocJob | null>(null);

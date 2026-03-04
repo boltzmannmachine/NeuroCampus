@@ -5,9 +5,15 @@ import { jobsApi } from "@/features/datos/api";
 import { errMsg } from "./_utils";
 
 /**
- * Hook de polling para jobs de unificación histórica (historico/*).
+ * Hook de React para hacer polling periódico sobre un proceso (job) asíncrono
+ * encargado de la "Unificación Histórica" de datasets (`historico/*`).
  *
- * Sigue el mismo patrón que `useBetoPreprocJob` para mantener consistencia.
+ * Emplea el mismo patrón subyacente que `useBetoPreprocJob`. Actualiza el estado
+ * local repetidamente hasta que el job alcance un estado terminal ("completed" o "failed").
+ *
+ * @param jobId - ID del job a monitorear. Si es nulo, no inicia peticiones a red.
+ * @param opts.intervalMs - Frecuencia de chequeo HTTP en milisegundos (por defecto 2000).
+ * @returns Objeto de estado actual del trabajo, estado de carga (loading) y mensaje de error si aplica.
  */
 export function useDataUnifyJob(jobId: string | null, opts?: { intervalMs?: number }) {
   const intervalMs = opts?.intervalMs ?? 2000;
