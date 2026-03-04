@@ -5,10 +5,17 @@ import { jobsApi } from "@/features/datos/api";
 import { errMsg } from "./_utils";
 
 /**
- * Hook de polling para jobs de feature-pack:
+ * Hook de React para hacer polling periódico sobre un trabajo en segundo plano (job)
+ * de construcción de "feature-packs" para ML.
+ * Un feature-pack típicamente genera:
  * `artifacts/features/<dataset_id>/train_matrix.parquet`
  *
- * Mantiene el mismo patrón que `useBetoPreprocJob`.
+ * Reutiliza la misma lógica de consultas periódicas, finalizando cuando
+ * el servidor devuelve "completed" o "failed".
+ *
+ * @param jobId - El identificador del proceso de "prepare_features". Nulo para saltar el polling.
+ * @param opts.intervalMs - Frecuencia de los ciclos HTTP de chequeo en milisegundos.
+ * @returns El estado más reciente del job, con sus indicadores de progreso y errores eventuales.
  */
 export function useFeaturesPrepareJob(jobId: string | null, opts?: { intervalMs?: number }) {
   const intervalMs = opts?.intervalMs ?? 2000;

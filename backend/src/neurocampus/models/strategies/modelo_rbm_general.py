@@ -83,8 +83,20 @@ def _auto_pick_embed_prefix(columns: List[str]) -> Optional[str]:
 # Vectorizador (minmax / 0..5)
 # ============================
 
+from dataclasses import dataclass
+
 @dataclass
 class _Vectorizer:
+    """
+    Vectorizador de estado numérico para variables continuas, usado previo al modelo RBM.
+    Proporciona un ajuste robusto frente a valores faltantes (`NaN`) y extremos (`inf`).
+
+    Attributes:
+        mean_ (Optional[np.ndarray]): Vector de medias aprendidas durante `fit`.
+        min_ (Optional[np.ndarray]): Vector de valores mínimos por columna.
+        max_ (Optional[np.ndarray]): Vector de valores máximos por columna.
+        mode (str): Estrategia de normalización. Puede ser "minmax" o "scale_0_5".
+    """
     mean_: Optional[np.ndarray] = None
     min_: Optional[np.ndarray] = None
     max_: Optional[np.ndarray] = None
@@ -92,8 +104,19 @@ class _Vectorizer:
 
     def fit(self, X: np.ndarray, mode: str = "minmax") -> "_Vectorizer":
         """
-        Ajuste robusto: soporta columnas completamente NaN/inf
-        sin propagar NaNs al RBM.
+        Calcula estadísticos empíricos requeridos para la transformación (media, min, max).
+        Ajuste robusto: soporta columnas que contengan datos faltantes (`NaN`)
+        o infinitos sin propagarlos al interior de la red.
+
+        Args:
+            X (np.ndarray): Matriz bidimensional de datos (filas = muestras, columnas = variables).
+            mode (str): Tipo de escalado a realizar. Valor por defecto: "minmax".
+
+        Returns:
+            _Vectorizer: La propia instancia con los vectores `mean_`, `min_` y `max_` calculados.
+
+        Raises:
+            ValueError: Si la matriz provista está vacía o es None.
         """
         if X is None or X.size == 0:
             raise ValueError("Vectorizer.fit recibió una matriz vacía.")
@@ -138,7 +161,18 @@ class _Vectorizer:
 
     def transform(self, X: np.ndarray) -> np.ndarray:
         """
-        Normaliza a [0,1] y elimina cualquier NaN/inf residual.
+        Escala los datos `X` aplicando las transformaciones calculadas durante `fit`.
+        Normaliza a rangos controlados (e.g. [0,1]) y elimina cualquier NaN o Inf
+        residual, sustituyéndolos por sus respectivas medias aprendidas.
+
+        Args:
+            X (np.ndarray): Matriz bidimensional de datos a escalar.
+
+        Returns:
+            np.ndarray: Matriz transformada con valores dentro del rango acotado sin datos faltantes.
+
+        Raises:
+            RuntimeError: Si se invoca sin haber llamado `fit` previamente.
         """
         if self.mean_ is None or self.min_ is None or self.max_ is None:
             raise RuntimeError("Vectorizer no está ajustado (llama a fit primero).")
@@ -184,7 +218,22 @@ class _Vectorizer:
 # ============================
 
 class _RBM(nn.Module):
+    """
+    Restricted Boltzmann Machine (RBM) base. Actúa como un módulo de red neuronal
+    (PyTorch) que extrae representaciones de características (hidden units) no
+    lineales a partir de las entradas (visible units).
+    Se usa para entrenamiento no supervisado o como inicialización de pesos.
+    """
     def __init__(self, n_visible: int, n_hidden: int, cd_k: int = 1, seed: int = 42):
+        """
+        Inicializa los pesos (`W`) y sesgos (`b_v`, `b_h`) de la RBM.
+
+        Args:
+            n_visible (int): Cantidad de neuronas en la capa visible (features de entrada).
+            n_hidden (int): Cantidad de neuronas en la capa oculta (representación aprendida).
+            cd_k (int): Cantidad de pasos en Contrastive Divergence (CD-k). Por defecto 1.
+            seed (int): Semilla aleatoria para la inicialización.
+        """
         super().__init__()
         g = torch.Generator().manual_seed(int(seed))
         self.W   = nn.Parameter(torch.randn(n_visible, n_hidden, generator=g) * 0.01)
@@ -281,6 +330,17 @@ class _RegressionHead(nn.Module):
 # ============================
 
 class RBMGeneral:
+    """
+    Estrategia de modelado que envuelve a la Restricted Boltzmann Machine (RBM)
+    junto con una capa lineal (head) y opcionalmente embeddings de variables
+    categóricas (docente/materia). Se encarga de coordinar:
+    1. Fase no supervisada: aprendizaje iterativo de RBM vía Contrastive Divergence.
+    2. Fase supervisada: Fine-tuning o entrenamiento del head usando características extraídas.
+
+    Implementa la inferfaz (implícita) necesaria para ser orquestada por
+    las plantillas de entrenamiento (e.g. `PlantillaEntrenamiento`).
+    """
+
     def __init__(
         self,
         n_visible: Optional[int] = None,
@@ -290,6 +350,19 @@ class RBMGeneral:
         seed: Optional[int] = None,
         **kwargs,
     ) -> None:
+        """
+        Constructor de la estrategia. Inicializa las configuraciones, sin
+        instanciar todavía los tensores ni módulos de PyTorch, a la espera
+        de llamar a `setup()` con los metadatos reales del dataset.
+
+        Args:
+            n_visible (Optional[int]): Total de variables numéricas/texto.
+            n_hidden (Optional[int]): Cantidad de neuronas latentes para RBM.
+            cd_k (Optional[int]): Hiperparámetro k para la heurística Contrastive Divergence.
+            device (Optional[str]): Dispositivo de cómputo ('cpu' o 'cuda').
+            seed (Optional[int]): Semilla de reproducibilidad (fijada globalmente).
+            **kwargs: Otros hiperparámetros extendidos como `lr_rbm`, `lr_head`, etc.
+        """
         # parámetros base
         self.n_visible = int(n_visible) if n_visible is not None else None
         self.n_hidden  = int(n_hidden)  if n_hidden  is not None else None
@@ -383,6 +456,21 @@ class RBMGeneral:
         text_embed_prefix: str,
         max_calif: int,
     ) -> List[str]:
+        """
+        Delega en la utilidad centralizada `_unified_pick_feature_cols` la detección y
+        selección de columnas a incluir en el vector de entrada numérico.
+        Soporta características textuales (incrustaciones/probas) y preguntas directas.
+
+        Args:
+            df (pd.DataFrame): Dataset crudo cargado en memoria.
+            include_text_probs (bool): Si debe inyectar las probabilidades pre-computadas por BETO.
+            include_text_embeds (bool): Si debe usar columnas explícitas de incrustación de texto.
+            text_embed_prefix (str): Prefijo fijo buscado en embeddings (o auto si es "x_text_").
+            max_calif (int): Número de columnas esperadas con prefijo "calif_".
+
+        Returns:
+            List[str]: Nombres de las columnas numéricas que se usarán como features visibles.
+        """
         # P2.6: Delegar al selector unificado para trazabilidad y consistencia.
         sel_result = _unified_pick_feature_cols(
             df,
@@ -700,6 +788,15 @@ class RBMGeneral:
     # setup() opcional (no usado por fit robusto, pero disponible)
     # --------------------------
     def setup(self, data_ref: Optional[str], hparams: Dict) -> None:
+        """
+        Configura los hiperparámetros base de la estrategia antes de que inicie el entrenamiento.
+        Asegura que las semillas aleatorias, tasas de aprendizaje y configuraciones de
+        optimizador queden instanciadas de acuerdo al contrato con la plantilla o sweep.
+
+        Args:
+            data_ref (Optional[str]): Referencia al dataset usado (ruta o ID).
+            hparams (Dict): Diccionario con parámetros como batch_size, cd_k, lr_rbm, etc.
+        """
         # Mantener compatibilidad si tu runner usa setup()
         self.seed = int(hparams.get("seed", self.seed or 42) or 42)
         np.random.seed(self.seed); torch.manual_seed(self.seed)
@@ -1389,9 +1486,18 @@ class RBMGeneral:
 
     def fit(self, *args, **kwargs) -> Dict:
         """
-        Soporta dos modos:
-        A) fit(X_df_o_np, y_np, ...)  -> usado por train_rbm.py
-        B) fit(df_completo, ...)      -> autodetecta labels/feats desde el DF (modo antiguo)
+        Punto de entrada principal para lanzar el entrenamiento completo de la RBM y
+        su cabecera de predicción. Mantiene compatibilidad hacia atrás soportando
+        múltiples firmas de llamada.
+
+        Soporta dos modos de uso:
+        A) `fit(X_df_o_np, y_np, ...)` -> Útil cuando las características ya fueron
+           previamente extraídas o manipuladas externamente (e.g. `train_rbm.py`).
+        B) `fit(df_completo, ...)` -> Realiza la extracción automática de columnas,
+           filtro por métricas de confianza y detección de embeddings desde un DataFrame.
+
+        Returns:
+            Dict: Resumen y métricas recolectadas al final del entrenamiento (p.ej. loss, f1_macro).
         """
         import numpy as _np
         import pandas as _pd

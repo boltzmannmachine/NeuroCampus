@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Entrena la RBM Pura (no supervisada) directamente sobre un dataset tabular.
-Guarda artefactos mínimos en artifacts/jobs/<timestamp>.
+Entrena la estrategia "RBM Pura" (arquitectura de red totalmente no supervisada,
+sin head de predicción) sobre un conjunto de datos numérico/tabular.
+Diseñado para extracción autónoma de características latentes, preentrenamiento
+de capas ocultas profundas o reducción de dimensionalidad exploratoria.
 
-Uso:
+Genera y persiste un modelo con sus artefactos (estado oculto) en la
+ruta `artifacts/jobs/<timestamp>` por defecto, o en la provista por `--out`.
+
+Uso Básico:
   PYTHONPATH=backend/src python scripts/train_rbm_pura.py --data data/labeled/evaluaciones_2025_teacher.parquet --out artifacts/jobs/rbm_pura_demo
 """
 import argparse, os, time, json

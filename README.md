@@ -41,6 +41,17 @@ data/               # Datasets estandarizados y etiquetados
 
 ---
 
+## Guía de Arquitectura
+
+El sistema está dividido en dos grandes bloques:
+- **Backend (FastAPI)**: Orquesta la carga de datos, el procesamiento de Procesamiento de Lenguaje Natural (PLN) utilizando el modelo BETO pre-entrenado y las estrategias de modelado de Machine Learning, principalmente focalizadas en Máquinas de Boltzmann Restringidas (RBM).
+- **Frontend (Vite + React)**: Provee una interfaz gráfica de usuario para subir datasets, iniciar y monitorear trabajos de preparación, y visualizar las métricas y reportes del modelo "champion".
+- **Scripts y Herramientas**: Utilidades en `scripts/` para ejecutar entrenamientos sin servidor, limpiar la carpeta temporal de artefactos y preparar ejecuciones de validación cruzada.
+
+Para una exploración profunda teórica de los modelos y del ecosistema de ML empleado, revisar la carpeta `/docs`.
+
+---
+
 ## Setup rápido
 
 ### 1) Backend

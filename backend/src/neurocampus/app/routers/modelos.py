@@ -1442,16 +1442,26 @@ def _prepare_selected_data(req: EntrenarRequest, job_id: str) -> str:
 
 def _build_run_hparams(req: EntrenarRequest, job_id: str) -> Dict[str, Any]:
     """
-    Construye hparams para el training garantizando:
+    Construye y consolida el diccionario de hiperparámetros (`hparams`) que se inyectará
+    a la estrategia de entrenamiento.
 
-    - NO incluir valores None (para evitar que el strategy reciba None y lo degrade a 'none').
-    - Defaults consistentes con el flujo nuevo.
-    - Los campos explícitos del request tienen prioridad sobre req.hparams.
+    Garantiza:
+    - Que los campos explícitos en el cuerpo de la petición (`req`) sobreescriban los
+      provistos dentro del diccionario genérico `req.hparams`.
+    - Eliminar valores `None` para evitar fallos donde la estrategia los malinterprete
+      y desactive la característica (e.g. degradar features a modo 'none').
+    - Establecer defaults consistentes para el pipeline, como ventanas y modos de texto.
 
     Extensión Ruta 2 (score_docente):
     - default data_source = pair_matrix
-    - default target_mode = score_total_0_50 (solo informativo; el target real lo dicta pair_meta)
-    - se pasan flags family/task/input_level/target_col e incremental config (window/replay/warm-start)
+    - default target_mode = score_total_0_50 (informativo; el target lo dicta pair_meta)
+
+    Args:
+        req (EntrenarRequest): Objeto con los parámetros de la petición de entrenamiento.
+        job_id (str): Identificador único de la corrida generada.
+
+    Returns:
+        Dict[str, Any]: Diccionario con los hiperparámetros listos para la estrategia.
     """
     hp = _normalize_hparams(getattr(req, "hparams", None))
 
@@ -1906,10 +1916,21 @@ def _temporal_split(n: int, val_ratio: float) -> tuple[np.ndarray, np.ndarray]:
 
 def _evaluate_post_training_metrics(estrategia, df: "pd.DataFrame", hparams: dict) -> dict:
     """
-    Calcula métricas REALES (accuracy/f1/confusion) usando:
-      - el mismo _prepare_xy del modelo
-      - el mismo split temporal (val_ratio)
-      - el mismo esquema de labels [neg, neu, pos]
+    Calcula las métricas de rendimiento reales (`accuracy`, `f1_macro`, matriz de confusión)
+    una vez que el modelo ha finalizado su entrenamiento.
+
+    Aplica rigurosamente la misma canalización de preprocesamiento (`_prepare_xy`)
+    y esquema de división de datos temporal (`_temporal_split`) que se usó
+    durante el `fit()`, para asegurar que las métricas de validación reflejen
+    fielmente la capacidad de generalización del modelo.
+
+    Args:
+        estrategia: Instancia de la clase de modelo (e.g. `RBMGeneral`) ya entrenada.
+        df (pd.DataFrame): Dataset original cargado en memoria.
+        hparams (dict): Diccionario de hiperparámetros que dictan umbrales y prefijos.
+
+    Returns:
+        dict: Resumen con las métricas calculadas (ej: `{"accuracy": 0.85, ...}`).
     """
     # defaults alineados con lo que tu modelo ya usa / espera
     accept_teacher = bool(hparams.get("accept_teacher", True))
@@ -2806,10 +2827,21 @@ def _pick_best_deterministic(
 
 def _run_model_sweep(sweep_id: str, req: "ModelSweepRequest") -> dict:
     """
-    Ejecuta sweep determinístico sobre los modelos en req.models.
+    Ejecuta una búsqueda determinística (sweep) sobre la lista de modelos especificada
+    en `req.models`. Evalúa secuencialmente a cada candidato en las mismas condiciones
+    (semilla, subconjunto de datos temporal) para garantizar comparabilidad y poder
+    seleccionar al "campeón" basándose en la métrica primaria predefinida para esa familia.
 
-    Reutiliza _run_training() por candidato (mismo flujo que /modelos/entrenar).
-    Devuelve payload del resumen para construir ModelSweepResponse.
+    Este método reutiliza intensivamente el flujo unitario encapsulado en `_run_training()`
+    por cada modelo candidato.
+
+    Args:
+        sweep_id (str): UUID inmutable único generado para el job padre del sweep.
+        req (ModelSweepRequest): Petición con las configuraciones compartidas y modelos.
+
+    Returns:
+        dict: Resumen serializable con el campeón seleccionado, resultados de todos
+              los candidatos iterados, duración y estado final.
     """
     t0 = time.perf_counter()
 

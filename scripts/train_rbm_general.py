@@ -2,10 +2,22 @@
 # -*- coding: utf-8 -*-
 """
 Entrena la RBM General (bipartita + cabeza supervisada mínima) con (X,y).
-Guarda artefactos (rbm.pt, head.pt, vectorizer.json, job_meta.json).
+Permite probar el modelo (Contrastive Divergence + Fine-tuning lineal)
+directamente desde un parquet sin usar la API FastAPI (útil para experimentación).
 
-Uso:
+Guarda artefactos resultantes (pesos `rbm.pt`, `head.pt`, parámetros del
+`vectorizer.json`, resumen de métricas en `job_meta.json`).
+
+Uso Básico:
   PYTHONPATH=backend/src python scripts/train_rbm_general.py --data data/labeled/evaluaciones_2025_teacher.parquet --target sentiment_label_teacher --out artifacts/jobs/rbm_general_demo
+
+Argumentos Principales:
+  --data      (req): Ruta al dataset parquet/csv/excel de origen.
+  --target    (opt): Nombre de la columna con la etiqueta a predecir.
+  --out       (opt): Ruta al directorio de guardado de los artefactos.
+  --n_hidden  (opt): Cantidad de neuronas latentes para RBM.
+  --epochs    (opt): Épocas totales para el fine-tuning del Head.
+  --epochs_rbm(opt): Épocas previas (pre-training) para Contrastive Divergence.
 """
 import argparse, os, time, json
 import numpy as np
