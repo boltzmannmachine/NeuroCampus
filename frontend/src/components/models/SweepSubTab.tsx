@@ -60,23 +60,34 @@ export function SweepSubTab({
    * - `datasetId` en UI usa IDs tipo "ds_2025_1"; se mapea a periodo backend
    *   usando `DATASETS[].period` (ej. "2025-1") cuando exista.
    */
+  const pollSweepJob = async (jobId: string): Promise<any> => {
+    let prog = 0;
+    while (true) {
+      const st = await modelosApi.getJobStatus(jobId);
+      const p = (st as any)?.progress;
+      if (typeof p === 'number') {
+        const normalized = p <= 1 ? p * 100 : p;
+        setSweepProgress(Math.max(0, Math.min(100, normalized)));
+      } else {
+        prog = Math.min(95, prog + 3 + Math.random() * 5);
+        setSweepProgress(prog);
+      }
+
+      const status = String((st as any)?.status ?? 'unknown');
+      if (status === 'completed' || status === 'failed') return st;
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  };
+
   const handleRunSweep = async () => {
     setSweepStatus('running');
     setSweepProgress(0);
     setSweepResult(null);
 
-    // Mapea dataset UI -> dataset backend (periodo). Si no hay match, usa el id tal cual.
     const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
 
-    // Mantener UX del prototipo: progreso incremental hasta ~95% mientras esperamos.
-    let prog = 0;
-    const interval = setInterval(() => {
-      prog += Math.random() * 10 + 5;
-      setSweepProgress(Math.min(prog, 95));
-    }, 400);
-
     try {
-      const result = await modelosApi.sweep({
+      const { sweep_id } = await modelosApi.sweep({
         dataset_id: backendDatasetId,
         family,
         seed,
@@ -86,7 +97,15 @@ export function SweepSubTab({
         auto_prepare: true,
       } as any);
 
-      clearInterval(interval);
+      const finalStatus = await pollSweepJob(sweep_id);
+
+      if (finalStatus.status === 'failed') {
+        throw new Error(finalStatus.error || "Sweep falló");
+      }
+
+      const rawSummary = await modelosApi.getSweepSummary(sweep_id);
+      const result = modelosApi.mapSweepSummaryToResult(rawSummary, family);
+
       setSweepProgress(100);
 
       // Paridad visual: conservar dataset_id como el ID UI seleccionado.
@@ -100,16 +119,14 @@ export function SweepSubTab({
       // Fallback a mocks: exactamente como prototipo (no bloquea UI).
     }
 
-    clearInterval(interval);
-
     // ---------------------------------------------------------------------
     // Fallback (mocks) — exactamente como el prototipo.
     // ---------------------------------------------------------------------
-    const result = generateMockSweep(family, datasetId);
+    const mockResult = generateMockSweep(family, datasetId);
     setSweepProgress(100);
-    setSweepResult(result);
+    setSweepResult(mockResult);
     setSweepStatus('completed');
-    onSweepComplete(result.candidates);
+    onSweepComplete(mockResult.candidates);
   };
 
   const winner = sweepResult?.candidates.find(c => c.run_id === sweepResult.winner_run_id);
