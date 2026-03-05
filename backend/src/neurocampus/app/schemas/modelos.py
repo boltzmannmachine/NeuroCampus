@@ -413,8 +413,8 @@ class EntrenarRequest(BaseModel):
     epochs: int = Field(
         default=5,
         ge=1,
-        le=500,
-        description="Número de épocas de entrenamiento (1..500).",
+        le=50000,
+        description="Número de épocas de entrenamiento (1..50000).",
     )
 
     # hparams se deja flexible (Any) para soportar floats/ints/bools/strings, etc.
