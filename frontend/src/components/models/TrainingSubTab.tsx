@@ -455,7 +455,6 @@ export function TrainingSubTab({
               value={epochs}
               onChange={e => setEpochs(Number(e.target.value))}
               min={1}
-              max={100}
               className="bg-[#0f1419] border-gray-700 h-9 text-sm"
             />
           </div>

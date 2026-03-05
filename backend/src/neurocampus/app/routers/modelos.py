@@ -29,6 +29,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Type
 
+import copy
 import re
 import os
 import time
@@ -2389,7 +2390,10 @@ def _run_sweep_training(sweep_id: str, req: SweepEntrenarRequest) -> None:
     for m in modelos:
         grid = grid_by_model.get(m) or grid_global
         for g in grid:
-            candidates.append({"model_name": m, "hparams": {**(req.base_hparams or {}), **(g or {})}})
+            # Aislamiento fuerte de hparams: hacer deepcopy para evitar cruce de estado (listas/diccionarios anidados)
+            merged = copy.deepcopy(req.base_hparams or {})
+            merged.update(copy.deepcopy(g or {}))
+            candidates.append({"model_name": m, "hparams": merged})
 
     # cap
     candidates = candidates[: int(req.max_total_runs or 50)]

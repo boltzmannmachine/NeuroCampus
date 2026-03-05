@@ -618,12 +618,22 @@ class DBMManualPlantillaStrategy:
             yva = np.asarray(self.y_va, dtype=np.float32).reshape(-1, 1)
 
             def _ridge_predict(Z_train: np.ndarray, y_train: np.ndarray, Z_eval: np.ndarray) -> np.ndarray:
+                # Optimización de regresión Ridge usando numpy explícito
                 A_tr = np.concatenate([np.ones((Z_train.shape[0], 1), dtype=np.float32), Z_train], axis=1)
                 A_ev = np.concatenate([np.ones((Z_eval.shape[0], 1), dtype=np.float32), Z_eval], axis=1)
+
+                # Evitar matriz identidad gigante si el número de variables latentes es muy grande (aunque en DBMs suele ser < 1000)
                 I = np.eye(A_tr.shape[1], dtype=np.float32)
                 I[0, 0] = 0.0  # no regularizar bias
-                w = np.linalg.solve((A_tr.T @ A_tr) + (l2 * I), (A_tr.T @ y_train))
-                return (A_ev @ w).reshape(-1)
+
+                # A_tr.T @ A_tr + l2*I
+                gram = np.dot(A_tr.T, A_tr) + (l2 * I)
+                # A_tr.T @ y_train
+                moment = np.dot(A_tr.T, y_train)
+
+                # Solve using Cholesky / standard solve
+                w = np.linalg.solve(gram, moment)
+                return np.dot(A_ev, w).reshape(-1)
 
             p_tr = _ridge_predict(Ztr, ytr, Ztr)
             p_va = _ridge_predict(Ztr, ytr, Zva)
