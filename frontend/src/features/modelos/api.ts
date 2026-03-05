@@ -203,16 +203,27 @@ export const modelosApi = {
    *
    * Retorna `SweepResult` con candidates listos para UI.
    */
-  async sweep(params: ModelSweepRequestDto): Promise<SweepResult> {
-    // Primero intenta endpoint moderno.
-    const resp = (await modelosService.sweep({
+  async sweep(params: ModelSweepRequestDto): Promise<{ sweep_id: string }> {
+    // Lanzar sweep asíncrono para evitar timeouts
+    const req: any = {
       ...params,
-      // El servicio no espera `null`; se usa `undefined` cuando no aplica.
       warm_start_from: nullToUndef(params.warm_start_from),
       warm_start_run_id: nullToUndef(params.warm_start_run_id),
-    } as any)) as any;
+    };
 
-    const family = normalizeFamily(resp.family);
+    // Forzamos uso del endpoint async legacy que responde de inmediato
+    req.modelos = req.models ?? ["rbm_general", "rbm_restringida", "dbm_manual"];
+    delete req.models;
+
+    const { data } = await api.post<any>("/modelos/entrenar/sweep", req);
+    return { sweep_id: data.sweep_id };
+  },
+
+  /**
+   * Transforma el payload final de /modelos/sweeps/:sweepId a SweepResult
+   */
+  mapSweepSummaryToResult(resp: any, fallbackFamily: Family): SweepResult {
+    const family = normalizeFamily(resp.family ?? fallbackFamily);
     const candidates = (resp.candidates ?? []).map((c: any) => {
       // Construimos un RunRecord mínimo a partir de cada candidato.
       const record = mapRunSummaryToRunRecord({

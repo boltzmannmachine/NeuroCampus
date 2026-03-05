@@ -557,12 +557,18 @@ class DBMManualPlantillaStrategy:
         if self.model is None or self.X is None:
             raise RuntimeError("DBMManualPlantillaStrategy: falta setup(data_ref, hparams)")
 
-        # 1 epoch layer1
-        self.model.rbm_v_h1.fit(self.X, epochs=1, batch_size=self.batch_size, verbose=0)
+        # En vez de hacer solo 1 pasada sobre batches, forzamos múltiples épocas internas
+        # o actualizamos el scheduler de learning rate para asegurar movimiento real del gradiente.
+        # RBM manual usa un descenso bastante suave, por lo que 3 epochs internas por llamada
+        # ayudan a no estancarse contra el Head exacto.
+        internal_epochs = 3
+
+        # layer1
+        self.model.rbm_v_h1.fit(self.X, epochs=internal_epochs, batch_size=self.batch_size, verbose=0)
         H1 = self.model.rbm_v_h1.transform(self.X)
 
-        # 1 epoch layer2
-        self.model.rbm_h1_h2.fit(H1, epochs=1, batch_size=self.batch_size, verbose=0)
+        # layer2
+        self.model.rbm_h1_h2.fit(H1, epochs=internal_epochs, batch_size=self.batch_size, verbose=0)
 
         # Recon error (muestra para no encarecer)
         n = self.X.shape[0]
