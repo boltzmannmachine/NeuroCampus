@@ -480,6 +480,9 @@ def test_warm_start_run_id_ok_and_trace(
 
     # Verificar trazabilidad en el estado del job
     trace = st.get("warm_start_trace", {})
+    assert trace.get("warm_start_requested") is True, f"warm_start_trace incorrecto: {trace}"
+    assert trace.get("warm_start_resolved") is True, f"warm_start_trace incorrecto: {trace}"
+    assert trace.get("warm_start_applied") is True, f"warm_start_trace incorrecto: {trace}"
     assert trace.get("warm_started") is True, f"warm_start_trace incorrecto: {trace}"
     assert trace.get("warm_start_source_run_id") == base_run_id
 
@@ -588,6 +591,13 @@ def test_warm_start_champion_ok_and_trace(
     assert metrics.get("warm_start_source_run_id") == base_run_id, metrics
     assert "warm_start_path" in metrics, metrics
 
+    trace = st.get("warm_start_trace", {})
+    assert trace.get("warm_start_requested") is True, f"warm_start_trace: {trace}"
+    assert trace.get("warm_start_resolved") is True, f"warm_start_trace: {trace}"
+    assert trace.get("warm_start_applied") is True, f"warm_start_trace: {trace}"
+    assert trace.get("warm_started") is True, f"warm_start_trace: {trace}"
+    assert trace.get("warm_start_source_run_id") == base_run_id, trace
+
 
 def test_warm_start_none_leaves_no_trace(
     client, artifacts_dir: Path, prepared_feature_pack: str, monkeypatch
@@ -657,6 +667,12 @@ def test_warm_start_none_leaves_no_trace(
     metrics = _json.loads((artifacts_dir / "runs" / new_run_id / "metrics.json").read_text())
     assert metrics.get("warm_started") is False, metrics
     assert "warm_start_path" not in metrics
+
+    trace = st.get("warm_start_trace", {})
+    assert trace.get("warm_start_requested") is False, f"warm_start_trace: {trace}"
+    assert trace.get("warm_start_resolved") is False, f"warm_start_trace: {trace}"
+    assert trace.get("warm_start_applied") is False, f"warm_start_trace: {trace}"
+    assert trace.get("warm_started") is False, f"warm_start_trace: {trace}"
 
 
 # ============================================================================
@@ -888,6 +904,9 @@ def test_dbm_warm_start_run_id_ok_and_trace(
 
     # warm_start_trace en el estado del job
     trace = st.get("warm_start_trace", {})
+    assert trace.get("warm_start_requested") is True, f"warm_start_trace: {trace}"
+    assert trace.get("warm_start_resolved") is True, f"warm_start_trace: {trace}"
+    assert trace.get("warm_start_applied") is True, f"warm_start_trace: {trace}"
     assert trace.get("warm_started") is True, f"warm_start_trace: {trace}"
     assert trace.get("warm_start_source_run_id") == base_run_id
 
