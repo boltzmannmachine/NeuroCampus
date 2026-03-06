@@ -160,6 +160,21 @@ def _load_model_from_model_dir(*, model_name: str, model_dir: Path) -> Any:
                 self._w = np.asarray(w, dtype=np.float32).reshape(-1)
                 self._feat_cols = list(self._meta.get("feat_cols_") or self._meta.get("feat_cols") or [])
                 self._target_scale = float(self._meta.get("target_scale", 50.0) or 50.0)
+                self._scale_mode = str(self._meta.get("scale_mode", "none") or "none").strip().lower()
+                self._feature_mins: Optional[np.ndarray] = None
+                self._feature_ranges: Optional[np.ndarray] = None
+
+                scaler_path = (model_dir / "input_scaler.npz").resolve()
+                if scaler_path.exists():
+                    scaler = np.load(scaler_path)
+                    self._feature_mins = np.asarray(scaler.get("feature_mins"), dtype=np.float32)
+                    self._feature_ranges = np.asarray(scaler.get("feature_ranges"), dtype=np.float32)
+                elif self._scale_mode != "none":
+                    mins = self._meta.get("feature_mins")
+                    ranges = self._meta.get("feature_ranges")
+                    if mins is not None and ranges is not None:
+                        self._feature_mins = np.asarray(mins, dtype=np.float32)
+                        self._feature_ranges = np.asarray(ranges, dtype=np.float32)
 
             def _latent(self, X: np.ndarray) -> np.ndarray:
                 # Intentar usar API de DBMManual; si no, fallback a transforms encadenadas.
@@ -174,6 +189,37 @@ def _load_model_from_model_dir(*, model_name: str, model_dir: Path) -> Any:
                     except Exception:
                         return np.asarray(H1, dtype=np.float32)
 
+            def _apply_input_scaler(self, X: np.ndarray) -> np.ndarray:
+                """Replica el escalado usado durante el entrenamiento del DBM."""
+                Xf = np.asarray(X, dtype=np.float32)
+                if self._scale_mode == "none":
+                    return Xf
+                if self._feature_mins is None or self._feature_ranges is None:
+                    return Xf
+
+                mins = np.asarray(self._feature_mins, dtype=np.float32).reshape(-1)
+                ranges = np.asarray(self._feature_ranges, dtype=np.float32).reshape(-1)
+
+                if mins.size != Xf.shape[1] or ranges.size != Xf.shape[1]:
+                    usable = min(Xf.shape[1], mins.size, ranges.size)
+                    if usable <= 0:
+                        return Xf
+                    mins = mins[:usable]
+                    ranges = ranges[:usable]
+                    Xwork = Xf[:, :usable]
+                else:
+                    Xwork = Xf
+
+                Xscaled = (Xwork - mins) / np.where(np.abs(ranges) < 1e-8, 1.0, ranges)
+                Xscaled = np.clip(Xscaled, 0.0, 1.0).astype(np.float32, copy=False)
+
+                if Xscaled.shape[1] == Xf.shape[1]:
+                    return Xscaled
+
+                # Si hubo mismatch legacy, preservamos columnas restantes sin escalar.
+                tail = Xf[:, Xscaled.shape[1] :]
+                return np.concatenate([Xscaled, tail], axis=1)
+
             def predict_score_df(self, df: pd.DataFrame) -> np.ndarray:
                 # Alinear features al orden del entrenamiento
                 if self._feat_cols:
@@ -186,6 +232,7 @@ def _load_model_from_model_dir(*, model_name: str, model_dir: Path) -> Any:
                        .fillna(0.0)
                        .to_numpy(dtype=np.float32)
                 )
+                X = self._apply_input_scaler(X)
                 Z = self._latent(X)
                 A = np.concatenate([np.ones((Z.shape[0], 1), dtype=np.float32), Z], axis=1)
 
