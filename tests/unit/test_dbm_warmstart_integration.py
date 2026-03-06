@@ -54,3 +54,64 @@ def test_dbm_warm_start_flow(tmp_path):
 
     assert strategy._warm_start_info_["warm_start"] == "ok"
     assert strategy.model.n_visible == 12
+
+
+
+def test_dbm_warm_start_skips_incompatible_champion_dimensions(tmp_path):
+    """El warm start implícito debe degradar a skipped cuando cambian las dimensiones."""
+    model_dir = tmp_path / "artifacts" / "runs" / "warm_src" / "model"
+    model_dir.mkdir(parents=True, exist_ok=True)
+
+    dbm = DBMManual(n_visible=12, n_hidden1=5, n_hidden2=3)
+    dbm.save(str(model_dir))
+
+    strategy = DBMManualPlantillaStrategy()
+
+    import pandas as pd
+    df = pd.DataFrame(np.random.rand(10, 10), columns=[f"feat_{i}" for i in range(10)])
+    df["target_score"] = np.random.rand(10)
+    dummy_csv = tmp_path / "dummy_reg.csv"
+    df.to_csv(dummy_csv, index=False)
+
+    strategy.setup(str(dummy_csv), {
+        "warm_start_path": str(model_dir),
+        "warm_start_from": "champion",
+        "task_type": "regression",
+        "target_col": "target_score",
+        "n_hidden1": 5,
+        "n_hidden2": 3,
+        "scale_mode": "minmax",
+    })
+
+    assert strategy._warm_start_info_["warm_start"] == "skipped"
+    assert strategy._warm_start_info_["reason"] == "incompatible_dimensions"
+    assert strategy._warm_start_info_["mismatched_dims"] == ["n_visible"]
+
+
+
+def test_dbm_warm_start_run_id_remains_strict_on_incompatible_dimensions(tmp_path):
+    """Un warm start explícito por run_id debe fallar si el modelo fuente es incompatible."""
+    model_dir = tmp_path / "artifacts" / "runs" / "warm_src_strict" / "model"
+    model_dir.mkdir(parents=True, exist_ok=True)
+
+    dbm = DBMManual(n_visible=12, n_hidden1=5, n_hidden2=3)
+    dbm.save(str(model_dir))
+
+    strategy = DBMManualPlantillaStrategy()
+
+    import pandas as pd
+    df = pd.DataFrame(np.random.rand(10, 10), columns=[f"feat_{i}" for i in range(10)])
+    df["target_score"] = np.random.rand(10)
+    dummy_csv = tmp_path / "dummy_reg_strict.csv"
+    df.to_csv(dummy_csv, index=False)
+
+    with pytest.raises(ValueError):
+        strategy.setup(str(dummy_csv), {
+            "warm_start_path": str(model_dir),
+            "warm_start_from": "run_id",
+            "task_type": "regression",
+            "target_col": "target_score",
+            "n_hidden1": 5,
+            "n_hidden2": 3,
+            "scale_mode": "minmax",
+        })
