@@ -831,6 +831,13 @@ def _copy_run_artifacts_to_dir(run_dir: Path, target_dir: Path) -> None:
 
 
 def _ensure_source_run_id(champ: Dict[str, Any]) -> Dict[str, Any]:
+    """Normaliza aliases del run fuente dentro del payload de champion.
+
+    Contrato interno:
+    - ``source_run_id`` es la llave canónica usada por warm start y Predictions.
+    - ``run_id`` se mantiene como alias de compatibilidad para código legacy
+      (por ejemplo algunos flujos de sweep/diagnóstico todavía leen ``run_id``).
+    """
     if not champ.get("source_run_id"):
         metrics = champ.get("metrics")
         rid = None
@@ -839,7 +846,68 @@ def _ensure_source_run_id(champ: Dict[str, Any]) -> Dict[str, Any]:
         rid = rid or champ.get("run_id")
         if rid:
             champ["source_run_id"] = str(rid)
+
+    if champ.get("source_run_id") and not champ.get("run_id"):
+        champ["run_id"] = str(champ["source_run_id"])
+
     return champ
+
+def _load_champion_payload_from_paths(paths: List[Path]) -> tuple[Optional[Dict[str, Any]], Optional[Path]]:
+    """Carga el primer ``champion.json`` válido desde una lista de candidatos."""
+    for p in paths:
+        payload = _try_read_json(p)
+        if isinstance(payload, dict) and payload:
+            return payload, p
+    return None, None
+
+
+def _hydrate_loaded_champion(champ: Dict[str, Any], *, champ_path: Optional[Path]) -> Dict[str, Any]:
+    """Completa aliases, métricas y path visible para un payload de champion ya leído."""
+    champ = dict(champ)
+    champ = _ensure_source_run_id(champ)
+
+    # Hidratar metrics si el champion es liviano.
+    if not isinstance(champ.get("metrics"), dict) or not champ["metrics"].get("run_id"):
+        src = champ.get("source_run_id")
+        if src:
+            rm = _try_read_json(RUNS_DIR / str(src) / "metrics.json")
+            if isinstance(rm, dict) and rm.get("run_id"):
+                champ["metrics"] = rm
+
+    if champ_path and not champ.get("path"):
+        champ["path"] = str(champ_path.parent.resolve())
+
+    return champ
+
+
+def load_model_champion(
+    dataset_id: str,
+    *,
+    model_name: str,
+    family: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
+    """Carga el champion específico de un modelo dentro de un dataset/family.
+
+    Prioriza siempre el layout por modelo:
+    ``artifacts/champions/<family>/<dataset>/<model>/champion.json``
+    y mantiene fallback legacy en ``artifacts/champions/<dataset>/<model>/champion.json``.
+
+    Este loader es la fuente de verdad para warm start compatible, ya que evita
+    mezclar artefactos entre arquitecturas distintas.
+    """
+    mn = _slug(model_name)
+    candidates: List[Path] = []
+
+    if family:
+        candidates.append(_champions_ds_dir(dataset_id, family=family) / mn / "champion.json")
+    candidates.append(_champions_ds_dir(dataset_id, family=None) / mn / "champion.json")
+
+    champ, champ_path = _load_champion_payload_from_paths(candidates)
+    if not champ:
+        return None
+
+    return _hydrate_loaded_champion(champ, champ_path=champ_path)
+
 
 def _build_champion_payload(
     *,
@@ -900,7 +968,12 @@ def _build_champion_payload(
 
 
 def load_dataset_champion(dataset_id: str, *, family: Optional[str] = None) -> Optional[Dict[str, Any]]:
-    """Carga champion.json (layout nuevo por family, con fallback legacy)."""
+    """Carga el champion GLOBAL del dataset (layout nuevo por family + fallback legacy).
+
+    Este loader representa el champion consumido por Predictions. Por diseño puede
+    hacer fallback al mejor champion deployable por modelo cuando el global apunta a
+    una arquitectura no compatible con inferencia.
+    """
 
     candidates: List[Path] = []
 
@@ -910,15 +983,7 @@ def load_dataset_champion(dataset_id: str, *, family: Optional[str] = None) -> O
 
     candidates.append(_champions_ds_dir(dataset_id, family=None) / "champion.json")
 
-    champ = None
-    champ_path = None
-    for p in candidates:
-        payload = _try_read_json(p)
-        if isinstance(payload, dict) and payload:
-            champ = payload
-            champ_path = p
-            break
-
+    champ, champ_path = _load_champion_payload_from_paths(candidates)
     if not champ:
         return None
 
@@ -946,24 +1011,12 @@ def load_dataset_champion(dataset_id: str, *, family: Optional[str] = None) -> O
                 best_payload = dict(best_payload)
                 best_payload["fallback_from_non_deployable"] = True
                 champ = best_payload
+                champ_path = ds_dir / _slug(str(best_payload.get("model_name") or best_payload.get("model") or "model")) / "champion.json"
     except Exception:
         # Nunca romper el loader por este hardening.
         pass
 
-    champ = _ensure_source_run_id(champ)
-
-    # Hidratar metrics si el champion es liviano
-    if not isinstance(champ.get("metrics"), dict) or not champ["metrics"].get("run_id"):
-        src = champ.get("source_run_id")
-        if src:
-            rm = _try_read_json(RUNS_DIR / str(src) / "metrics.json")
-            if isinstance(rm, dict) and rm.get("run_id"):
-                champ["metrics"] = rm
-
-    if champ_path and not champ.get("path"):
-        champ["path"] = str(champ_path.parent.resolve())
-
-    return champ
+    return _hydrate_loaded_champion(champ, champ_path=champ_path)
 
 
 def maybe_update_champion(
@@ -1117,7 +1170,16 @@ def promote_run_to_champion(
     *,
     family: Optional[str] = None,
 ) -> Dict[str, Any]:
-    """Promueve un run existente a champion (manual)."""
+    """Promueve manualmente un run a champion del mismo modelo.
+
+    Reglas de producto:
+    - Siempre escribe champion POR MODELO, aunque el modelo no sea deployable para
+      Predictions. Esto mantiene funcional el warm start compatible (misma family +
+      mismo modelo) para entrenamientos y sweeps.
+    - Solo actualiza el champion GLOBAL del dataset cuando el modelo es deployable
+      para Predictions. Así evitamos romper inferencia al promover arquitecturas no
+      soportadas por la pestaña de Predicciones.
+    """
 
     rid = str(run_id or "").strip()
     if rid.lower() in _INVALID_RUN_IDS:
@@ -1138,20 +1200,13 @@ def promote_run_to_champion(
 
     inferred_model = _norm_str(model_name or metrics.get("model_name") or req.get("modelo") or "model")
     inferred_model = inferred_model or "model"
-
-    # Seguridad de producto: evitar romper Predictions.
-    if not is_deployable_for_predictions(inferred_model, inferred_family):
-        allowed = sorted(deployable_models_for_family(inferred_family))
-        raise ValueError(
-            "El modelo no es deployable para Predictions y no puede ser champion global. "
-            f"family={inferred_family!r}, model_name={inferred_model!r}. "
-            f"Modelos permitidos para champion global en esta family: {allowed}"
-        )
+    deployable_for_predictions = is_deployable_for_predictions(inferred_model, inferred_family)
 
     ds_dir = _ensure_champions_ds_dir(dataset_id, family=inferred_family)
     dst_dir = ensure_dir(ds_dir / _slug(inferred_model))
 
-    # Copia artifacts run -> champion
+    # Copia artifacts run -> champion por modelo.
+    _write_json(dst_dir / "metrics.json", metrics)
     _copy_run_artifacts_to_dir(run_dir, dst_dir)
 
     champion_payload = _build_champion_payload(
@@ -1163,12 +1218,17 @@ def promote_run_to_champion(
         ds_dir=ds_dir,
         model_dir=dst_dir,
     )
-    _write_json(ds_dir / "champion.json", champion_payload)
+    _write_json(dst_dir / "champion.json", champion_payload)
+
+    # Champion global solo para modelos deployable consumidos por Predictions.
+    if deployable_for_predictions:
+        _write_json(ds_dir / "champion.json", champion_payload)
 
     # legacy mirror best-effort
     try:
         legacy_ds_dir = _ensure_champions_ds_dir(dataset_id, family=None)
         legacy_model_dir = ensure_dir(legacy_ds_dir / _slug(inferred_model))
+        _write_json(legacy_model_dir / "metrics.json", metrics)
         _copy_run_artifacts_to_dir(run_dir, legacy_model_dir)
         legacy_payload = dict(champion_payload)
         legacy_payload["path"] = str(legacy_model_dir.resolve())
@@ -1176,12 +1236,17 @@ def promote_run_to_champion(
             legacy_payload["paths"] = dict(legacy_payload["paths"])
             legacy_payload["paths"]["champion_ds_dir"] = _artifacts_ref(legacy_ds_dir)
             legacy_payload["paths"]["champion_model_dir"] = _artifacts_ref(legacy_model_dir)
-        _write_json(legacy_ds_dir / "champion.json", legacy_payload)
+        _write_json(legacy_model_dir / "champion.json", legacy_payload)
+        if deployable_for_predictions:
+            _write_json(legacy_ds_dir / "champion.json", legacy_payload)
     except Exception:
         pass
 
     champion_api = dict(champion_payload)
     champion_api["metrics"] = metrics
+    champion_api["run_id"] = str(rid)
+    champion_api["promoted_model"] = True
+    champion_api["promoted_global"] = bool(deployable_for_predictions)
     return champion_api
 
 
@@ -1192,18 +1257,35 @@ def load_current_champion(
     model_name: Optional[str] = None,
     family: Optional[str] = None,
 ) -> Optional[Dict[str, Any]]:
+    """Carga el champion actual con semántica explícita global vs por modelo.
+
+    - Si ``model_name`` viene informado, prioriza el champion específico del mismo
+      modelo para soportar warm start compatible y la UI de Modelos.
+    - Si no existe champion por modelo, hace fallback al champion global solo cuando
+      coincide exactamente con el modelo pedido (compatibilidad con artefactos legacy).
+    - Si ``model_name`` no viene, devuelve el champion global del dataset/family.
+    """
     ds = dataset_id or periodo
     if not ds:
+        return None
+
+    if model_name:
+        champ = load_model_champion(str(ds), model_name=str(model_name), family=family)
+        if champ:
+            return _ensure_source_run_id(champ)
+
+        champ = load_dataset_champion(str(ds), family=family)
+        if not champ:
+            return None
+
+        req_model = _slug(model_name)
+        champ_model = champ.get("model_name") or champ.get("model")
+        if champ_model and _slug(champ_model) == req_model:
+            return _ensure_source_run_id(champ)
         return None
 
     champ = load_dataset_champion(str(ds), family=family)
     if not champ:
         return None
-
-    if model_name:
-        req_model = _slug(model_name)
-        champ_model = champ.get("model_name") or champ.get("model")
-        if champ_model and _slug(champ_model) != req_model:
-            return None
 
     return _ensure_source_run_id(champ)
