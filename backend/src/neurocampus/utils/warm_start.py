@@ -19,12 +19,12 @@ Reglas de resolución
 - warm_start_from="champion" → lee champion.json, extrae source_run_id y
   reutiliza la misma resolución que "run_id".
 
-Errores
--------
-- 404 si el run o el champion.json no existen.
-- 422 si existen pero les falta el directorio ``model/`` o archivos mínimos.
-- 422 si warm_start_from="run_id" pero warm_start_run_id está vacío.
-- 422 si champion existe pero no tiene source_run_id.
+Errores y política de fallback
+-----------------------------
+- ``run_id`` es estricto: 404 si el run no existe y 422 si el ``model/`` es inválido.
+- ``champion`` es best-effort: solo acepta el champion del mismo modelo/family y,
+  si no existe o está inconsistente, degrada limpiamente a cold start dejando traza.
+- 422 si ``warm_start_from="run_id"`` pero ``warm_start_run_id`` está vacío.
 """
 from __future__ import annotations
 
@@ -260,20 +260,30 @@ def resolve_warm_start_path(
 
     Lanza
     -----
-    HTTPException(404) si el run / champion.json no existe.
-    HTTPException(422) si la configuración es inválida o el model/ está incompleto.
+    HTTPException(404) si ``warm_start_from='run_id'`` y el run no existe.
+    HTTPException(422) si la configuración es inválida o el ``model/`` explícito está incompleto.
+
+    Nota
+    ----
+    ``warm_start_from='champion'`` no lanza error por ausencia de champion. En ese caso
+    retorna ``(None, trace)`` para que el entrenamiento continúe en cold start con una
+    explicación auditable del motivo.
     """
     mode = (warm_start_from or "none").strip().lower()
 
     _empty_trace: Dict[str, Any] = {
         "warm_started": False,
+        "warm_start_requested": False,
+        "warm_start_resolved": False,
+        "warm_start_applied": False,
         "warm_start_from": None,
         "warm_start_source_run_id": None,
         "warm_start_path": None,
+        "warm_start_model_name": str(model_name or ""),
     }
 
     if mode == "none":
-        return None, _empty_trace
+        return None, dict(_empty_trace)
 
     # ---- Modo run_id -------------------------------------------------------
     if mode == "run_id":
@@ -295,12 +305,17 @@ def resolve_warm_start_path(
         model_dir = run_dir / "model"
         _validate_model_dir(model_dir, run_id)
 
-        trace: Dict[str, Any] = {
-            "warm_started": True,
-            "warm_start_from": "run_id",
-            "warm_start_source_run_id": run_id,
-            "warm_start_path": f"artifacts/runs/{run_id}/model",
-        }
+        trace: Dict[str, Any] = dict(_empty_trace)
+        trace.update(
+            {
+                "warm_started": True,  # compat: históricamente significaba "resuelto"
+                "warm_start_requested": True,
+                "warm_start_resolved": True,
+                "warm_start_from": "run_id",
+                "warm_start_source_run_id": run_id,
+                "warm_start_path": f"artifacts/runs/{run_id}/model",
+            }
+        )
         logger.info(
             "warm_start resuelto [run_id]: run_id=%s model_dir=%s",
             run_id,
@@ -338,6 +353,7 @@ def resolve_warm_start_path(
             trace = dict(_empty_trace)
             trace.update(
                 {
+                    "warm_start_requested": True,
                     "warm_started": False,
                     "warm_start_from": "champion",
                     "warm_start_reason": (
@@ -367,6 +383,7 @@ def resolve_warm_start_path(
             trace = dict(_empty_trace)
             trace.update(
                 {
+                    "warm_start_requested": True,
                     "warm_started": False,
                     "warm_start_from": "champion",
                     "warm_start_reason": "champion_read_error",
@@ -381,6 +398,7 @@ def resolve_warm_start_path(
             trace = dict(_empty_trace)
             trace.update(
                 {
+                    "warm_start_requested": True,
                     "warm_started": False,
                     "warm_start_from": "champion",
                     "warm_start_reason": "champion_missing_source_run_id",
@@ -399,6 +417,7 @@ def resolve_warm_start_path(
             trace = dict(_empty_trace)
             trace.update(
                 {
+                    "warm_start_requested": True,
                     "warm_started": False,
                     "warm_start_from": "champion",
                     "warm_start_source_run_id": source_run_id,
@@ -437,12 +456,18 @@ def resolve_warm_start_path(
             )
             return None, trace
 
-        trace = {
-            "warm_started": True,
-            "warm_start_from": "champion",
-            "warm_start_source_run_id": source_run_id,
-            "warm_start_path": f"artifacts/runs/{source_run_id}/model",
-        }
+        trace = dict(_empty_trace)
+        trace.update(
+            {
+                "warm_started": True,  # compat: históricamente significaba "resuelto"
+                "warm_start_requested": True,
+                "warm_start_resolved": True,
+                "warm_start_from": "champion",
+                "warm_start_source_run_id": source_run_id,
+                "warm_start_path": f"artifacts/runs/{source_run_id}/model",
+                "warm_start_champion_path": str(champ_path),
+            }
+        )
         logger.info(
             "warm_start resuelto [champion]: source_run_id=%s champion=%s",
             source_run_id,
