@@ -2238,6 +2238,7 @@ def _run_training(job_id: str, req: EntrenarRequest) -> None:
         # Esto evita falsos positivos donde el path existe pero hay mismatch
         # de tarea/columnas/arquitectura y el warm-start se omite.
         # -----------------------------------------------------------------
+        final_metrics["warm_start_requested"] = bool(_ws_trace.get("warm_start_requested"))
         final_metrics["warm_start_resolved"] = bool(_ws_path is not None)
 
         # Copiar trazabilidad de resolución (para debugging/UI)
@@ -2247,6 +2248,10 @@ def _run_training(job_id: str, req: EntrenarRequest) -> None:
             final_metrics["warm_start_source_run_id"] = _ws_trace["warm_start_source_run_id"]
         if _ws_trace.get("warm_start_path"):
             final_metrics["warm_start_path"] = _ws_trace["warm_start_path"]
+        if _ws_trace.get("warm_start_reason"):
+            final_metrics["warm_start_reason"] = _ws_trace["warm_start_reason"]
+        if _ws_trace.get("warm_start_error"):
+            final_metrics["warm_start_error"] = _ws_trace["warm_start_error"]
 
         # Determinar si el warm-start se aplicó realmente (según estrategia)
         ws_obj = final_metrics.get("warm_start")
@@ -2290,7 +2295,12 @@ def _run_training(job_id: str, req: EntrenarRequest) -> None:
         elif not isinstance(ws_obj, dict):
             synthesized_ws = {
                 "warm_start": "ok" if ws_applied else "skipped",
+                "requested": bool(_ws_trace.get("warm_start_requested")),
+                "resolved": bool(_ws_path is not None),
+                "source": _ws_trace.get("warm_start_from"),
             }
+            if _ws_trace.get("warm_start_source_run_id"):
+                synthesized_ws["source_run_id"] = str(_ws_trace["warm_start_source_run_id"])
             if _ws_path is not None:
                 synthesized_ws["warm_start_dir"] = str(_ws_path)
             if _ws_trace.get("warm_start_error"):
@@ -2419,12 +2429,14 @@ def _run_training(job_id: str, req: EntrenarRequest) -> None:
             except Exception:
                 # No romper el manejo de error por fallos de path.
                 pass
+        _failed_ws_trace = locals().get("_ws_trace")
         st.update(
             {
                 "status": "failed",
                 "error": str(e),
                 "time_total_ms": float(dt_ms),
                 "run_id": str(_failed_run_id) if _failed_run_id else st.get("run_id"),
+                "warm_start_trace": _failed_ws_trace if isinstance(_failed_ws_trace, dict) else st.get("warm_start_trace"),
             }
         )
         _ESTADOS[job_id] = st
