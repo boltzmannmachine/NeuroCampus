@@ -163,31 +163,113 @@ class DBMManualPlantillaStrategy:
     # Persistencia y warm start
     # ------------------------------------------------------------------
 
-    def _try_warm_start(self, warm_start_path: str) -> Dict[str, Any]:
+    def _read_warm_start_meta(self, warm_start_path: str) -> Dict[str, Any]:
+        """Lee el ``meta.json`` del modelo origen si existe.
+
+        Parameters
+        ----------
+        warm_start_path:
+            Directorio del modelo candidato a warm start.
+
+        Returns
+        -------
+        dict
+            Metadata deserializada. Si el archivo no existe o está corrupto, lanza
+            una excepción para que la llamada decida si debe degradar o fallar.
         """
-        Intenta cargar pesos desde un directorio previo y copiarlos al modelo actual.
+        meta_path = Path(warm_start_path) / "meta.json"
+        if not meta_path.exists():
+            raise FileNotFoundError(
+                f"DBMManualPlantillaStrategy: warm start sin meta.json en '{warm_start_path}'"
+            )
+        with meta_path.open("r", encoding="utf-8") as fh:
+            meta = json.load(fh)
+        if not isinstance(meta, dict):
+            raise ValueError(
+                f"DBMManualPlantillaStrategy: meta.json inválido en '{warm_start_path}'"
+            )
+        return meta
 
-        Debe llamarse DESPUÉS de que self.model ya fue instanciado en setup().
+    def _describe_warm_start_incompatibility(self, meta: Dict[str, Any]) -> Dict[str, Any]:
+        """Describe la incompatibilidad entre el modelo actual y el origen del warm start.
 
-        Retorna un dict de trazabilidad:
-          - {"warm_start": "ok"}        si los pesos se cargaron correctamente.
-          - {"warm_start": "skipped"}   si warm_start_path está vacío.
-          - {"warm_start": "error"}     si ocurrió un error (incompatibilidad / missing files).
+        El objetivo es dejar trazabilidad suficiente para auditoría, logs y UI sin que el
+        operador tenga que inspeccionar manualmente las matrices de pesos.
+        """
+        current = {
+            "n_visible": int(getattr(self.model, "n_visible", 0) or 0),
+            "n_hidden1": int(getattr(self.model, "n_hidden1", 0) or 0),
+            "n_hidden2": int(getattr(self.model, "n_hidden2", 0) or 0),
+        }
+        source = {
+            "n_visible": int(meta.get("n_visible", 0) or 0),
+            "n_hidden1": int(meta.get("n_hidden1", 0) or 0),
+            "n_hidden2": int(meta.get("n_hidden2", 0) or 0),
+        }
+        mismatched = [
+            key for key in ("n_visible", "n_hidden1", "n_hidden2")
+            if current.get(key) != source.get(key)
+        ]
+        return {
+            "reason": "incompatible_dimensions",
+            "current_dims": current,
+            "source_dims": source,
+            "mismatched_dims": mismatched,
+        }
+
+    def _try_warm_start(self, warm_start_path: str, *, strict: bool = False) -> Dict[str, Any]:
+        """Intenta cargar pesos previos y degradar limpiamente si son incompatibles.
+
+        Parameters
+        ----------
+        warm_start_path:
+            Directorio del modelo previo.
+        strict:
+            Si es ``True``, cualquier incompatibilidad o corrupción del warm start se
+            convierte en error fatal. Si es ``False``, incompatibilidades previsibles
+            (por ejemplo, cambios en ``n_visible`` o en el tamaño de capas ocultas)
+            se degradan a ``skipped`` con trazabilidad estructurada.
+
+        Returns
+        -------
+        dict
+            Estado auditado del warm start.
         """
         info: Dict[str, Any] = {
             "warm_start": "skipped",
             "warm_start_dir": str(warm_start_path),
+            "strict": bool(strict),
         }
         if not warm_start_path:
             return info
 
+        if self.model is None:
+            info["warm_start"] = "error"
+            info["error"] = "self.model es None; setup() debe llamarse antes"
+            if strict:
+                raise RuntimeError(info["error"])
+            return info
+
         try:
-            prev = DBMManual.load(str(warm_start_path))
-            if self.model is None:
-                info["warm_start"] = "error"
-                info["error"] = "self.model es None; setup() debe llamarse antes"
+            meta = self._read_warm_start_meta(warm_start_path)
+            incompat = self._describe_warm_start_incompatibility(meta)
+            if incompat["mismatched_dims"]:
+                info.update(incompat)
+                info["warm_start"] = "error" if strict else "skipped"
+                info["error"] = (
+                    "Warm start incompatible: dimensiones distintas entre el modelo actual "
+                    "y el artefacto origen."
+                )
+                logger.warning(
+                    "DBMManualPlantillaStrategy: warm start incompatible desde %s — %s",
+                    warm_start_path,
+                    incompat,
+                )
+                if strict:
+                    raise ValueError(info["error"])
                 return info
 
+            prev = DBMManual.load(str(warm_start_path))
             self.model.copy_weights_from(prev)
             info["warm_start"] = "ok"
             info["n_visible"] = self.model.n_visible
@@ -197,22 +279,23 @@ class DBMManualPlantillaStrategy:
                 "DBMManualPlantillaStrategy: warm start OK desde %s", warm_start_path
             )
         except (ValueError, FileNotFoundError) as exc:
-            # Dimensiones incompatibles o archivos faltantes → marcar error
-            info["warm_start"] = "error"
+            info["warm_start"] = "error" if strict else "skipped"
             info["error"] = str(exc)
             logger.warning(
                 "DBMManualPlantillaStrategy: warm start falló (%s) — %s",
                 type(exc).__name__,
                 exc,
             )
-            raise  # Re-raise para que _run_training lo capture si fue explícito
+            if strict:
+                raise
         except Exception as exc:
             info["warm_start"] = "error"
             info["error"] = str(exc)
             logger.exception(
                 "DBMManualPlantillaStrategy: warm start error inesperado desde %s", warm_start_path
             )
-            raise
+            if strict:
+                raise
 
         return info
 
@@ -754,17 +837,26 @@ class DBMManualPlantillaStrategy:
         self._warm_start_info_ = {"warm_start": "skipped", "warm_start_dir": warm_dir}
         if warm_dir:
             ws_mode = str(hparams.get("warm_start_from") or "run_id").lower()
+            warm_start_strict = hparams.get("warm_start_strict", None)
+            if warm_start_strict is None:
+                warm_start_strict = (ws_mode == "run_id")
+            warm_start_strict = bool(warm_start_strict)
             try:
-                self._warm_start_info_ = self._try_warm_start(warm_dir)
+                self._warm_start_info_ = self._try_warm_start(
+                    warm_dir,
+                    strict=warm_start_strict,
+                )
             except Exception as exc:
-                # Si el warm start fue explícito (run_id), re-raise para fallar el job.
-                # Si fue "champion" (podría no existir), dejamos skipped+error.
+                # Si el warm start fue explícito (run_id) o se marcó como estricto,
+                # el entrenamiento falla. Para champion y otros modos implícitos,
+                # degradamos limpiamente con trazabilidad.
                 self._warm_start_info_ = {
                     "warm_start": "error",
                     "warm_start_dir": warm_dir,
+                    "strict": warm_start_strict,
                     "error": str(exc),
                 }
-                if ws_mode == "run_id":
+                if warm_start_strict:
                     raise
 
 
