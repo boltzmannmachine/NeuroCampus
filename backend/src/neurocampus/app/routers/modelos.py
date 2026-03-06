@@ -2266,6 +2266,39 @@ def _run_training(job_id: str, req: EntrenarRequest) -> None:
 
         final_metrics["warm_started"] = bool(ws_applied)
 
+        # -----------------------------------------------------------------
+        # Normalizar el objeto anidado ``warm_start``.
+        #
+        # Motivación:
+        # - Algunas estrategias (por ejemplo DBM manual) reportan el detalle
+        #   de warm-start solo en la primera época dentro de ``history``.
+        # - Otras lo incluyen también en ``metrics`` finales.
+        #
+        # Para que la UI de runs/sweep pinte badges consistentes, consolidamos
+        # aquí un objeto ``warm_start`` único con resultado + trazabilidad.
+        # -----------------------------------------------------------------
+        history_ws = None
+        if isinstance(history, list) and history:
+            first_hist = history[0] if isinstance(history[0], dict) else None
+            if isinstance(first_hist, dict):
+                maybe_ws = first_hist.get("warm_start")
+                if isinstance(maybe_ws, dict):
+                    history_ws = dict(maybe_ws)
+
+        if history_ws is not None:
+            final_metrics["warm_start"] = history_ws
+        elif not isinstance(ws_obj, dict):
+            synthesized_ws = {
+                "warm_start": "ok" if ws_applied else "skipped",
+            }
+            if _ws_path is not None:
+                synthesized_ws["warm_start_dir"] = str(_ws_path)
+            if _ws_trace.get("warm_start_error"):
+                synthesized_ws["error"] = str(_ws_trace["warm_start_error"])
+            if _ws_trace.get("warm_start_reason"):
+                synthesized_ws["reason"] = str(_ws_trace["warm_start_reason"])
+            final_metrics["warm_start"] = synthesized_ws
+
         # 6) Guardar run en artifacts (fuente de verdad)
         req_snapshot = req_norm.model_dump()
         params = {"req": req_snapshot, "hparams": run_hparams}
