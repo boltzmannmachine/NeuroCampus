@@ -295,10 +295,112 @@ export function mapRunSummaryToRunRecord(summary: RunSummaryDto): RunRecord {
 }
 
 /**
+ * Construye la serie por época consumida por las gráficas del prototipo.
+ *
+ * Este helper traduce el `metrics.history` del backend a `EpochData`, usando la
+ * métrica primaria real del run (`val_rmse`, `val_f1_macro`, etc.) y su par de
+ * entrenamiento (`train_rmse`, `train_f1_macro`, ...).
+ *
+ * @param historyArr historial crudo por época proveniente del backend.
+ * @param primaryMetricKey clave de validación a graficar, por ejemplo `val_rmse`.
+ * @returns serie normalizada apta para Recharts.
+ */
+function buildEpochSeriesFromHistory(historyArr: unknown[], primaryMetricKey: string): EpochData[] {
+  const valKey = primaryMetricKey.startsWith("val_") ? primaryMetricKey : `val_${primaryMetricKey}`;
+  const trainKey = valKey.startsWith("val_") ? `train_${valKey.slice(4)}` : `train_${valKey}`;
+
+  return historyArr
+    .map((item, idx) => {
+      const h = (item ?? {}) as Record<string, unknown>;
+      const epoch = toNumber(h["epoch"]) ?? idx + 1;
+      const val_metric = toNumber(h[valKey]);
+      const train_metric = toNumber(h[trainKey]);
+      const train_loss = toNumber(h["train_loss"]) ?? toNumber(h["loss"]);
+      const val_loss = toNumber(h["val_loss"]);
+      return { epoch, train_loss, val_loss, train_metric, val_metric };
+    })
+    .filter(
+      (point) =>
+        point.val_metric !== null ||
+        point.train_metric !== null ||
+        point.train_loss !== null ||
+        point.val_loss !== null
+    );
+}
+
+/**
+ * Resume la "riqueza" de una serie por época.
+ *
+ * La UI puede abrir un run con una serie preliminar proveniente del polling del
+ * job o del listado. En esos casos a menudo solo existe `loss`, mientras que el
+ * detalle del run ya trae `train_rmse`/`val_rmse` completos. Este contador nos
+ * permite decidir cuándo reemplazar la serie preliminar por la serie rica.
+ */
+function summarizeEpochSeries(series: EpochData[]): {
+  epochs: number;
+  trainMetricPoints: number;
+  valMetricPoints: number;
+  trainLossPoints: number;
+  valLossPoints: number;
+} {
+  return series.reduce(
+    (acc, point) => {
+      acc.epochs += 1;
+      if (point.train_metric !== null) acc.trainMetricPoints += 1;
+      if (point.val_metric !== null) acc.valMetricPoints += 1;
+      if (point.train_loss !== null) acc.trainLossPoints += 1;
+      if (point.val_loss !== null) acc.valLossPoints += 1;
+      return acc;
+    },
+    {
+      epochs: 0,
+      trainMetricPoints: 0,
+      valMetricPoints: 0,
+      trainLossPoints: 0,
+      valLossPoints: 0,
+    }
+  );
+}
+
+/**
+ * Decide si conviene reemplazar la serie preliminar por la reconstruida desde el
+ * detalle del backend.
+ *
+ * Regla principal:
+ * - si el detalle trae más puntos de métrica (`train_metric`/`val_metric`) que
+ *   la serie actual, debemos usar el detalle;
+ * - si ambas series son equivalentes, se conserva la existente para no alterar
+ *   innecesariamente la UI.
+ */
+function shouldPreferDetailedEpochSeries(existing: EpochData[], rebuilt: EpochData[]): boolean {
+  if (!rebuilt.length) return false;
+  if (!existing.length) return true;
+
+  const current = summarizeEpochSeries(existing);
+  const detailed = summarizeEpochSeries(rebuilt);
+
+  if (detailed.valMetricPoints > current.valMetricPoints) return true;
+  if (detailed.trainMetricPoints > current.trainMetricPoints) return true;
+
+  const currentHasOnlyLoss = current.valMetricPoints === 0 && current.trainMetricPoints === 0;
+  const detailedHasMetrics = detailed.valMetricPoints > 0 || detailed.trainMetricPoints > 0;
+  if (currentHasOnlyLoss && detailedHasMetrics) return true;
+
+  if (detailed.epochs > current.epochs && detailedHasMetrics) return true;
+  if (detailed.trainLossPoints > current.trainLossPoints && current.trainLossPoints === 0) return true;
+  if (detailed.valLossPoints > current.valLossPoints && current.valLossPoints === 0) return true;
+
+  return false;
+}
+
+/**
  * Enriquecer un `RunRecord` con señales del detalle del run.
  *
  * Nota:
  * - Este mapper NO cambia estructura ni estética; solo llena datos.
+ * - Si el detalle trae un `metrics.history` más rico que la serie ya presente en
+ *   el `record`, se reemplaza la serie previa para que las gráficas reflejen las
+ *   métricas reales del entrenamiento (incluyendo warm-start desde `run_id`).
  */
 export function mergeRunDetails(record: RunRecord, details: RunDetailsDto): RunRecord {
   const family = normalizeFamily(details.family ?? record.family);
@@ -306,38 +408,19 @@ export function mergeRunDetails(record: RunRecord, details: RunDetailsDto): RunR
 
   const bundleStatus = computeBundleStatus(details);
   const bundleChecklist = computeBundleChecklist(details);
-  // Derive epoch-by-epoch series for charts. The list endpoint returns only aggregate metrics,
-  // but the details endpoint includes metrics.history with per-epoch values.
-  const epochsData = (() => {
-    if (record.epochs_data && record.epochs_data.length) return record.epochs_data;
 
-    const history = (details.metrics as any)?.history;
-    const historyArr: any[] = Array.isArray(history) ? history : [];
-    if (!historyArr.length) return [];
-
-    const valKey = record.primary_metric || "val_rmse";
-    const trainKey = valKey.startsWith("val_") ? `train_${valKey.slice(4)}` : `train_${valKey}`;
-
-    return historyArr
-      .map((h, idx) => {
-        const epoch = typeof h?.epoch === "number" ? h.epoch : idx + 1;
-        const valRaw = h?.[valKey];
-        const trainRaw = h?.[trainKey];
-        const lossRaw = h?.loss;
-        const valLossRaw = h?.val_loss;
-        const val_metric = typeof valRaw === "number" ? valRaw : null;
-        const train_metric = typeof trainRaw === "number" ? trainRaw : null;
-        const train_loss = typeof lossRaw === "number" ? lossRaw : null;
-        const val_loss = typeof valLossRaw === "number" ? valLossRaw : null;
-        return { epoch, train_loss, val_loss, train_metric, val_metric };
-      })
-      .filter((p) => p.val_metric !== null || p.train_metric !== null || p.train_loss !== null || p.val_loss !== null);
-  })();
+  const history = (details.metrics as any)?.history;
+  const historyArr: unknown[] = Array.isArray(history) ? history : [];
+  const primaryMetricKey = toStringOrNull((details.metrics as any)?.primary_metric) ?? record.primary_metric ?? fc.primaryMetric;
+  const rebuiltEpochsData = buildEpochSeriesFromHistory(historyArr, primaryMetricKey);
+  const currentEpochsData = Array.isArray(record.epochs_data) ? record.epochs_data : [];
+  const epochsData = shouldPreferDetailedEpochSeries(currentEpochsData, rebuiltEpochsData)
+    ? rebuiltEpochsData
+    : currentEpochsData;
 
   const epochsFromSeries = epochsData.length ? Math.max(...epochsData.map((p) => p.epoch)) : record.epochs;
 
   const ws = parseWarmStartForUI(details.metrics ?? record.metrics);
-
 
   return {
     ...record,
