@@ -112,6 +112,24 @@ function parseWarmStartForUI(metrics: Record<string, unknown> | null | undefined
   const startedRaw = m["warm_started"];
   const warm_started = typeof startedRaw === "boolean" ? startedRaw : warm_start_result === "ok";
 
+  // -----------------------------------------------------------------------
+  // Fallback visual para runs históricos o estrategias que no persisten el
+  // objeto anidado ``warm_start`` en métricas finales.
+  //
+  // Caso observado:
+  // - DBM puede persistir ``warm_started=true`` y la trazabilidad de origen,
+  //   pero omitir ``warm_start: { warm_start: "ok" }`` en el resumen final.
+  // - Sin este fallback, la UI muestra ``WS:Champ`` sin ``(ok)`` aunque el
+  //   warm-start se haya aplicado correctamente.
+  // -----------------------------------------------------------------------
+  if (warm_start_result == null) {
+    if (warm_started) {
+      warm_start_result = "ok";
+    } else if (warm_start_resolved) {
+      warm_start_result = "skipped";
+    }
+  }
+
   return {
     warm_started,
     warm_start_resolved,
