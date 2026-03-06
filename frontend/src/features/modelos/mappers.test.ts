@@ -14,6 +14,34 @@ import { mergeRunDetails, mapRunSummaryToRunRecord } from "./mappers";
 import type { RunDetailsDto, RunSummaryDto } from "./types";
 
 describe("features/modelos/mappers.mergeRunDetails", () => {
+  it("infiere warm_start_result=ok cuando warm_started=true pero falta el objeto nested", () => {
+    const summary: RunSummaryDto = {
+      run_id: "run-ws-fallback-1",
+      model_name: "dbm_manual",
+      dataset_id: "2025-1",
+      family: "score_docente",
+      task_type: "regression",
+      input_level: "pair",
+      target_col: "target_score",
+      data_source: "pair_matrix",
+      created_at: "2026-03-06T20:12:50Z",
+      metrics: {
+        warm_started: true,
+        warm_start_resolved: true,
+        warm_start_from: "champion",
+        warm_start_source_run_id: "base-run-1",
+        warm_start_path: "artifacts/runs/base-run-1/model",
+        val_rmse: 1.61,
+      },
+    };
+
+    const mapped = mapRunSummaryToRunRecord(summary);
+
+    expect(mapped.warm_started).toBe(true);
+    expect(mapped.warm_start_from).toBe("champion");
+    expect(mapped.warm_start_result).toBe("ok");
+  });
+
   it("reemplaza la serie preliminar cuando el detalle trae val_rmse/train_rmse", () => {
     const summary: RunSummaryDto = {
       run_id: "run-dbmhist-1",
