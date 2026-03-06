@@ -578,6 +578,17 @@ class EntrenarResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 class SweepCandidate(BaseModel):
+    """Representa el estado serializable de un candidato dentro de un sweep.
+
+    El mismo schema se reutiliza en:
+    - summaries persistidos de sweep legacy,
+    - respuestas de ``GET /modelos/sweeps/{sweep_id}``,
+    - estructuras ``best`` / ``best_by_model``.
+
+    ``primary_metric_value`` se expone explícitamente para que la UI pueda mostrar
+    la métrica principal de cada candidato sin depender de heurísticas sobre
+    ``metrics`` o de contratos legacy distintos entre endpoints.
+    """
     model_config = ConfigDict(extra="ignore", protected_namespaces=())
 
     model_name: ModeloName
@@ -587,6 +598,7 @@ class SweepCandidate(BaseModel):
     child_job_id: Optional[str] = None
     run_id: Optional[str] = None
     metrics: Optional[Dict[str, Any]] = None
+    primary_metric_value: Optional[float] = None
     score: Optional[List[Any]] = None  # serializable: [tier, score]
     error: Optional[str] = None
 
@@ -721,6 +733,13 @@ class SweepEntrenarResponse(BaseModel):
 
 
 class SweepSummary(BaseModel):
+    """Resumen normalizado de un sweep legacy o asíncrono.
+
+    Este schema actúa como contrato estable para la pestaña Sweep del frontend.
+    Incluye aliases que antes solo existían en el sweep determinístico (``best`` y
+    ``primary_metric``), de modo que la UI pueda renderizar métricas comparables
+    aun cuando el backend entregue un summary legado persistido en disco.
+    """
     model_config = ConfigDict(extra="ignore")
 
     sweep_id: str
@@ -735,6 +754,10 @@ class SweepSummary(BaseModel):
     n_completed: int = 0
     n_failed: int = 0
 
+    primary_metric: Optional[str] = None
+    primary_metric_mode: Optional[str] = None
+
+    best: Optional[SweepCandidate] = None
     best_overall: Optional[SweepCandidate] = None
     best_by_model: Dict[str, SweepCandidate] = Field(default_factory=dict)
 
