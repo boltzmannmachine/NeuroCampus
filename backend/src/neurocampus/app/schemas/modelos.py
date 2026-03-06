@@ -417,6 +417,14 @@ class EntrenarRequest(BaseModel):
         description="Número de épocas de entrenamiento (1..50000).",
     )
 
+    seed: int = Field(
+        default=42,
+        description=(
+            "Semilla explícita del entrenamiento. Se propaga a `hparams.seed` "
+            "para mantener compatibilidad con estrategias como DBM manual."
+        ),
+    )
+
     # hparams se deja flexible (Any) para soportar floats/ints/bools/strings, etc.
     hparams: Dict[str, Any] = Field(
         default_factory=lambda: {
@@ -434,7 +442,12 @@ class EntrenarRequest(BaseModel):
             # "tm_emb_dim": 16,
             # "tm_use_interaction": True,
         },
-        description="Hiperparámetros del entrenamiento (dict flexible).",
+        description=(
+            "Hiperparámetros del entrenamiento (dict flexible). "
+            "Puede incluir numéricos, strings y booleanos; por ejemplo, en DBM "
+            "manual: `n_hidden1`, `n_hidden2`, `scale_mode`, `use_pcd`, "
+            "`exclude_id_like_features` e `internal_epochs`."
+        ),
     )
 
     @model_validator(mode="after")
