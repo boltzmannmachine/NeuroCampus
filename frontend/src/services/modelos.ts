@@ -52,8 +52,16 @@ export type EntrenarReq = {
   /** epochs del entrenamiento */
   epochs?: number;
 
-  /** hparams del backend: lr, batch_size, etc */
-  hparams?: Record<string, number | null>;
+  /**
+   * hparams del backend.
+   *
+   * Se dejan flexibles porque DBM manual requiere, además de numéricos,
+   * banderas booleanas y opciones de preprocesamiento como `scale_mode`.
+   */
+  hparams?: Record<string, number | string | boolean | null>;
+
+  /** Semilla explícita del entrenamiento. */
+  seed?: number;
 
   /** Metodología de selección */
   metodologia?: "periodo_actual" | "acumulado" | "ventana";
