@@ -1478,6 +1478,7 @@ def _build_run_hparams(req: EntrenarRequest, job_id: str) -> Dict[str, Any]:
 
     family = str(getattr(req, "family", "sentiment_desempeno") or "sentiment_desempeno").lower()
     put("family", family)
+    put("seed", getattr(req, "seed", None))
     put("task_type", getattr(req, "task_type", None))
     put("input_level", getattr(req, "input_level", None))
     put("target_col", getattr(req, "target_col", None))
