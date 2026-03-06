@@ -2468,6 +2468,7 @@ def _run_sweep_training(sweep_id: str, req: SweepEntrenarRequest) -> None:
                 "child_job_id": None,
                 "run_id": None,
                 "metrics": None,
+                "primary_metric_value": None,
                 "score": None,
                 "error": None,
             }
@@ -2490,6 +2491,7 @@ def _run_sweep_training(sweep_id: str, req: SweepEntrenarRequest) -> None:
 
     best_overall: dict[str, Any] | None = None
     best_by_model: dict[str, dict[str, Any]] = {}
+    primary_metric, primary_metric_mode = primary_metric_for_family(str(req.family or ""), task_type=str(req.task_type or ""))
 
     from ...utils.runs_io import champion_score, load_run_metrics, load_current_champion, promote_run_to_champion  # noqa
 
@@ -2558,6 +2560,13 @@ def _run_sweep_training(sweep_id: str, req: SweepEntrenarRequest) -> None:
 
             metrics = load_run_metrics(str(item["run_id"]))
             item["metrics"] = metrics
+            pmv = metrics.get("primary_metric_value")
+            if isinstance(pmv, (int, float)) and math.isfinite(float(pmv)):
+                item["primary_metric_value"] = float(pmv)
+            else:
+                fallback_value = metrics.get(primary_metric)
+                if isinstance(fallback_value, (int, float)) and math.isfinite(float(fallback_value)):
+                    item["primary_metric_value"] = float(fallback_value)
 
             tier, score = champion_score(metrics or {})
             if not isinstance(score, (int, float)) or not math.isfinite(float(score)):
@@ -2595,6 +2604,9 @@ def _run_sweep_training(sweep_id: str, req: SweepEntrenarRequest) -> None:
         "n_candidates": len(cand_state),
         "n_completed": sum(1 for c in cand_state if c.get("status") == "completed"),
         "n_failed": sum(1 for c in cand_state if c.get("status") == "failed"),
+        "primary_metric": primary_metric,
+        "primary_metric_mode": primary_metric_mode,
+        "best": best_overall,
         "best_overall": best_overall,
         "best_deployable": None,
         "best_by_model": best_by_model,
@@ -3609,6 +3621,13 @@ def get_sweep_summary(sweep_id: str) -> SweepSummary:
     payload = json.loads(p.read_text(encoding="utf-8"))
     payload["summary_path"] = str(p)
 
+    # Normalizar metadatos base para que la UI pueda renderizar tanto sweeps
+    # determinísticos como summaries legacy con el mismo contrato.
+    if not payload.get("primary_metric") or not payload.get("primary_metric_mode"):
+        pm_name, pm_mode = primary_metric_for_family(str(payload.get("family") or ""), task_type="")
+        payload.setdefault("primary_metric", pm_name)
+        payload.setdefault("primary_metric_mode", pm_mode)
+
     # Compatibilidad por si existen llaves antiguas en summary.json
     if "best_overall" not in payload and "sweep_best_overall" in payload:
         payload["best_overall"] = payload.get("sweep_best_overall")
@@ -3646,8 +3665,28 @@ def get_sweep_summary(sweep_id: str) -> SweepSummary:
             bbm[k] = _hydrate_candidate(v, default_model_name=k)
         payload["best_by_model"] = bbm
 
+    candidates = payload.get("candidates") or []
+    if isinstance(candidates, list):
+        hydrated_candidates: list[dict[str, Any]] = []
+        primary_metric = str(payload.get("primary_metric") or "")
+        for cand in candidates:
+            hc = _hydrate_candidate(cand)
+            if isinstance(hc, dict) and hc.get("primary_metric_value") is None:
+                metrics = hc.get("metrics") or {}
+                pmv = metrics.get("primary_metric_value")
+                if isinstance(pmv, (int, float)) and math.isfinite(float(pmv)):
+                    hc["primary_metric_value"] = float(pmv)
+                elif primary_metric:
+                    fallback_value = metrics.get(primary_metric)
+                    if isinstance(fallback_value, (int, float)) and math.isfinite(float(fallback_value)):
+                        hc["primary_metric_value"] = float(fallback_value)
+            hydrated_candidates.append(hc)
+        payload["candidates"] = hydrated_candidates
+
     bo = payload.get("best_overall")
     payload["best_overall"] = _hydrate_candidate(bo)
+    if not payload.get("best") and payload.get("best_overall"):
+        payload["best"] = payload.get("best_overall")
 
 
     # Normalización robusta:
@@ -3664,9 +3703,13 @@ def get_sweep_summary(sweep_id: str) -> SweepSummary:
                     return (-999, -1e30)
 
             payload["best_overall"] = max(bbm.values(), key=_score_tuple)
+            payload["best"] = payload.get("best_overall")
 
             # Persistir la corrección para UI/offline (idempotente)
             p.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    if not payload.get("best") and payload.get("best_overall"):
+        payload["best"] = payload.get("best_overall")
 
     return SweepSummary(**payload)
 
