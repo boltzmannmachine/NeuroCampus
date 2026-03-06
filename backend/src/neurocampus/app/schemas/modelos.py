@@ -958,7 +958,8 @@ class EstadoResponse(BaseModel):
     warm_start_trace: Optional[Dict[str, Any]] = Field(
         default=None,
         description=(
-            "Trazabilidad del warm-start: warm_started, warm_start_from, "
+            "Trazabilidad del warm-start: warm_start_requested, warm_start_resolved, "
+            "warm_start_applied/warm_started, warm_start_from, "
             "warm_start_source_run_id, warm_start_path. None si no aplica."
         ),
     )
