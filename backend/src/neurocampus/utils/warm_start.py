@@ -51,29 +51,75 @@ _DBM_REQUIRED_FILES = {"meta.json", "dbm_state.npz"}
 def _slug(s: str) -> str:
     return str(s).strip().lower().replace(" ", "_")
 
-def _find_champion_json(
+def _candidate_champion_paths(
     artifacts_dir: Path,
     dataset_id: str,
     family: Optional[str],
     model_name: Optional[str] = None,
-) -> Optional[Path]:
+    *,
+    allow_cross_model_fallback: bool = False,
+) -> list[Path]:
+    """Construye, en orden de prioridad, las rutas candidatas de champion.
+
+    Parámetros
+    ----------
+    artifacts_dir:
+        Directorio raíz de artifacts.
+    dataset_id:
+        Dataset/periodo para el que se busca champion.
+    family:
+        Familia del modelo.
+    model_name:
+        Nombre lógico del modelo que se desea warm-start.
+    allow_cross_model_fallback:
+        Cuando es ``False`` y ``model_name`` está definido, la búsqueda se limita a
+        champions del mismo modelo. Esto evita reutilizar un champion global de otra
+        arquitectura durante warm start. Cuando es ``True``, se conservan los
+        fallbacks legacy/globales para compatibilidad.
+    """
     candidates: list[Path] = []
     ds = _slug(dataset_id)
     fam = _slug(family) if family else None
     mn = _slug(model_name) if model_name else None
 
-    # Nuevo layout (por modelo)
+    # Layout actual por familia/dataset/modelo.
     if fam and mn:
         candidates.append(artifacts_dir / "champions" / fam / ds / mn / "champion.json")
+    # Layout legacy por dataset/modelo.
     if mn:
         candidates.append(artifacts_dir / "champions" / ds / mn / "champion.json")
 
-    # Fallbacks legacy
-    if fam:
-        candidates.append(artifacts_dir / "champions" / fam / ds / "champion.json")
-    candidates.append(artifacts_dir / "champions" / ds / "champion.json")
+    # Importante: el fallback global solo es válido cuando se permite mezclar
+    # arquitecturas o cuando no conocemos el nombre del modelo destino.
+    if allow_cross_model_fallback or not mn:
+        if fam:
+            candidates.append(artifacts_dir / "champions" / fam / ds / "champion.json")
+        candidates.append(artifacts_dir / "champions" / ds / "champion.json")
 
-    for p in candidates:
+    return candidates
+
+
+def _find_champion_json(
+    artifacts_dir: Path,
+    dataset_id: str,
+    family: Optional[str],
+    model_name: Optional[str] = None,
+    *,
+    allow_cross_model_fallback: bool = False,
+) -> Optional[Path]:
+    """Resuelve el ``champion.json`` aplicando una política explícita de fallback.
+
+    Por defecto, cuando ``model_name`` está definido, la búsqueda queda restringida
+    al champion del mismo modelo. Esto evita warm starts cruzados entre modelos con
+    arquitecturas distintas dentro de sweeps o entrenamientos secuenciales.
+    """
+    for p in _candidate_champion_paths(
+        artifacts_dir,
+        dataset_id,
+        family,
+        model_name=model_name,
+        allow_cross_model_fallback=allow_cross_model_fallback,
+    ):
         if p.is_file():
             return p
     return None
@@ -264,26 +310,56 @@ def resolve_warm_start_path(
 
     # ---- Modo champion ------------------------------------------------------
     if mode == "champion":
-        # Buscamos champion por modelo primero (si existe), con fallback legacy.
+        # Política actual: para warm start solo se acepta el champion del mismo
+        # modelo. Si no existe, se degrada limpiamente a entrenamiento desde cero.
+        same_model_candidates = _candidate_champion_paths(
+            artifacts_dir,
+            dataset_id,
+            family,
+            model_name=model_name,
+            allow_cross_model_fallback=False,
+        )
         champ_path = _find_champion_json(
             artifacts_dir,
             dataset_id,
             family,
             model_name=model_name,
+            allow_cross_model_fallback=False,
         )
 
-
         if champ_path is None:
-            # Contrato: si se solicita warm_start_from="champion" y no existe champion.json,
-            # debe fallar con 404 (no continuar silenciosamente).
-            raise HTTPException(
-                status_code=404,
-                detail=(
-                    f"No existe champion.json para dataset_id='{dataset_id}', "
-                    f"family='{family}', model='{model_name}'."
-                ),
+            cross_model_candidate = _find_champion_json(
+                artifacts_dir,
+                dataset_id,
+                family,
+                model_name=None,
+                allow_cross_model_fallback=True,
             )
-
+            trace = dict(_empty_trace)
+            trace.update(
+                {
+                    "warm_started": False,
+                    "warm_start_from": "champion",
+                    "warm_start_reason": (
+                        "cross_model_champion_ignored" if cross_model_candidate else "model_specific_champion_missing"
+                    ),
+                    "warm_start_error": (
+                        f"No existe champion específico para model='{model_name}' en dataset_id='{dataset_id}', "
+                        f"family='{family}'."
+                    ),
+                    "warm_start_model_name": str(model_name or ""),
+                    "warm_start_model_specific_paths": [str(p) for p in same_model_candidates],
+                    "warm_start_cross_model_candidate": str(cross_model_candidate) if cross_model_candidate else None,
+                }
+            )
+            logger.info(
+                "warm_start skip [champion]: no existe champion del mismo modelo model=%s dataset=%s family=%s cross_model_candidate=%s",
+                model_name,
+                dataset_id,
+                family,
+                cross_model_candidate,
+            )
+            return None, trace
 
         try:
             champ = json.loads(champ_path.read_text(encoding="utf-8"))
