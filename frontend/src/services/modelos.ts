@@ -365,9 +365,17 @@ export type SweepSummaryResp = {
   dataset_id: string;
   family: string;
   status: string;
+  primary_metric?: string | null;
+  primary_metric_mode?: string | null;
   summary_path?: string | null;
+  candidates?: SweepCandidateResult[];
+  best?: Record<string, any> | null;
   best_overall?: Record<string, any> | null;
   best_by_model?: Record<string, any> | null;
+  champion_run_id?: string | null;
+  champion_updated?: boolean | null;
+  n_completed?: number;
+  n_failed?: number;
 };
 
 /**
@@ -400,6 +408,12 @@ export async function promoteChampion(req: PromoteChampionReq) {
 
 /**
  * POST /modelos/sweep (P2 Parte 5) con fallback a /modelos/entrenar/sweep (legacy).
+ *
+ * Importante:
+ * - El endpoint nuevo devuelve el resumen completo del sweep en una sola respuesta.
+ * - El fallback legacy es asíncrono y, por defecto, podía expandir un grid por modelo.
+ *   Aquí lo normalizamos para que la semántica siga siendo "un candidato por modelo",
+ *   que es exactamente lo que la pestaña Sweep espera mostrar.
  */
 export async function sweep(req: SweepReq) {
   try {
@@ -408,10 +422,31 @@ export async function sweep(req: SweepReq) {
   } catch (err) {
     if (!shouldFallback(err)) throw err;
 
-    // Payload legacy: espera `modelos` en vez de `models`.
-    const legacy: any = { ...req };
-    legacy.modelos = legacy.models ?? ["rbm_general", "rbm_restringida", "dbm_manual"];
+    const selectedModels = req.models ?? ["rbm_general", "rbm_restringida", "dbm_manual"];
+    const baseHparams = { ...(req.base_hparams ?? {}) } as Record<string, any>;
+    if (typeof req.seed === "number" && Number.isFinite(req.seed)) {
+      baseHparams.seed = req.seed;
+    }
+
+    /**
+     * Adaptación al contrato legacy:
+     * - `modelos` en vez de `models`.
+     * - `hparams_by_model` espera una lista de configuraciones por modelo.
+     * - Forzamos exactamente una configuración por modelo para evitar el grid
+     *   implícito del endpoint async antiguo.
+     */
+    const legacy: any = {
+      ...req,
+      modelos: selectedModels,
+      base_hparams: baseHparams,
+      hparams_grid: [{}],
+      hparams_by_model: Object.fromEntries(
+        selectedModels.map((modelName) => [modelName, [{ ...(req.hparams_overrides?.[modelName] ?? {}) }]])
+      ),
+      max_total_runs: Math.min(selectedModels.length, req.max_candidates ?? selectedModels.length),
+    };
     delete legacy.models;
+    delete legacy.hparams_overrides;
 
     const { data } = await api.post<any>("/modelos/entrenar/sweep", legacy);
     return data as SweepResp;
