@@ -111,8 +111,33 @@ export type EstadoResp = {
   /** Métricas globales (dict flexible). */
   metrics?: Record<string, any>;
 
-  /** Historial de entrenamiento (si el backend lo expone). */
-  history?: { epoch: number; loss?: number; recon_error?: number; time_epoch_ms?: number }[];
+  /**
+   * Historial de entrenamiento (si el backend lo expone).
+   *
+   * El detalle del backend puede incluir tanto pérdidas como métricas
+   * supervisadas por época (`train_rmse`, `val_rmse`, `val_accuracy`, etc.).
+   * Dejamos una firma abierta para conservar esa información durante el polling
+   * y permitir que la UI reconstruya correctamente las curvas del detalle.
+   */
+  history?: Array<{
+    epoch: number;
+    loss?: number;
+    recon_error?: number;
+    time_epoch_ms?: number;
+    train_loss?: number | null;
+    val_loss?: number | null;
+    train_rmse?: number | null;
+    val_rmse?: number | null;
+    train_mae?: number | null;
+    val_mae?: number | null;
+    train_r2?: number | null;
+    val_r2?: number | null;
+    train_accuracy?: number | null;
+    val_accuracy?: number | null;
+    train_f1_macro?: number | null;
+    val_f1_macro?: number | null;
+    [key: string]: number | string | null | undefined;
+  }>;
 
   /** Sweep (cuando job_type="sweep"). */
   job_type?: "train" | "sweep";
