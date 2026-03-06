@@ -33,6 +33,7 @@ import {
 } from "./types";
 
 import {
+  extractPrimaryMetricValue,
   mapChampionToChampionRecord,
   mapChampionToResolvedModel,
   mapMetricsToRunMetrics,
@@ -87,6 +88,21 @@ function nullToUndef<T>(value: T | null | undefined): T | undefined {
   return value === null ? undefined : value;
 }
 
+/**
+ * Convierte un valor arbitrario en número finito cuando es posible.
+ *
+ * Se usa en la normalización del summary de sweep porque el backend puede
+ * devolver ``primary_metric_value`` como number, string o puede omitirlo en
+ * summaries legacy donde la métrica debe derivarse desde ``metrics``.
+ */
+function toFiniteNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
 
 /**
  * Wrapper estable para consumirse desde hooks/UI.
@@ -206,20 +222,33 @@ export const modelosApi = {
    *
    * Retorna `SweepResult` con candidates listos para UI.
    */
-  async sweep(params: ModelSweepRequestDto): Promise<{ sweep_id: string }> {
-    // Lanzar sweep asíncrono para evitar timeouts
+  async sweep(params: ModelSweepRequestDto): Promise<{
+    sweep_id: string;
+    requiresPolling: boolean;
+    summary?: modelosService.SweepResp;
+  }> {
     const req: any = {
       ...params,
       warm_start_from: nullToUndef(params.warm_start_from),
       warm_start_run_id: nullToUndef(params.warm_start_run_id),
     };
 
-    // Forzamos uso del endpoint async legacy que responde de inmediato
-    req.modelos = req.models ?? ["rbm_general", "rbm_restringida", "dbm_manual"];
-    delete req.models;
+    const data = await modelosService.sweep(req);
 
-    const { data } = await api.post<any>("/modelos/entrenar/sweep", req);
-    return { sweep_id: data.sweep_id };
+    // Endpoint nuevo: devuelve el summary completo en la respuesta.
+    if (Array.isArray((data as any)?.candidates)) {
+      return {
+        sweep_id: String((data as any).sweep_id ?? crypto.randomUUID()),
+        requiresPolling: false,
+        summary: data as modelosService.SweepResp,
+      };
+    }
+
+    // Fallback legacy: solo devuelve sweep_id y hay que consultar /estado + /sweeps/:id.
+    return {
+      sweep_id: String((data as any)?.sweep_id),
+      requiresPolling: true,
+    };
   },
 
   /**
@@ -227,11 +256,19 @@ export const modelosApi = {
    */
   mapSweepSummaryToResult(resp: any, fallbackFamily: Family): SweepResult {
     const family = normalizeFamily(resp.family ?? fallbackFamily);
-    const candidates = (resp.candidates ?? []).map((c: any) => {
-      // Construimos un RunRecord mínimo a partir de cada candidato.
+    const fc = FAMILY_CONFIGS[family];
+    const primaryMetric = String(resp.primary_metric ?? fc.primaryMetric);
+    const primaryMetricMode = String(resp.primary_metric_mode ?? fc.metricMode);
+
+    const rawCandidates = Array.isArray(resp.candidates) && resp.candidates.length > 0
+      ? resp.candidates
+      : Object.values(resp.best_by_model ?? {});
+
+    const candidates = rawCandidates.map((c: any) => {
+      const metrics = (c.metrics ?? {}) as Record<string, unknown>;
       const record = mapRunSummaryToRunRecord({
         run_id: c.run_id ?? `sweep_${String(c.model_name)}_unknown`,
-        model_name: String(c.model_name),
+        model_name: String(c.model_name ?? "rbm_general"),
         dataset_id: resp.dataset_id,
         family,
         task_type: null,
@@ -240,30 +277,49 @@ export const modelosApi = {
         data_plan: null,
         data_source: null,
         created_at: new Date().toISOString(),
-        metrics: (c.metrics ?? {}) as any,
+        metrics: metrics as any,
       });
 
-      // Enriquecemos primary metric value
-      // FAMILY_CONFIGS define la métrica primaria y el modo por family (prototipo UI).
-      const fc = FAMILY_CONFIGS[family];
-      const pmv = (c.primary_metric_value ?? 0) as number;
+      const explicitPmv = toFiniteNumber(c.primary_metric_value);
+      const derivedPmv = extractPrimaryMetricValue(metrics, primaryMetric);
+      const finalPmv = explicitPmv ?? derivedPmv;
+
       return {
         ...record,
-        primary_metric: fc.primaryMetric,
-        metric_mode: fc.metricMode,
-        primary_metric_value: pmv,
-        metrics: mapMetricsToRunMetrics(c.metrics ?? {}),
+        primary_metric: primaryMetric,
+        metric_mode: primaryMetricMode,
+        primary_metric_value: finalPmv,
+        metrics: mapMetricsToRunMetrics(metrics),
         status: c.status === "failed" ? "failed" : "completed",
       } as RunRecord;
     });
 
-    const bestId = resp.best?.run_id ?? candidates[0]?.run_id ?? "unknown";
+    const sortedCandidates = [...candidates].sort((a, b) => {
+      if (primaryMetricMode === "min") {
+        if (a.primary_metric_value !== b.primary_metric_value) {
+          return a.primary_metric_value - b.primary_metric_value;
+        }
+      } else if (a.primary_metric_value !== b.primary_metric_value) {
+        return b.primary_metric_value - a.primary_metric_value;
+      }
+      if (a.model_name !== b.model_name) {
+        return String(a.model_name).localeCompare(String(b.model_name));
+      }
+      return String(a.run_id).localeCompare(String(b.run_id));
+    });
+
+    const bestId = String(
+      resp.best?.run_id
+      ?? resp.best_overall?.run_id
+      ?? sortedCandidates[0]?.run_id
+      ?? "unknown"
+    );
 
     return {
       candidates,
       winner_run_id: bestId,
-      winner_reason: `Best candidate selected by ${resp.primary_metric} (${resp.primary_metric_mode})`,
-      auto_promoted: Boolean(resp.champion_promoted),
+      winner_reason: `Best candidate selected by ${primaryMetric} (${primaryMetricMode})`,
+      auto_promoted: Boolean(resp.champion_promoted ?? resp.champion_updated),
     };
   },
 
