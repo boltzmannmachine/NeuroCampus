@@ -70,11 +70,26 @@ class DBMManualStrategy:
 
 class DBMManualPlantillaStrategy:
     """
-    Strategy DBM compatible con PlantillaEntrenamiento (setup/train_step).
+    Estrategia DBM compatible con :class:`PlantillaEntrenamiento`.
 
-    - Entrenamiento greedy: 1 epoch de rbm_v_h1 + 1 epoch de rbm_h1_h2 por train_step.
-    - Reporta recon_error (loss) para graficación UI.
-    - Para regression: eval supervisada con ridge sobre embeddings latentes (sin leakage).
+    Responsabilidades principales
+    -----------------------------
+    - Preparar la matriz numérica de entrada a partir del dataset fuente.
+    - Excluir columnas numéricas que son identificadores crudos y, por tanto,
+      no deben tratarse como visibles Bernoulli del DBM.
+    - Escalar las features a ``[0, 1]`` antes del preentrenamiento para evitar
+      saturación de sigmoides y curvas de pérdida artificialmente planas.
+    - Ejecutar el preentrenamiento greedy (RBM visible->h1 y RBM h1->h2).
+    - Reportar métricas de reconstrucción y, cuando aplica, métricas
+      supervisadas sobre el espacio latente (ridge / softmax lineal).
+
+    Nota de diseño
+    --------------
+    El DBM manual del proyecto usa visibles Bernoulli. Por ello, el
+    preprocesamiento de entrada es crítico: si se alimentan variables continuas
+    sin escalar, la reconstrucción queda acotada a ``[0, 1]`` mientras que los
+    datos pueden vivir en escalas mucho mayores. El resultado típico es una
+    pérdida casi constante y métricas de regresión que no mejoran.
     """
 
     def __init__(self) -> None:
@@ -94,6 +109,15 @@ class DBMManualPlantillaStrategy:
         self.val_ratio_: float = 0.2
         self.seed_: int = 42
         self.ridge_l2_: float = 1e-3
+        self.internal_epochs_: int = 3
+
+        # Configuración y trazabilidad del preprocesamiento de entrada.
+        self.scale_mode_: str = "minmax"
+        self.exclude_id_like_features_: bool = True
+        self.excluded_numeric_cols_: List[str] = []
+        self._feature_mins_: Optional[np.ndarray] = None
+        self._feature_ranges_: Optional[np.ndarray] = None
+        self.hparams_: Dict[str, Any] = {}
 
         self.X_tr: Optional[np.ndarray] = None
         self.X_va: Optional[np.ndarray] = None
@@ -119,6 +143,14 @@ class DBMManualPlantillaStrategy:
         self.val_ratio_ = 0.2
         self.seed_ = 42
         self.ridge_l2_ = 1e-3
+        self.internal_epochs_ = 3
+
+        self.scale_mode_ = "minmax"
+        self.exclude_id_like_features_ = True
+        self.excluded_numeric_cols_ = []
+        self._feature_mins_ = None
+        self._feature_ranges_ = None
+        self.hparams_ = {}
 
         self.X_tr = None
         self.X_va = None
@@ -210,6 +242,9 @@ class DBMManualPlantillaStrategy:
             "split_mode": getattr(self, "split_mode_", None),
             "val_ratio": getattr(self, "val_ratio_", None),
             "seed": getattr(self, "seed_", None),
+            "scale_mode": getattr(self, "scale_mode_", "minmax"),
+            "exclude_id_like_features": getattr(self, "exclude_id_like_features_", True),
+            "excluded_numeric_cols": list(getattr(self, "excluded_numeric_cols_", []) or []),
         }
         # P2.6: Trazabilidad de features de texto
         _text_trace = getattr(self, "_text_feature_trace_", None)
@@ -288,6 +323,15 @@ class DBMManualPlantillaStrategy:
             )
 
 
+        # 3.25) Persistir scaler de entrada para inferencia reproducible.
+        if self._feature_mins_ is not None and self._feature_ranges_ is not None:
+            np.savez_compressed(
+                out_path / "input_scaler.npz",
+                feature_mins=np.asarray(self._feature_mins_, dtype=np.float32),
+                feature_ranges=np.asarray(self._feature_ranges_, dtype=np.float32),
+                schema_version=np.int32(1),
+            )
+
         # 3.5) Para regresión: persistir head supervisado (ridge) para inferencia en Predictions
         #      El head se entrena sobre embeddings latentes del DBM y se guarda como:
         #      - ridge_head.npz: w (bias + pesos) y l2.
@@ -328,6 +372,8 @@ class DBMManualPlantillaStrategy:
             )
         # 4) Validación fuerte: si falta algo, el job debe fallar (no dejar runs corruptos)
         required = {"dbm_state.npz", "meta.json"}
+        if getattr(self, "scale_mode_", "none") != "none":
+            required.add("input_scaler.npz")
         if str(getattr(self, "task_type_", "")).lower() == "regression":
             required.add("ridge_head.npz")
         present = {p.name for p in out_path.iterdir() if p.is_file()}
@@ -357,7 +403,117 @@ class DBMManualPlantillaStrategy:
             return pd.read_excel(data_ref)
         raise ValueError(f"DBMManualPlantillaStrategy: formato no soportado: {ext}")
 
+
+    def _resolve_numeric_exclude_cols(
+        self,
+        df: pd.DataFrame,
+        *,
+        base_exclude_cols: Optional[List[str]] = None,
+        extra_exclude_cols: Optional[List[str]] = None,
+        exclude_id_like_features: bool = True,
+    ) -> List[str]:
+        """
+        Calcula la lista final de columnas numéricas que deben excluirse.
+
+        Parameters
+        ----------
+        df:
+            DataFrame fuente.
+        base_exclude_cols:
+            Columnas que deben excluirse siempre (por ejemplo, el target).
+        extra_exclude_cols:
+            Exclusiones explícitas solicitadas por el usuario en ``hparams``.
+        exclude_id_like_features:
+            Si es ``True``, descarta columnas con nombres típicos de
+            identificadores (``id``, ``*_id`` o ``id_*``) para evitar que el
+            DBM trate enteros arbitrarios como magnitudes continuas.
+
+        Returns
+        -------
+        list[str]
+            Columnas numéricas a excluir.
+        """
+        exclude = {str(c) for c in (base_exclude_cols or []) if c is not None}
+        exclude.update(str(c) for c in (extra_exclude_cols or []) if c is not None)
+
+        if exclude_id_like_features:
+            id_like_cols: List[str] = []
+            for col in df.select_dtypes(include=[np.number]).columns:
+                norm = str(col).strip().lower()
+                if norm == "id" or norm.endswith("_id") or norm.startswith("id_"):
+                    id_like_cols.append(str(col))
+            exclude.update(id_like_cols)
+
+        return sorted(exclude)
+
+    def _fit_input_scaler(self, X: np.ndarray, scale_mode: str) -> None:
+        """
+        Ajusta el escalado de entrada que se aplicará al DBM.
+
+        El modo por defecto es ``minmax`` porque las visibles del modelo son
+        Bernoulli/sigmoid y necesitan features acotadas en ``[0, 1]`` para que
+        la reconstrucción tenga una escala compatible con la entrada.
+        """
+        mode = str(scale_mode or "minmax").strip().lower()
+        if mode in {"", "default"}:
+            mode = "minmax"
+        if mode not in {"none", "minmax", "minmax_0_1", "scale_0_1"}:
+            raise ValueError(
+                "DBMManualPlantillaStrategy: scale_mode debe ser 'none' o 'minmax'"
+            )
+
+        self.scale_mode_ = "none" if mode == "none" else "minmax"
+
+        n_features = int(X.shape[1]) if X.ndim == 2 else 0
+        if self.scale_mode_ == "none" or n_features == 0:
+            self._feature_mins_ = np.zeros(n_features, dtype=np.float32)
+            self._feature_ranges_ = np.ones(n_features, dtype=np.float32)
+            return
+
+        mins = np.min(X, axis=0).astype(np.float32, copy=False)
+        maxs = np.max(X, axis=0).astype(np.float32, copy=False)
+        ranges = (maxs - mins).astype(np.float32, copy=False)
+        ranges = np.where(np.abs(ranges) < 1e-8, 1.0, ranges).astype(np.float32, copy=False)
+
+        self._feature_mins_ = mins
+        self._feature_ranges_ = ranges
+
+    def _apply_input_scaler(self, X: np.ndarray) -> np.ndarray:
+        """
+        Aplica el escalado ajustado en :meth:`_fit_input_scaler`.
+
+        Returns
+        -------
+        np.ndarray
+            Matriz ``float32`` lista para alimentar el DBM.
+        """
+        Xf = np.asarray(X, dtype=np.float32)
+        if self._feature_mins_ is None or self._feature_ranges_ is None:
+            return Xf
+        if self.scale_mode_ == "none":
+            return Xf
+
+        mins = np.asarray(self._feature_mins_, dtype=np.float32)
+        ranges = np.asarray(self._feature_ranges_, dtype=np.float32)
+        Xs = (Xf - mins) / ranges
+        return np.clip(Xs, 0.0, 1.0).astype(np.float32, copy=False)
+
     def _numeric_matrix(self, df: pd.DataFrame, exclude_cols: Optional[List[str]] = None) -> np.ndarray:
+        """
+        Convierte un ``DataFrame`` a matriz numérica preservando trazabilidad.
+
+        Parameters
+        ----------
+        df:
+            DataFrame fuente.
+        exclude_cols:
+            Columnas numéricas a excluir antes de construir la matriz.
+
+        Returns
+        -------
+        np.ndarray
+            Matriz ``float32`` con las columnas numéricas restantes.
+        """
         exclude = set(exclude_cols or [])
         num_df = df.select_dtypes(include=[np.number])
 
@@ -373,6 +529,7 @@ class DBMManualPlantillaStrategy:
             raise ValueError("DBMManualPlantillaStrategy: no hay columnas numéricas para entrenar.")
 
         self.feat_cols_ = cols
+        self.excluded_numeric_cols_ = [c for c in num_df.columns if c not in cols]
 
         # P2.6: Trazabilidad de features de texto
         _detected_prefix = _auto_detect_embed_prefix(cols)
@@ -422,7 +579,19 @@ class DBMManualPlantillaStrategy:
 
 
     def setup(self, data_ref: str, hparams: Dict[str, Any]) -> None:
+        """
+        Prepara el dataset, ajusta el preprocesamiento de entrada y crea el DBM.
+
+        Este método centraliza dos correcciones necesarias para el modelo:
+
+        1. Excluir identificadores numéricos crudos (por ejemplo ``teacher_id``)
+           que no deben interpretarse como visibles Bernoulli.
+        2. Ajustar un escalado ``minmax`` sobre las features de entrenamiento
+           antes de cualquier paso de preentrenamiento para estabilizar la curva
+           de pérdida y la evaluación supervisada sobre latentes.
+        """
         df = self._load_df(str(data_ref))
+        self.hparams_ = dict(hparams or {})
 
         # ---- Task meta ----
         self.task_type_ = str(hparams.get("task_type") or "").lower() or "unsupervised"
@@ -433,6 +602,16 @@ class DBMManualPlantillaStrategy:
         self.val_ratio_ = float(hparams.get("val_ratio", 0.2) or 0.2)
         self.seed_ = int(hparams.get("seed", 42) or 42)
         self.ridge_l2_ = float(hparams.get("ridge_l2", 1e-3) or 1e-3)
+        self.internal_epochs_ = int(hparams.get("internal_epochs", 3) or 3)
+        self.exclude_id_like_features_ = bool(hparams.get("exclude_id_like_features", True))
+
+        raw_extra_excludes = hparams.get("exclude_numeric_cols") or []
+        if isinstance(raw_extra_excludes, (str, bytes)):
+            extra_exclude_cols = [str(raw_extra_excludes)]
+        elif isinstance(raw_extra_excludes, (list, tuple, set)):
+            extra_exclude_cols = [str(v) for v in raw_extra_excludes if v is not None]
+        else:
+            extra_exclude_cols = []
 
         is_regression = (self.task_type_ == "regression")
 
@@ -455,9 +634,16 @@ class DBMManualPlantillaStrategy:
                 seed=self.seed_,
             )
 
-            X_all = self._numeric_matrix(df, exclude_cols=[str(self.target_col_)])
-            self.X_tr = X_all[tr_idx]
-            self.X_va = X_all[va_idx]
+            exclude_cols = self._resolve_numeric_exclude_cols(
+                df,
+                base_exclude_cols=[str(self.target_col_)],
+                extra_exclude_cols=extra_exclude_cols,
+                exclude_id_like_features=self.exclude_id_like_features_,
+            )
+            X_all = self._numeric_matrix(df, exclude_cols=exclude_cols)
+            self._fit_input_scaler(X_all[tr_idx], hparams.get("scale_mode", "minmax"))
+            self.X_tr = self._apply_input_scaler(X_all[tr_idx])
+            self.X_va = self._apply_input_scaler(X_all[va_idx])
             self.y_tr = y[tr_idx]
             self.y_va = y[va_idx]
 
@@ -477,23 +663,44 @@ class DBMManualPlantillaStrategy:
                 mask = y_cls >= 0
                 df = df[mask].reset_index(drop=True)
                 y_cls = y_cls[mask]
-                X_all = self._numeric_matrix(df, exclude_cols=[label_col])
+                exclude_cols = self._resolve_numeric_exclude_cols(
+                    df,
+                    base_exclude_cols=[label_col],
+                    extra_exclude_cols=extra_exclude_cols,
+                    exclude_id_like_features=self.exclude_id_like_features_,
+                )
+                X_all = self._numeric_matrix(df, exclude_cols=exclude_cols)
                 tr_idx, va_idx = self._split_train_val_indices(
                     df=df, split_mode=self.split_mode_, val_ratio=self.val_ratio_, seed=self.seed_
                 )
-                self.X = X_all[tr_idx]
-                self.X_tr = X_all[tr_idx]
-                self.X_va = X_all[va_idx]
+                self._fit_input_scaler(X_all[tr_idx], hparams.get("scale_mode", "minmax"))
+                self.X = self._apply_input_scaler(X_all[tr_idx])
+                self.X_tr = self._apply_input_scaler(X_all[tr_idx])
+                self.X_va = self._apply_input_scaler(X_all[va_idx])
                 self.y_tr = y_cls[tr_idx]
                 self.y_va = y_cls[va_idx]
             else:
-                X_all = self._numeric_matrix(df, exclude_cols=None)
-                self.X = X_all
+                exclude_cols = self._resolve_numeric_exclude_cols(
+                    df,
+                    base_exclude_cols=None,
+                    extra_exclude_cols=extra_exclude_cols,
+                    exclude_id_like_features=self.exclude_id_like_features_,
+                )
+                X_all = self._numeric_matrix(df, exclude_cols=exclude_cols)
+                self._fit_input_scaler(X_all, hparams.get("scale_mode", "minmax"))
+                self.X = self._apply_input_scaler(X_all)
                 self.X_tr = self.X_va = self.y_tr = self.y_va = None
                 self.labels_ = []
         else:
-            X_all = self._numeric_matrix(df, exclude_cols=None)
-            self.X = X_all
+            exclude_cols = self._resolve_numeric_exclude_cols(
+                df,
+                base_exclude_cols=None,
+                extra_exclude_cols=extra_exclude_cols,
+                exclude_id_like_features=self.exclude_id_like_features_,
+            )
+            X_all = self._numeric_matrix(df, exclude_cols=exclude_cols)
+            self._fit_input_scaler(X_all, hparams.get("scale_mode", "minmax"))
+            self.X = self._apply_input_scaler(X_all)
             self.X_tr = None
             self.X_va = None
             self.y_tr = None
@@ -516,6 +723,14 @@ class DBMManualPlantillaStrategy:
 
         self.eval_rows = int(hparams.get("eval_rows", 2048) or 2048)
         self._rng = np.random.default_rng(self.seed_)
+
+        # Registrar hparams efectivos para persistencia y auditoría del run.
+        self.hparams_.update({
+            "seed": int(self.seed_),
+            "scale_mode": self.scale_mode_,
+            "exclude_id_like_features": bool(self.exclude_id_like_features_),
+            "internal_epochs": int(self.internal_epochs_),
+        })
 
         if self.X is None:
             raise RuntimeError("DBMManualPlantillaStrategy: X no inicializado en setup()")
@@ -557,11 +772,11 @@ class DBMManualPlantillaStrategy:
         if self.model is None or self.X is None:
             raise RuntimeError("DBMManualPlantillaStrategy: falta setup(data_ref, hparams)")
 
-        # En vez de hacer solo 1 pasada sobre batches, forzamos múltiples épocas internas
-        # o actualizamos el scheduler de learning rate para asegurar movimiento real del gradiente.
-        # RBM manual usa un descenso bastante suave, por lo que 3 epochs internas por llamada
-        # ayudan a no estancarse contra el Head exacto.
-        internal_epochs = 3
+        # Se permiten múltiples épocas internas por `train_step` para dar
+        # suficiente señal de gradiente al preentrenamiento greedy. El valor se
+        # deja parametrizable porque el DBM responde de forma sensible a este
+        # hiperparámetro en datasets pequeños.
+        internal_epochs = max(1, int(getattr(self, "internal_epochs_", 3) or 3))
 
         # layer1
         self.model.rbm_v_h1.fit(self.X, epochs=internal_epochs, batch_size=self.batch_size, verbose=0)
