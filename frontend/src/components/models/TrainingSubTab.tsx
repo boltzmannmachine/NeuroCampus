@@ -167,15 +167,23 @@ export function TrainingSubTab({
     // datasetId en UI usa ids tipo ds_2025_1; el backend usa el periodo 2025-1.
     const backendDatasetId = DATASETS.find((d) => d.id === datasetId)?.period ?? datasetId;
 
-    // El backend actual espera hparams numéricos. Para mantener compatibilidad con la UI
-    // (que permite JSON libre), filtramos valores no numéricos.
-    const numericHparams: Record<string, number | null> = {};
-    if (parsedHparams && typeof parsedHparams === 'object') {
+    /**
+     * El backend acepta `hparams` heterogéneos (number/string/boolean/null).
+     *
+     * Esto es necesario para DBM manual porque algunos hiperparámetros útiles
+     * no son numéricos (`use_pcd`, `exclude_id_like_features`, `scale_mode`).
+     * Además, inyectamos la `seed` visible del formulario para que el valor que
+     * configura la UI sí llegue a la estrategia de entrenamiento.
+     */
+    const normalizedHparams: Record<string, number | string | boolean | null> = {};
+    if (parsedHparams && typeof parsedHparams === 'object' && !Array.isArray(parsedHparams)) {
       for (const [k, v] of Object.entries(parsedHparams as Record<string, unknown>)) {
-        if (typeof v === 'number' && Number.isFinite(v)) numericHparams[k] = v;
-        else if (v === null) numericHparams[k] = null;
+        if (v === null) normalizedHparams[k] = null;
+        else if (typeof v === 'number' && Number.isFinite(v)) normalizedHparams[k] = v;
+        else if (typeof v === 'string' || typeof v === 'boolean') normalizedHparams[k] = v;
       }
     }
+    normalizedHparams.seed = seed;
 
     try {
       // Intento real contra backend
@@ -188,7 +196,7 @@ export function TrainingSubTab({
         auto_prepare: autoPrepare,
         warm_start_from: warmStart ? warmStartFrom : 'none',
         warm_start_run_id: warmStart && warmStartFrom === 'run_id' ? warmStartRunId : undefined,
-        hparams: numericHparams,
+        hparams: normalizedHparams,
       } as any);
 
       if (isCancelledRef.current) return;
