@@ -878,6 +878,8 @@ def test_dbm_warm_start_run_id_ok_and_trace(
     assert metrics.get("warm_start_from") == "run_id", metrics
     assert metrics.get("warm_start_source_run_id") == base_run_id, metrics
     assert "warm_start_path" in metrics, metrics
+    assert isinstance(metrics.get("warm_start"), dict), metrics
+    assert metrics["warm_start"].get("warm_start") == "ok", metrics
 
     # warm_start_trace en el estado del job
     trace = st.get("warm_start_trace", {})
