@@ -1441,6 +1441,62 @@ def _prepare_selected_data(req: EntrenarRequest, job_id: str) -> str:
 # FIX: Construcción robusta de hparams para el training (NO None + defaults)
 # ---------------------------------------------------------------------------
 
+def _request_field_was_explicitly_set(req: EntrenarRequest, field_name: str) -> bool:
+    """Indica si un campo top-level del request fue enviado explícitamente.
+
+    En Pydantic v2, los campos con valor por defecto aparecen poblados en la instancia
+    incluso cuando el cliente no los incluyó en el payload. Para consolidar correctamente
+    los hiperparámetros del entrenamiento necesitamos distinguir entre:
+
+    - un ``seed`` top-level enviado de forma explícita por el cliente; y
+    - el ``seed`` por defecto del schema (42), que no debería pisar un
+      ``hparams.seed`` personalizado.
+
+    Parameters
+    ----------
+    req:
+        Instancia validada del request de entrenamiento.
+    field_name:
+        Nombre del campo top-level a consultar.
+
+    Returns
+    -------
+    bool
+        ``True`` si el campo fue enviado explícitamente por el cliente.
+    """
+    fields_set = getattr(req, "model_fields_set", None)
+    if fields_set is None:
+        fields_set = getattr(req, "__pydantic_fields_set__", set())
+    try:
+        return field_name in set(fields_set or set())
+    except Exception:
+        return False
+
+
+
+def _resolve_effective_request_seed(req: EntrenarRequest, hp: Dict[str, Any]) -> int:
+    """Resuelve la semilla efectiva respetando la precedencia correcta.
+
+    Regla de precedencia
+    -------------------
+    1. Si el cliente envió ``seed`` como campo top-level, ese valor gana.
+    2. En caso contrario, si ``hparams.seed`` existe, se conserva.
+    3. Si ninguna de las dos fuentes provee semilla, se usa el default del schema.
+
+    Esta lógica evita que el default del schema (42) sobreescriba accidentalmente un
+    ``hparams.seed`` personalizado cuando el cliente no mandó ``seed`` explícito.
+    """
+    if _request_field_was_explicitly_set(req, "seed"):
+        return int(getattr(req, "seed", 42) or 42)
+
+    hp_seed = hp.get("seed", None)
+    if hp_seed is not None:
+        return int(hp_seed)
+
+    return int(getattr(req, "seed", 42) or 42)
+
+
+
 def _build_run_hparams(req: EntrenarRequest, job_id: str) -> Dict[str, Any]:
     """
     Construye y consolida el diccionario de hiperparámetros (`hparams`) que se inyectará
@@ -1452,6 +1508,8 @@ def _build_run_hparams(req: EntrenarRequest, job_id: str) -> Dict[str, Any]:
     - Eliminar valores `None` para evitar fallos donde la estrategia los malinterprete
       y desactive la característica (e.g. degradar features a modo 'none').
     - Establecer defaults consistentes para el pipeline, como ventanas y modos de texto.
+    - Consolidar `seed` sin que el default del schema pise accidentalmente el valor
+      enviado dentro de `hparams`.
 
     Extensión Ruta 2 (score_docente):
     - default data_source = pair_matrix
@@ -1478,7 +1536,7 @@ def _build_run_hparams(req: EntrenarRequest, job_id: str) -> Dict[str, Any]:
 
     family = str(getattr(req, "family", "sentiment_desempeno") or "sentiment_desempeno").lower()
     put("family", family)
-    put("seed", getattr(req, "seed", None))
+    put("seed", _resolve_effective_request_seed(req, hp))
     put("task_type", getattr(req, "task_type", None))
     put("input_level", getattr(req, "input_level", None))
     put("target_col", getattr(req, "target_col", None))
