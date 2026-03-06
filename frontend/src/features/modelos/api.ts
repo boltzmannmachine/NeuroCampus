@@ -50,28 +50,31 @@ import {
 } from "@/components/models/mockData";
 
 /**
- * Filtra y normaliza `hparams` hacia el contrato actual del servicio (`number | null`).
+ * Normaliza `hparams` sin perder tipos relevantes para el backend.
  *
- * Nota:
- * - La UI puede producir strings/bools en el futuro; hoy el backend soporta numéricos.
- * - Los valores no numéricos se omiten (conservador).
+ * El contrato actual de `/modelos/entrenar` acepta números, strings y booleanos.
+ * Esto es especialmente importante para `dbm_manual`, que usa flags como
+ * `use_pcd`, `exclude_id_like_features` y opciones de preprocesamiento como
+ * `scale_mode`.
  */
-function toNumericHparams(
+function normalizeHparamsPayload(
   hparams: Record<string, number | string | boolean | null> | undefined
-): Record<string, number | null> | undefined {
+): Record<string, number | string | boolean | null> | undefined {
   if (!hparams) return undefined;
 
-  const out: Record<string, number | null> = {};
+  const out: Record<string, number | string | boolean | null> = {};
   for (const [k, v] of Object.entries(hparams)) {
     if (v === null) {
       out[k] = null;
       continue;
     }
-    if (typeof v === "number" && Number.isFinite(v)) {
-      out[k] = v;
+    if (typeof v === "number") {
+      if (Number.isFinite(v)) out[k] = v;
       continue;
     }
-    // Ignorar strings/bools para no romper contrato del backend.
+    if (typeof v === "string" || typeof v === "boolean") {
+      out[k] = v;
+    }
   }
   return Object.keys(out).length > 0 ? out : undefined;
 }
@@ -176,7 +179,7 @@ export const modelosApi = {
   async train(request: EntrenarRequestDto): Promise<{ jobId: string }> {
     const resp = await modelosService.entrenar({
       ...request,
-      hparams: toNumericHparams(request.hparams),
+      hparams: normalizeHparamsPayload(request.hparams),
     } as any);
     return { jobId: resp.job_id };
   },
