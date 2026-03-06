@@ -194,6 +194,7 @@ def test_entrenar_estado_and_promote_contract(client, artifacts_dir: Path, prepa
 
     champ_ds_dir = artifacts_dir / "champions" / "sentiment_desempeno" / dataset_id
     assert (champ_ds_dir / "champion.json").exists()
+    assert (champ_ds_dir / "rbm_general" / "champion.json").exists()
 
     # --- P2.1: el API debe devolver contexto completo (sin null/unknown) ---
     # Champion
@@ -344,18 +345,18 @@ def test_warm_start_errors_404_422(client, artifacts_dir: Path, prepared_feature
     except Exception as exc:
         assert getattr(exc, "status_code", None) == 404, f"Esperaba 404, got {exc}"
 
-    # champion inexistente → 404
-    try:
-        resolve_warm_start_path(
-            artifacts_dir=artifacts_dir,
-            dataset_id="ds_no_champion_xyz",
-            family="sentiment_desempeno",
-            model_name="rbm_general",
-            warm_start_from="champion",
-        )
-        assert False, "Debería haber lanzado HTTPException 404"
-    except Exception as exc:
-        assert getattr(exc, "status_code", None) == 404, f"Esperaba 404, got {exc}"
+    # champion inexistente → fallback suave a cold start con trazabilidad
+    ws_path, ws_trace = resolve_warm_start_path(
+        artifacts_dir=artifacts_dir,
+        dataset_id="ds_no_champion_xyz",
+        family="sentiment_desempeno",
+        model_name="rbm_general",
+        warm_start_from="champion",
+    )
+    assert ws_path is None
+    assert ws_trace.get("warm_start_requested") is True
+    assert ws_trace.get("warm_start_resolved") is False
+    assert ws_trace.get("warm_start_reason") == "model_specific_champion_missing"
 
     # run existe pero sin model/ → 422
     fake_run_id = f"run_nomodel_{uuid.uuid4().hex[:6]}"
@@ -510,10 +511,14 @@ def test_warm_start_champion_ok_and_trace(
 
     # Verificar que champion.json existe y tiene source_run_id
     champ_path = artifacts_dir / "champions" / "sentiment_desempeno" / dataset_id / "champion.json"
-    assert champ_path.exists(), "champion.json debe existir tras promote"
+    assert champ_path.exists(), "champion.json global debe existir tras promote"
+    model_champ_path = artifacts_dir / "champions" / "sentiment_desempeno" / dataset_id / "rbm_general" / "champion.json"
+    assert model_champ_path.exists(), "champion.json por modelo debe existir tras promote"
     import json as _json
     champ_data = _json.loads(champ_path.read_text())
+    model_champ_data = _json.loads(model_champ_path.read_text())
     assert champ_data.get("source_run_id") == base_run_id, champ_data
+    assert model_champ_data.get("source_run_id") == base_run_id, model_champ_data
 
     # Ahora entrenar con warm start por champion
     from neurocampus.app.routers import modelos as m
