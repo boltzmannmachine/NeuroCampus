@@ -2272,6 +2272,25 @@ def _run_training(job_id: str, req: EntrenarRequest) -> None:
         final_metrics["warm_started"] = bool(ws_applied)
 
         # -----------------------------------------------------------------
+        # Consolidar la traza final del warm-start a nivel de job.
+        #
+        # ``resolve_warm_start_path`` conoce únicamente el estado de
+        # resolución de la fuente base. La aplicación real ocurre dentro de
+        # la estrategia/plantilla. Para evitar respuestas ambiguas en
+        # /modelos/estado/{job_id}, normalizamos la traza final con tres
+        # niveles explícitos: requested, resolved y applied.
+        #
+        # Compatibilidad: ``warm_started`` en la traza final queda como alias
+        # de ``warm_start_applied`` para que consola/UI no muestren estados
+        # contradictorios del tipo warm_started=True pero applied=False.
+        # -----------------------------------------------------------------
+        _ws_trace = dict(_ws_trace or {})
+        _ws_trace["warm_start_requested"] = bool(_ws_trace.get("warm_start_requested"))
+        _ws_trace["warm_start_resolved"] = bool(_ws_path is not None)
+        _ws_trace["warm_start_applied"] = bool(ws_applied)
+        _ws_trace["warm_started"] = bool(ws_applied)
+
+        # -----------------------------------------------------------------
         # Normalizar el objeto anidado ``warm_start``.
         #
         # Motivación:
