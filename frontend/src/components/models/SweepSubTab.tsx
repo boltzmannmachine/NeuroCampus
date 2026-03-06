@@ -1,7 +1,7 @@
 // ============================================================
 // NeuroCampus — Sweep Sub-Tab
 // ============================================================
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -41,6 +41,11 @@ export function SweepSubTab({
   const [warmStartFrom, setWarmStartFrom] = useState<WarmStartFrom>('champion');
   const [autoPromote, setAutoPromote] = useState(false);
   const [showOverrides, setShowOverrides] = useState(false);
+  const [modelOverridesJson, setModelOverridesJson] = useState<Record<string, string>>({
+    rbm_general: '{}',
+    rbm_restringida: '{}',
+    dbm_manual: '{}',
+  });
 
   // Status
   const [sweepStatus, setSweepStatus] = useState<'idle' | 'running' | 'completed'>('idle');
@@ -87,23 +92,52 @@ export function SweepSubTab({
     const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
 
     try {
-      const { sweep_id } = await modelosApi.sweep({
+      /**
+       * Parsea y valida overrides JSON por modelo antes de lanzar el sweep.
+       *
+       * Cada override se envía tal cual al backend nuevo (`/modelos/sweep`) y,
+       * si caemos al sweep legacy, el adapter traduce automáticamente el
+       * contrato para seguir ejecutando exactamente un candidato por modelo.
+       */
+      const hparams_overrides = Object.fromEntries(
+        MODEL_STRATEGIES.map((ms) => {
+          const raw = modelOverridesJson[ms.value] ?? '{}';
+          try {
+            const parsed = JSON.parse(raw || '{}');
+            if (parsed === null || Array.isArray(parsed) || typeof parsed !== 'object') {
+              throw new Error('Debe ser un objeto JSON.');
+            }
+            return [ms.value, parsed];
+          } catch (parseError) {
+            throw new Error(`Overrides inválidos para ${ms.label}: ${(parseError as Error).message}`);
+          }
+        })
+      );
+
+      const sweepLaunch = await modelosApi.sweep({
         dataset_id: backendDatasetId,
         family,
         seed,
         epochs,
+        models: MODEL_STRATEGIES.map(ms => ms.value as any),
+        hparams_overrides,
         warm_start_from: warmStartFrom,
         auto_promote_champion: autoPromote,
         auto_prepare: true,
       } as any);
 
-      const finalStatus = await pollSweepJob(sweep_id);
-
-      if (finalStatus.status === 'failed') {
-        throw new Error(finalStatus.error || "Sweep falló");
+      let rawSummary: any;
+      if (sweepLaunch.requiresPolling) {
+        const finalStatus = await pollSweepJob(sweepLaunch.sweep_id);
+        if (finalStatus.status === 'failed') {
+          throw new Error(finalStatus.error || 'Sweep falló');
+        }
+        rawSummary = await modelosApi.getSweepSummary(sweepLaunch.sweep_id);
+      } else {
+        rawSummary = sweepLaunch.summary;
+        setSweepProgress(100);
       }
 
-      const rawSummary = await modelosApi.getSweepSummary(sweep_id);
       const result = modelosApi.mapSweepSummaryToResult(rawSummary, family);
 
       setSweepProgress(100);
@@ -116,6 +150,7 @@ export function SweepSubTab({
       onSweepComplete(uiCandidates);
       return;
     } catch (err) {
+      console.error('SweepSubTab.handleRunSweep', err);
       // Fallback a mocks: exactamente como prototipo (no bloquea UI).
     }
 
@@ -209,7 +244,8 @@ export function SweepSubTab({
                 <textarea
                   rows={2}
                   className="w-full bg-[#0f1419] border border-gray-700 rounded-md p-2 text-xs text-gray-300 font-mono resize-none focus:outline-none focus:border-cyan-500"
-                  defaultValue="{}"
+                  value={modelOverridesJson[ms.value] ?? '{}'}
+                  onChange={(e) => setModelOverridesJson(prev => ({ ...prev, [ms.value]: e.target.value }))}
                 />
               </div>
             ))}
