@@ -69,11 +69,29 @@ export interface EpochItemDto {
   recon_error?: number;
   time_epoch_ms?: number;
 
-  /** Campos opcionales si el backend expone métricas de val. */
+  /**
+   * Campos opcionales si el backend expone métricas supervisadas por época.
+   *
+   * Nota:
+   * - Para regresión suelen venir `train_rmse`, `val_rmse`, `train_mae`, etc.
+   * - Para clasificación pueden venir `train_accuracy`, `val_f1_macro`, etc.
+   * - Se mantiene una firma abierta para no perder métricas nuevas del backend.
+   */
   train_metric?: number;
   val_metric?: number;
   train_loss?: number;
   val_loss?: number;
+  train_rmse?: number;
+  val_rmse?: number;
+  train_mae?: number;
+  val_mae?: number;
+  train_r2?: number;
+  val_r2?: number;
+  train_accuracy?: number;
+  val_accuracy?: number;
+  train_f1_macro?: number;
+  val_f1_macro?: number;
+  [key: string]: number | string | null | undefined;
 }
 
 /**
