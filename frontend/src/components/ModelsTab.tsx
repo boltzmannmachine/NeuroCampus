@@ -3,8 +3,12 @@
 // 7 Sub-tabs: Resumen · Entrenamiento · Runs · Champion · Sweep · Bundle · Diagnóstico
 // ============================================================
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { motion } from 'motion/react';
+import { setAppFilters } from '@/state/appFilters.store';
+import { useModelosContext } from '@/features/modelos/hooks/useModelosContext';
+import { normalizeDatasetIdForBackend } from '@/features/modelos/utils/datasetId';
 import type { Family, RunRecord, ResolvedModel } from './models/mockData';
 import { ModelContextHeader } from './models/ModelContextHeader';
 import { SummarySubTab } from './models/SummarySubTab';
@@ -18,9 +22,25 @@ import { DiagnosticSubTab } from './models/DiagnosticSubTab';
 type SubTab = 'resumen' | 'entrenamiento' | 'runs' | 'champion' | 'sweep' | 'bundle' | 'diagnostico';
 
 export function ModelsTab() {
-  // Global context
-  const [datasetId, setDatasetId] = useState('ds_2025_1');
-  const [family, setFamily] = useState<Family>('sentiment_desempeno');
+  const navigate = useNavigate();
+
+  /**
+   * Contexto compartido entre Modelos y Predicciones.
+   *
+   * El hook conserva la experiencia visual legacy de Modelos, pero sincroniza
+   * el store global con IDs canónicos y metadatos reutilizables por otras
+   * pestañas.
+   */
+  const {
+    datasetId,
+    family,
+    setDatasetId,
+    setFamily,
+  } = useModelosContext({
+    initialDatasetId: 'ds_2025_1',
+    initialFamily: 'sentiment_desempeno',
+  });
+
   const [resolvedModel, setResolvedModel] = useState<ResolvedModel | null>(null);
 
   // Sub-tab state
@@ -37,10 +57,25 @@ export function ModelsTab() {
     setActiveSubTab('runs');
   }, []);
 
+  /**
+   * Navega a Predicciones preservando trazabilidad del run seleccionado.
+   *
+   * Importante:
+   * - Predicciones sigue resolviendo inferencia mediante el champion activo del
+   *   dataset/family soportado por backend.
+   * - El run se guarda como contexto de UI y trazabilidad, no como bypass del
+   *   contrato de inferencia.
+   */
   const handleUsePredictions = useCallback((runId: string) => {
-    // In a real app, navigate to Predictions tab with params
-    alert(`Navegar a Predictions con:\n  run_id=${runId}\n  dataset_id=${datasetId}\n  family=${family}`);
-  }, [datasetId, family]);
+    setAppFilters({
+      activeDatasetId: normalizeDatasetIdForBackend(datasetId),
+      selectedModelFamily: family,
+      requestedPredictionRunId: runId,
+      predictionSource: 'run',
+    });
+
+    navigate('/prediction');
+  }, [datasetId, family, navigate]);
 
   const handleTrainingComplete = useCallback((run: RunRecord) => {
     setSessionRuns(prev => [run, ...prev]);
@@ -75,7 +110,7 @@ export function ModelsTab() {
       {/* Global Context Header */}
       <ModelContextHeader
         datasetId={datasetId}
-        family={family}
+        family={family as Family}
         onDatasetChange={setDatasetId}
         onFamilyChange={setFamily}
         resolvedModel={resolvedModel}
@@ -96,7 +131,7 @@ export function ModelsTab() {
 
         <TabsContent value="resumen" className="mt-5">
           <SummarySubTab
-            family={family}
+            family={family as Family}
             datasetId={datasetId}
             onNavigateToRun={handleNavigateToRun}
             onUsePredictions={handleUsePredictions}
@@ -105,7 +140,7 @@ export function ModelsTab() {
 
         <TabsContent value="entrenamiento" className="mt-5">
           <TrainingSubTab
-            family={family}
+            family={family as Family}
             datasetId={datasetId}
             onTrainingComplete={handleTrainingComplete}
             onNavigateToRun={handleNavigateToRun}
@@ -115,7 +150,7 @@ export function ModelsTab() {
 
         <TabsContent value="runs" className="mt-5">
           <RunsSubTab
-            family={family}
+            family={family as Family}
             datasetId={datasetId}
             extraRuns={sessionRuns}
             initialRunId={navigateToRunId}
@@ -125,7 +160,7 @@ export function ModelsTab() {
 
         <TabsContent value="champion" className="mt-5">
           <ChampionSubTab
-            family={family}
+            family={family as Family}
             datasetId={datasetId}
             extraRuns={sessionRuns}
             onNavigateToRun={handleNavigateToRun}
@@ -135,7 +170,7 @@ export function ModelsTab() {
 
         <TabsContent value="sweep" className="mt-5">
           <SweepSubTab
-            family={family}
+            family={family as Family}
             datasetId={datasetId}
             onNavigateToRun={handleNavigateToRun}
             onUsePredictions={handleUsePredictions}
@@ -145,14 +180,14 @@ export function ModelsTab() {
 
         <TabsContent value="bundle" className="mt-5">
           <BundleSubTab
-            family={family}
+            family={family as Family}
             datasetId={datasetId}
           />
         </TabsContent>
 
         <TabsContent value="diagnostico" className="mt-5">
           <DiagnosticSubTab
-            family={family}
+            family={family as Family}
             datasetId={datasetId}
           />
         </TabsContent>
