@@ -1,60 +1,54 @@
-// frontend/src/features/modelos/hooks/useModelosContext.ts
 // =============================================================================
 // NeuroCampus — Feature Modelos: Hook de contexto (dataset/family/model)
 // =============================================================================
 //
 // Este hook centraliza el estado de selección que la pestaña Modelos necesita
-// (dataset_id, family, model_name), y lo sincroniza con el store global
-// (si existe) para mantener coherencia entre pestañas.
+// (dataset_id, family, model_name) y lo sincroniza con el store global real.
 //
 // Principios:
-// - No alterar la UI del prototipo.
-// - Evitar acoplar componentes UI a detalles del store; este hook funciona como
-//   "puente".
-//
-// Notas:
-// - Si el store global no está disponible o cambia de nombre, este hook mantiene
-//   un estado local y expone setters.
-// - Cuando el backend esté completo, este hook será el lugar para añadir
-//   persistencia (query params, localStorage, etc.) sin tocar la UI.
+// - Mantener la UI legacy de Modelos operando con IDs tipo `ds_2025_1`.
+// - Mantener el store global en formato canónico backend (`2025-1`) para que
+//   Predicciones y otras vistas compartan el mismo contrato.
+// - Encapsular la traducción entre ambos formatos en un solo lugar.
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
+import { getAppFilters, setAppFilters, useAppFilters } from "@/state/appFilters.store";
+
+import { normalizeDatasetIdForBackend, normalizeDatasetIdForUi } from "../utils/datasetId";
 import { type Family, type ModeloName } from "../types";
 
 /**
- * Contrato mínimo de un store global de filtros.
+ * Contrato mínimo del store global que este hook necesita.
  *
- * El repositorio puede tener stores con nombres diferentes; por eso evitamos
- * importar directamente. La sincronización real se hace de forma opcional en
- * `bindGlobalFilters`.
+ * Se expone como API imperativa para mantener desacoplados los componentes de
+ * UI y permitir que el hook siga siendo el único punto de sincronización.
  */
 interface GlobalFiltersLike {
-  activeDatasetId?: string;
-  setActiveDatasetId?: (id: string) => void;
+  getActiveDatasetId: () => string | null;
+  setActiveDatasetId: (id: string) => void;
 
-  activeFamily?: Family;
-  setActiveFamily?: (family: Family) => void;
+  getActiveFamily: () => Family | null;
+  setActiveFamily: (family: Family) => void;
 
-  activeModelName?: ModeloName;
-  setActiveModelName?: (name: ModeloName) => void;
+  getActiveModelName: () => ModeloName | null;
+  setActiveModelName: (name: ModeloName) => void;
 }
 
 /**
- * Intenta enlazar con un store global si existe.
- *
- * Implementación:
- * - En este paso NO asumimos un path exacto.
- * - La integración concreta se hará cuando confirmemos dónde vive el store.
- *
- * @returns `null` cuando no hay store detectable.
+ * Enlaza la pestaña Modelos con el store global real del proyecto.
  */
-function bindGlobalFilters(): GlobalFiltersLike | null {
-  // TODO(P16): conectar con store real del proyecto.
-  // Ejemplo esperado en NeuroCampus:
-  //   import { useAppFiltersStore } from "@/stores/appFilters.store";
-  //   return useAppFiltersStore.getState();
-  return null;
+function bindGlobalFilters(): GlobalFiltersLike {
+  return {
+    getActiveDatasetId: () => getAppFilters().activeDatasetId,
+    setActiveDatasetId: (id: string) => setAppFilters({ activeDatasetId: id }),
+
+    getActiveFamily: () => (getAppFilters().selectedModelFamily as Family | null) ?? null,
+    setActiveFamily: (family: Family) => setAppFilters({ selectedModelFamily: family }),
+
+    getActiveModelName: () => (getAppFilters().selectedModelName as ModeloName | null) ?? null,
+    setActiveModelName: (name: ModeloName) => setAppFilters({ selectedModelName: name }),
+  };
 }
 
 /**
@@ -84,38 +78,61 @@ export function useModelosContext(params?: {
 }): ModelosContextState {
   const global = useMemo(() => bindGlobalFilters(), []);
 
-  // Defaults conservadores (no rompen UI)
-  const defaultDatasetId = params?.initialDatasetId ?? "2024-2";
+  const defaultDatasetId = normalizeDatasetIdForUi(params?.initialDatasetId ?? "2024-2");
   const defaultFamily: Family = params?.initialFamily ?? "sentiment_desempeno";
   const defaultModel: ModeloName = params?.initialModelName ?? "rbm_general";
 
-  // Si hay store global, usarlo como fuente inicial.
-  const [datasetId, setDatasetIdLocal] = useState<string>(global?.activeDatasetId ?? defaultDatasetId);
-  const [family, setFamilyLocal] = useState<Family>(global?.activeFamily ?? defaultFamily);
-  const [modelName, setModelNameLocal] = useState<ModeloName>(global?.activeModelName ?? defaultModel);
+  const globalDatasetId = useAppFilters((state) => state.activeDatasetId);
+  const globalFamily = useAppFilters((state) => state.selectedModelFamily);
+  const globalModelName = useAppFilters((state) => state.selectedModelName);
+
+  const datasetId = normalizeDatasetIdForUi(globalDatasetId ?? defaultDatasetId);
+  const family = (globalFamily as Family | null) ?? defaultFamily;
+  const modelName = (globalModelName as ModeloName | null) ?? defaultModel;
+
+  /**
+   * Inicializa el store compartido una sola vez con defaults conservadores.
+   *
+   * Con esto evitamos que Modelos opere aislado de Predicciones cuando el
+   * usuario entra directo a `/models` con el store vacío.
+   */
+  useEffect(() => {
+    const patch: Record<string, string> = {};
+
+    if (!global.getActiveDatasetId()) {
+      patch.activeDatasetId = normalizeDatasetIdForBackend(defaultDatasetId);
+    }
+    if (!global.getActiveFamily()) {
+      patch.selectedModelFamily = defaultFamily;
+    }
+    if (!global.getActiveModelName()) {
+      patch.selectedModelName = defaultModel;
+    }
+
+    if (Object.keys(patch).length > 0) {
+      setAppFilters(patch);
+    }
+  }, [defaultDatasetId, defaultFamily, defaultModel, global]);
 
   const setDatasetId = useCallback(
     (id: string) => {
-      setDatasetIdLocal(id);
-      global?.setActiveDatasetId?.(id);
+      global.setActiveDatasetId(normalizeDatasetIdForBackend(id));
     },
-    [global]
+    [global],
   );
 
   const setFamily = useCallback(
-    (f: Family) => {
-      setFamilyLocal(f);
-      global?.setActiveFamily?.(f);
+    (nextFamily: Family) => {
+      global.setActiveFamily(nextFamily);
     },
-    [global]
+    [global],
   );
 
   const setModelName = useCallback(
-    (name: ModeloName) => {
-      setModelNameLocal(name);
-      global?.setActiveModelName?.(name);
+    (nextModelName: ModeloName) => {
+      global.setActiveModelName(nextModelName);
     },
-    [global]
+    [global],
   );
 
   return {
