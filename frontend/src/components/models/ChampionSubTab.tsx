@@ -11,8 +11,9 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { modelosApi } from '@/features/modelos/api';
+import { buildDatasetIdBridge } from '@/features/modelos/utils/datasetId';
 import {
-  MOCK_CHAMPIONS, MOCK_RUNS, DATASETS, FAMILY_CONFIGS, formatDate,
+  MOCK_CHAMPIONS, MOCK_RUNS, FAMILY_CONFIGS, formatDate,
   type Family, type ChampionRecord, type RunRecord,
 } from './mockData';
 import { BundleStatusBadge, WarmStartBadge, TextFeaturesBadge, CopyButton } from './SharedBadges';
@@ -56,35 +57,10 @@ export function ChampionSubTab({
   // Backend integration (tolerante): champion + runs con fallback a mocks.
   // ---------------------------------------------------------------------------
   const [remoteChampion, setRemoteChampion] = useState<ChampionRecord | undefined>(undefined);
-  // Always try to load the champion from the API when this tab is opened, so we
-  // don't depend on the (possibly mocked) context state after a promotion from another tab.
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        const resp = await modelosApi.getChampionUI({ datasetId, family });
-        if (!alive) return;
-        setRemoteChampion(resp.record);
-      } catch (err) {
-        if (!alive) return;
-        // 404 -> no champion: leave undefined so the empty state renders.
-        setRemoteChampion(undefined);
-      }
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, [datasetId, family]);
-
-  const [remoteRuns, setRemoteRuns] = useState<RunRecord[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-
-    // El UI usa IDs tipo "ds_2025_1"; el backend suele usar "2025-1".
-    const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
+    const { backendDatasetId, uiDatasetId } = buildDatasetIdBridge(datasetId);
 
     (async () => {
       try {
@@ -93,27 +69,31 @@ export function ChampionSubTab({
           family,
         });
 
-        // Paridad visual: mantener dataset_id como el ID UI seleccionado.
-        const uiRecord: ChampionRecord = { ...record, dataset_id: datasetId };
-        if (!cancelled) setRemoteChampion(uiRecord);
+        if (!cancelled) {
+          setRemoteChampion({ ...record, dataset_id: uiDatasetId });
+        }
       } catch {
-        // Si el backend no está listo/offline, dejamos `remoteChampion` indefinido
-        // y la UI cae a los mocks del prototipo.
+        // 404 o backend offline: dejamos que la UI resuelva el empty state o el
+        // fallback de mocks sin duplicar llamadas redundantes.
         if (!cancelled) setRemoteChampion(undefined);
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [family, datasetId]);
+
+  const [remoteRuns, setRemoteRuns] = useState<RunRecord[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
+    const { backendDatasetId, uiDatasetId } = buildDatasetIdBridge(datasetId);
 
     (async () => {
       try {
         const runs = await modelosApi.listRunsUI({ datasetId: backendDatasetId, family });
-        const uiRuns = runs.map(r => ({ ...r, dataset_id: datasetId }));
+        const uiRuns = runs.map(r => ({ ...r, dataset_id: uiDatasetId }));
         if (!cancelled) setRemoteRuns(uiRuns);
       } catch {
         if (!cancelled) setRemoteRuns(null);
@@ -189,7 +169,7 @@ export function ChampionSubTab({
     }
 
     // Mapear dataset UI -> dataset backend (periodo).
-    const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
+    const { backendDatasetId, uiDatasetId } = buildDatasetIdBridge(datasetId);
 
     try {
       await modelosApi.promote({
