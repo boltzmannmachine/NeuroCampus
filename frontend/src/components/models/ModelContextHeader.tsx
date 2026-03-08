@@ -9,6 +9,7 @@ import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { Search, Zap } from 'lucide-react';
 import { modelosApi } from '@/features/modelos/api';
+import { normalizeDatasetIdForBackend, normalizeDatasetIdForUi } from '@/features/modelos/utils/datasetId';
 import {
   DATASETS, FAMILY_CONFIGS, MOCK_CHAMPIONS, MOCK_RUNS,
   type Family, type ModelResolveSource, type ResolvedModel,
@@ -72,9 +73,9 @@ export function ModelContextHeader({
 
         // Si el dataset seleccionado no existe en backend, selecciona el primero disponible.
         if (normalized.length > 0) {
-          const values = new Set(normalized.map((x) => x.dataset_id));
+          const values = new Set(normalized.map((x) => normalizeDatasetIdForUi(x.dataset_id)));
           if (!values.has(datasetId)) {
-            onDatasetChange(normalized[0].dataset_id);
+            onDatasetChange(normalizeDatasetIdForUi(normalized[0].dataset_id));
           }
         }
       } catch {
@@ -98,8 +99,8 @@ export function ModelContextHeader({
         if (d.has_train_matrix) bits.push('train_matrix');
         if (d.has_pair_matrix) bits.push('pair_matrix');
         return {
-          value: d.dataset_id,
-          label: d.dataset_id,
+          value: normalizeDatasetIdForUi(d.dataset_id),
+          label: normalizeDatasetIdForUi(d.dataset_id),
           detail: bits.length ? bits.join(' · ') : null,
         };
       });
@@ -128,7 +129,7 @@ export function ModelContextHeader({
     setResolveError(null);
 
     // Mapea dataset UI -> dataset backend (periodo). Si no hay match, usa el id tal cual.
-    const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
+    const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
 
     try {
       if (resolveSource === 'champion') {
