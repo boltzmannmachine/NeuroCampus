@@ -1,6 +1,16 @@
 // frontend/src/state/appFilters.store.ts
 import { useSyncExternalStore } from "react";
 
+/**
+ * Fuente lógica solicitada por la pestaña Predicciones.
+ *
+ * Nota de producto:
+ * - El backend actual resuelve inferencia usando el champion activo.
+ * - Aun así, conservamos el run seleccionado en Modelos como trazabilidad
+ *   para que Predicciones pueda mostrar contexto al usuario.
+ */
+export type PredictionSource = "champion" | "run";
+
 export type AppFiltersState = {
   activeDatasetId: string | null;
   activePeriodo: string | null;
@@ -18,6 +28,17 @@ export type AppFiltersState = {
   programa: string | null;
   asignatura: string | null;
   docente: string | null;
+
+  /**
+   * Contexto compartido entre Modelos y Predicciones.
+   *
+   * Estos campos no reemplazan la resolución real del backend; sirven para
+   * transportar intención de navegación, trazabilidad y defaults de UI.
+   */
+  selectedModelFamily: string | null;
+  selectedModelName: string | null;
+  requestedPredictionRunId: string | null;
+  predictionSource: PredictionSource | null;
 };
 
 const STORAGE_KEY = "NC_APP_FILTERS_V1";
@@ -30,6 +51,10 @@ const defaultState: AppFiltersState = {
   programa: null,
   asignatura: null,
   docente: null,
+  selectedModelFamily: null,
+  selectedModelName: null,
+  requestedPredictionRunId: null,
+  predictionSource: null,
 };
 
 function safeParse(json: string | null): AppFiltersState | null {
