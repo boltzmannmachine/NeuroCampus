@@ -47,6 +47,9 @@ export function PredictionsTab() {
 
   // --- Filtros globales (sincroniza dataset entre pestañas) ---
   const activeDatasetId = useAppFilters((s) => s.activeDatasetId);
+  const selectedModelFamily = useAppFilters((s) => s.selectedModelFamily);
+  const requestedPredictionRunId = useAppFilters((s) => s.requestedPredictionRunId);
+  const predictionSource = useAppFilters((s) => s.predictionSource);
 
   // --- Resultado individual ---
   const [predResult, setPredResult] = useState<IndividualPredictionResponse | null>(null);
@@ -85,6 +88,15 @@ export function PredictionsTab() {
   const batchLow = batchRows.filter((r) => r.risk === 'low').length;
   const batchMedium = batchRows.filter((r) => r.risk === 'medium').length;
   const batchHigh = batchRows.filter((r) => r.risk === 'high').length;
+
+  const selectedFamilyLabel = useMemo(() => {
+    if (selectedModelFamily === 'score_docente') return 'Score Docente';
+    if (selectedModelFamily === 'sentiment_desempeno') return 'Sentiment Desempeño';
+    return selectedModelFamily ?? null;
+  }, [selectedModelFamily]);
+
+  const hasModelsContext = Boolean(selectedModelFamily || requestedPredictionRunId || predictionSource);
+  const predictionsSupportsSelectedFamily = !selectedModelFamily || selectedModelFamily === 'score_docente';
 
   // Cargar datasets al montar (respetando el dataset activo global si existe)
   useEffect(() => {
@@ -417,6 +429,59 @@ export function PredictionsTab() {
         <h2 className="text-white mb-2">Predicciones</h2>
         <p className="text-gray-400">Sistema de predicción del desempeño docente</p>
       </motion.div>
+
+      {hasModelsContext && (
+        <Card className="bg-[#1a1f2e] border-gray-800 p-4">
+          <div className="flex items-start gap-3">
+            {predictionsSupportsSelectedFamily ? (
+              <CheckCircle className="w-5 h-5 mt-0.5 text-emerald-400" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 mt-0.5 text-yellow-400" />
+            )}
+
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-white text-sm">Contexto recibido desde Modelos</h3>
+                <p className="text-xs text-gray-400">
+                  Esta pestaña ejecuta inferencia usando el champion activo del dataset seleccionado.
+                  El run enviado desde Modelos se conserva como referencia de trazabilidad para la UI.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {activeDatasetId && (
+                  <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                    dataset {activeDatasetId}
+                  </Badge>
+                )}
+                {selectedFamilyLabel && (
+                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                    family {selectedFamilyLabel}
+                  </Badge>
+                )}
+                {requestedPredictionRunId && (
+                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 font-mono">
+                    run {requestedPredictionRunId}
+                  </Badge>
+                )}
+                {predictionSource && (
+                  <Badge className="bg-gray-700 text-gray-200 border-gray-600">
+                    origen {predictionSource === 'run' ? 'run seleccionado' : 'champion'}
+                  </Badge>
+                )}
+              </div>
+
+              {!predictionsSupportsSelectedFamily && (
+                <p className="text-xs text-yellow-300/90">
+                  El contexto activo en Modelos corresponde a {selectedFamilyLabel}, pero la pestaña Predicciones
+                  opera actualmente sobre el champion de la family score_docente. Puedes seguir usando el dataset
+                  compartido; el run seleccionado queda como referencia visual.
+                </p>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Tabs */}
       <Tabs value={predictionMode} onValueChange={(v) => setPredictionMode(v as 'individual' | 'batch')}>
