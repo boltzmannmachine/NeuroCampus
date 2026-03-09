@@ -38,12 +38,14 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
   // Estado remoto del backend: cuando el backend está disponible, esta variable
   // reemplaza el bundle resuelto por mocks manteniendo la UI 1:1.
   const [remoteRun, setRemoteRun] = useState<RunRecord | null>(null);
+  const [remoteArtifacts, setRemoteArtifacts] = useState<Record<string, object | null> | null>(null);
 
   // Si cambia el contexto (family/dataset), invalidamos el bundle resuelto.
   useEffect(() => {
     setResolved(false);
     setResolveError(null);
     setRemoteRun(null);
+    setRemoteArtifacts(null);
   }, [family, datasetId]);
 
   const champKey = `${family}__${datasetId}`;
@@ -69,6 +71,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
   const handleResolve = async () => {
     setResolveError(null);
     setRemoteRun(null);
+    setRemoteArtifacts(null);
 
     // Map UI datasetId ("ds_2025_1") a backend datasetId ("2025-1") cuando aplica.
     const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
@@ -82,14 +85,27 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
         const runId = champ.record.run_id;
 
         // Cargar detalle del run para obtener checklist/bundle_status.
-        const run = await modelosApi.getRunDetailsUI(runId);
-        setRemoteRun({ ...run, dataset_id: datasetId });
+        const bundle = await modelosApi.getRunBundleUI(runId);
+        setRemoteRun({ ...bundle.run, dataset_id: datasetId });
+        setRemoteArtifacts(bundle.artifacts ? {
+          predictor: bundle.artifacts.predictor ?? null,
+          metrics: bundle.artifacts.metrics ?? null,
+          job_meta: bundle.artifacts.job_meta ?? null,
+          preprocess: bundle.artifacts.preprocess ?? null,
+        } : null);
         setResolved(true);
         return;
       }
 
       // resolveSource === 'run_id'
-      const run = await modelosApi.getRunDetailsUI(resolveRunId);
+      const bundle = await modelosApi.getRunBundleUI(resolveRunId);
+      const run = bundle.run;
+      setRemoteArtifacts(bundle.artifacts ? {
+        predictor: bundle.artifacts.predictor ?? null,
+        metrics: bundle.artifacts.metrics ?? null,
+        job_meta: bundle.artifacts.job_meta ?? null,
+        preprocess: bundle.artifacts.preprocess ?? null,
+      } : null);
       if (run.bundle_status === 'incomplete') {
         setResolveError('422: Bundle incompleto — falta artefactos para inferencia completa.');
       }
@@ -159,11 +175,18 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
     created_at: resolvedRun?.created_at ?? new Date().toISOString(),
   };
 
+  /**
+   * JSONs a mostrar en el viewer.
+   *
+   * Prioridad:
+   * 1) artefactos reales devueltos por backend para el run resuelto
+   * 2) fallback mock para conservar la UI del prototipo cuando backend no está listo
+   */
   const jsonTabs: Record<string, object> = {
-    predictor: predictorJson,
-    metrics: metricsJson,
-    job_meta: jobMetaJson,
-    preprocess: preprocessJson,
+    predictor: (remoteArtifacts?.predictor as object | null) ?? predictorJson,
+    metrics: (remoteArtifacts?.metrics as object | null) ?? metricsJson,
+    job_meta: (remoteArtifacts?.job_meta as object | null) ?? jobMetaJson,
+    preprocess: (remoteArtifacts?.preprocess as object | null) ?? preprocessJson,
   };
 
   return (
@@ -174,7 +197,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
         <div className="flex items-end gap-3">
           <div>
             <label className="block text-xs text-gray-400 mb-1">Fuente</label>
-            <Select value={resolveSource} onValueChange={(v) => { setResolveSource(v as ModelResolveSource); setResolved(false); setResolveError(null); setRemoteRun(null); }}>
+            <Select value={resolveSource} onValueChange={(v) => { setResolveSource(v as ModelResolveSource); setResolved(false); setResolveError(null); setRemoteRun(null); setRemoteArtifacts(null); }}>
               <SelectTrigger className="bg-[#0f1419] border-gray-700 h-9 text-sm w-[140px]">
                 <SelectValue />
               </SelectTrigger>
@@ -189,7 +212,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
               <label className="block text-xs text-gray-400 mb-1">Run ID</label>
               <Input
                 value={resolveRunId}
-                onChange={e => { setResolveRunId(e.target.value); setResolved(false); }}
+                onChange={e => { setResolveRunId(e.target.value); setResolved(false); setResolveError(null); setRemoteRun(null); setRemoteArtifacts(null); }}
                 placeholder="run_xxxxxxxx"
                 className="bg-[#0f1419] border-gray-700 h-9 text-sm"
               />
