@@ -63,6 +63,44 @@ INDICATOR_NAMES: List[str] = [
 
 
 # ---------------------------------------------------------------------------
+# Helpers internos
+# ---------------------------------------------------------------------------
+
+def _normalize_indicator_value(value: float) -> float:
+    """Normaliza un indicador a escala 0–5 con compatibilidad legacy.
+
+    En algunas variantes del pipeline histórico, ``mean_calif_*`` quedó
+    persistido en escala 0–50 en vez de 0–5. Cuando eso ocurre, el radar y el
+    bar chart mezclan magnitudes incompatibles y la serie de predicción se ve
+    aplastada cerca del origen.
+
+    Esta función corrige ese caso manteniendo compatibilidad hacia atrás:
+
+    - si el valor ya está en 0–5, se conserva;
+    - si viene en 0–50, se reescala a 0–5 dividiendo por 10;
+    - cualquier valor fuera de rango se recorta a [0, 5].
+    """
+    try:
+        normalized = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+    if normalized < 0.0:
+        return 0.0
+    if normalized > 5.0:
+        if normalized <= 50.0:
+            normalized = normalized / 10.0
+        else:
+            normalized = 5.0
+    return round(min(max(normalized, 0.0), 5.0), 4)
+
+
+def _normalize_indicator_means(values: List[float]) -> List[float]:
+    """Normaliza una lista de indicadores a la escala visual canónica 0–5."""
+    return [_normalize_indicator_value(v) for v in values]
+
+
+# ---------------------------------------------------------------------------
 # Funciones públicas
 # ---------------------------------------------------------------------------
 
@@ -148,16 +186,18 @@ def build_radar(
     Returns:
         Lista de dicts con claves ``indicator``, ``actual``, ``prediccion``.
     """
+    normalized_means = _normalize_indicator_means(calif_means)
+
     global_actual = mean_score_total / 50.0 * 5.0
     global_pred = score_total_pred / 50.0 * 5.0
     ratio = global_pred / max(global_actual, 0.01)
 
-    n = min(len(INDICATOR_NAMES), len(calif_means))
+    n = min(len(INDICATOR_NAMES), len(normalized_means))
     return [
         {
             "indicator": INDICATOR_NAMES[i],
-            "actual": round(float(calif_means[i]), 3),
-            "prediccion": round(min(float(calif_means[i]) * ratio, 5.0), 3),
+            "actual": round(float(normalized_means[i]), 3),
+            "prediccion": round(min(float(normalized_means[i]) * ratio, 5.0), 3),
         }
         for i in range(n)
     ]
@@ -179,16 +219,19 @@ def build_comparison(
     Returns:
         Lista de dicts con claves ``dimension``, ``docente``, ``cohorte``.
     """
+    docente_normalized = _normalize_indicator_means(calif_means_docente)
+    cohorte_normalized = _normalize_indicator_means(calif_means_cohorte)
+
     n = min(
         len(INDICATOR_NAMES),
-        len(calif_means_docente),
-        len(calif_means_cohorte),
+        len(docente_normalized),
+        len(cohorte_normalized),
     )
     return [
         {
             "dimension": INDICATOR_NAMES[i],
-            "docente": round(float(calif_means_docente[i]), 3),
-            "cohorte": round(float(calif_means_cohorte[i]), 3),
+            "docente": round(float(docente_normalized[i]), 3),
+            "cohorte": round(float(cohorte_normalized[i]), 3),
         }
         for i in range(n)
     ]
