@@ -989,12 +989,18 @@ class RunSummary(BaseModel):
 
 
 class RunDetails(BaseModel):
-    """Detalle completo de un run."""
+    """Detalle completo de un run.
+
+    Además de métricas/configuración, este schema expone el estado explícito del
+    bundle de inferencia para que el frontend no dependa de heurísticas al
+    decidir si un run es desplegable o qué JSONs puede visualizar.
+    """
 
     model_config = ConfigDict(extra="ignore")
 
     run_id: str
     dataset_id: Optional[str] = None
+    model_name: Optional[str] = None
     family: Optional[Family] = None
     task_type: Optional[TaskType] = None
     input_level: Optional[InputLevel] = None
@@ -1004,6 +1010,11 @@ class RunDetails(BaseModel):
     metrics: Dict[str, Any]
     config: Optional[Dict[str, Any]] = None
     artifact_path: Optional[str] = None
+
+    # Estado explícito de artefactos del bundle de inferencia.
+    bundle_status: Optional[str] = None
+    bundle_checklist: Optional[Dict[str, bool]] = None
+    bundle_artifacts: Optional[Dict[str, Any]] = None
 
 
 
