@@ -11,7 +11,7 @@ import { Search, Zap } from 'lucide-react';
 import { modelosApi } from '@/features/modelos/api';
 import { normalizeDatasetIdForBackend, normalizeDatasetIdForUi } from '@/features/modelos/utils/datasetId';
 import {
-  DATASETS, FAMILY_CONFIGS, MOCK_CHAMPIONS, MOCK_RUNS,
+  DATASETS, FAMILY_CONFIGS, MOCK_CHAMPIONS,
   type Family, type ModelResolveSource, type ResolvedModel,
 } from './mockData';
 import { BundleStatusBadge, MetricChip } from './SharedBadges';
@@ -297,11 +297,25 @@ export function ModelContextHeader({
         <MetricChip label="Métrica principal" value={fc.primaryMetric} mode={fc.metricMode} />
         {resolvedModel && (
           <>
-            <MetricChip label="bundle_version" value={MOCK_RUNS.find(r => r.run_id === resolvedModel.resolved_run_id)?.bundle_version ?? '—'} />
             <BundleStatusBadge status={resolvedModel.bundle_status} />
             <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/40 gap-1 text-xs">
               <Zap className="w-3 h-3" />
               {resolvedModel.source === 'champion' ? 'Champion' : 'Run'}: {resolvedModel.resolved_run_id}
+            </Badge>
+            <Badge
+              className={`text-xs ${
+                family === 'score_docente'
+                  ? resolvedModel.source === 'champion'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/40'
+                  : 'bg-slate-500/20 text-slate-300 border-slate-500/40'
+              }`}
+            >
+              {family === 'score_docente'
+                ? resolvedModel.source === 'champion'
+                  ? 'Listo para Predicciones'
+                  : 'Predicciones usa el champion activo'
+                : 'Predicciones consume score_docente'}
             </Badge>
           </>
         )}
