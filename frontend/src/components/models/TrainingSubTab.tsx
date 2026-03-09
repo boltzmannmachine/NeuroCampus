@@ -72,26 +72,49 @@ export function TrainingSubTab({
   const warmStartValid = !warmStart || warmStartFrom !== 'run_id' || warmStartRunId.trim().length > 0;
 
   /**
-   * Prepara feature-pack (si el backend lo tiene) o mantiene el comportamiento
-   * del prototipo como fallback.
+   * Prepara el feature-pack del dataset activo.
    *
-   * Estrategia:
-   * - Intentar `GET /modelos/readiness` para verificar si `feature_pack_exists`.
-   * - Si el backend no responde (o no está listo), usar simulación 1:1.
+   * Flujo preferido:
+   * 1) Consultar readiness para evitar trabajo innecesario si el artefacto ya existe.
+   * 2) Si todavía no existe, llamar al endpoint real `POST /modelos/feature-pack/prepare`.
+   * 3) Revalidar readiness antes de marcar el estado como listo.
+   *
+   * Compatibilidad:
+   * - Si el backend no expone todavía el endpoint o falla la llamada, mantenemos el
+   *   fallback visual del prototipo para no bloquear la exploración de la UI.
    */
   const handlePrepareFeaturePack = async () => {
     isCancelledRef.current = false;
     setFeaturePackStatus('preparing');
+    setTrainingError(null);
 
     // datasetId en UI usa ids tipo ds_2025_1; el backend usa el periodo 2025-1.
     const backendDatasetId = DATASETS.find((d) => d.id === datasetId)?.period ?? datasetId;
 
     try {
-      const readiness = await modelosApi.readiness(backendDatasetId);
-      if (!isCancelledRef.current && readiness.feature_pack_exists) {
+      const readinessBefore = await modelosApi.readiness(backendDatasetId);
+      if (!isCancelledRef.current && readinessBefore.feature_pack_exists) {
         setFeaturePackStatus('ready');
         return;
       }
+
+      await modelosApi.prepareFeaturePack({
+        dataset_id: backendDatasetId,
+        force: false,
+        text_feats_mode: family === 'sentiment_desempeno' ? 'tfidf_lsa' : 'none',
+      });
+
+      const readinessAfter = await modelosApi.readiness(backendDatasetId);
+      if (!isCancelledRef.current && readinessAfter.feature_pack_exists) {
+        setFeaturePackStatus('ready');
+        return;
+      }
+
+      if (!isCancelledRef.current) {
+        setFeaturePackStatus('idle');
+        setTrainingError('El backend respondió, pero el feature-pack aún no aparece como disponible.');
+      }
+      return;
     } catch {
       // Ignorar: caemos al fallback del prototipo.
     }
