@@ -29,6 +29,20 @@ import { useAppFilters, setAppFilters, getAppFilters } from '../state/appFilters
 
 // --- Pestaña Predicciones (docente–materia) ---
 
+/**
+ * Normaliza valores de indicadores a la escala visual canónica 0–5.
+ *
+ * La API de predicciones debería entregar radar y comparación ya normalizados,
+ * pero este guardarraíl evita que una respuesta legacy o desalineada vuelva a
+ * aplastar la serie verde de predicción cerca del origen.
+ */
+function normalizeIndicatorScale(value: number | null | undefined): number {
+  const numeric = Number(value ?? 0);
+  if (!Number.isFinite(numeric) || numeric <= 0) return 0;
+  if (numeric > 5) return Math.min(numeric / 10, 5);
+  return Math.min(numeric, 5);
+}
+
 export function PredictionsTab() {
   // --- Modo ---
   const [predictionMode, setPredictionMode] = useState<'individual' | 'batch'>('individual');
@@ -80,8 +94,24 @@ export function PredictionsTab() {
   const gaugePercent = predictedScore != null ? Math.round((predictedScore / 50) * 100) : 0;
   const scoreDisplay = predictedScore != null ? predictedScore.toFixed(2) : '—';
   const confidenceDisplay = predResult ? `${Math.round(predResult.confidence * 100)}%` : '—';
-  const radarData = predResult?.radar ?? [];
-  const comparisonData = predResult?.comparison ?? [];
+  const radarData = useMemo(
+    () =>
+      (predResult?.radar ?? []).map((point) => ({
+        ...point,
+        actual: normalizeIndicatorScale(point.actual),
+        prediccion: normalizeIndicatorScale(point.prediccion),
+      })),
+    [predResult],
+  );
+  const comparisonData = useMemo(
+    () =>
+      (predResult?.comparison ?? []).map((point) => ({
+        ...point,
+        docente: normalizeIndicatorScale(point.docente),
+        cohorte: normalizeIndicatorScale(point.cohorte),
+      })),
+    [predResult],
+  );
   const historicalData = predResult?.timeline ?? [];
   const predRisk = predResult?.risk ?? 'low';
   const batchTotal = batchStatus?.n_pairs ?? batchRows.length;
@@ -699,7 +729,12 @@ export function PredictionsTab() {
                         <RadarChart data={radarData}>
                           <PolarGrid stroke="#374151" />
                           <PolarAngleAxis dataKey="indicator" stroke="#9CA3AF" tick={{ fontSize: 11 }} />
-                          <PolarRadiusAxis angle={90} domain={[0, 5]} stroke="#9CA3AF" />
+                          <PolarRadiusAxis
+                            angle={90}
+                            domain={[0, 5]}
+                            ticks={[0, 1, 2, 3, 4, 5]}
+                            stroke="#9CA3AF"
+                          />
                           <Radar name="Promedio Actual" dataKey="actual" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
                           <Radar name="Predicción" dataKey="prediccion" stroke="#10B981" fill="#10B981" fillOpacity={0.4} />
                           <Legend />
@@ -723,7 +758,7 @@ export function PredictionsTab() {
                         <BarChart data={comparisonData}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                           <XAxis dataKey="dimension" stroke="#9CA3AF" />
-                          <YAxis domain={[0, 5]} stroke="#9CA3AF" />
+                          <YAxis domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} stroke="#9CA3AF" />
                           <Tooltip
                             contentStyle={{ backgroundColor: '#1a1f2e', border: '1px solid #374151' }}
                             labelStyle={{ color: '#fff' }}
