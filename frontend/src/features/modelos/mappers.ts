@@ -278,7 +278,6 @@ export function mapRunSummaryToRunRecord(summary: RunSummaryDto): RunRecord {
     run_id: summary.run_id,
     dataset_id: summary.dataset_id ?? "unknown",
     family,
-    model_name: (details.model_name as ModeloName) ?? record.model_name,
     model_name: (summary.model_name as ModeloName) ?? "rbm_general",
     task_type: summary.task_type ?? fc.taskType,
     input_level: summary.input_level ?? fc.inputLevel,
