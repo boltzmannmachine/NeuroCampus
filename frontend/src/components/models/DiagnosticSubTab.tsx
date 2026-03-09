@@ -1,18 +1,23 @@
 // ============================================================
 // NeuroCampus — Diagnóstico Sub-Tab
 // ============================================================
-import { useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import {
-  Shield, RefreshCw, Copy, CheckCircle2, AlertTriangle, XCircle,
+  RefreshCw, Copy, CheckCircle2, AlertTriangle, XCircle,
   Heart, FileCheck, Activity,
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { modelosApi } from '@/features/modelos/api';
+import { buildDiagnosticsSnapshot } from '@/features/modelos/diagnostics';
+import { buildDatasetIdBridge } from '@/features/modelos/utils/datasetId';
 import {
-  generateDiagnostics, MOCK_RUNS, FAMILY_CONFIGS,
-  type Family, type DiagnosticCheck,
+  MOCK_CHAMPIONS,
+  MOCK_RUNS,
+  type Family,
+  type DiagnosticCheck,
 } from './mockData';
 import { DiagnosticIcon } from './SharedBadges';
 
@@ -22,48 +27,84 @@ interface DiagnosticSubTabProps {
 }
 
 export function DiagnosticSubTab({ family, datasetId }: DiagnosticSubTabProps) {
-  const fc = FAMILY_CONFIGS[family];
-  const [checks, setChecks] = useState<DiagnosticCheck[]>(() => generateDiagnostics(family, datasetId));
+  const [checks, setChecks] = useState<DiagnosticCheck[]>([]);
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [lastCheck, setLastCheck] = useState(new Date().toISOString());
+  const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
 
-  const handleRevalidate = () => {
-    setChecks(generateDiagnostics(family, datasetId));
-    setLastCheck(new Date().toISOString());
-  };
+  /**
+   * Recalcula el snapshot de diagnóstico.
+   *
+   * Estrategia:
+   * 1) Intentar datos reales del backend (`runs` + `champion`).
+   * 2) Si la API no responde, usar los mocks del prototipo sin romper la UI.
+   */
+  const loadDiagnostics = useCallback(async () => {
+    const { backendDatasetId, uiDatasetId } = buildDatasetIdBridge(datasetId);
 
-  // Warnings
-  const warnings = useMemo(() => {
-    const warns: string[] = [];
-    const runs = MOCK_RUNS.filter(r => r.family === family && r.dataset_id === datasetId);
-    const legacy = runs.filter(r => r.bundle_version === '1.0.0');
-    if (legacy.length > 0) warns.push(`${legacy.length} runs con bundle_version legacy (1.0.0)`);
+    try {
+      const [runs, championResult] = await Promise.all([
+        modelosApi.listRunsUI({ datasetId: backendDatasetId, family }),
+        modelosApi.getChampionUI({ datasetId: backendDatasetId, family }).catch(() => null),
+      ]);
 
-    const noBundleVersion = runs.filter(r => !r.bundle_version);
-    if (noBundleVersion.length > 0) warns.push(`${noBundleVersion.length} runs sin bundle_version`);
+      const uiRuns = runs.map((run) => ({ ...run, dataset_id: uiDatasetId }));
+      const snapshot = buildDiagnosticsSnapshot({
+        family,
+        datasetId: uiDatasetId,
+        runs: uiRuns,
+        champion: championResult?.record ? { ...championResult.record, dataset_id: uiDatasetId } : null,
+      });
 
-    const noText = runs.filter(r => r.n_feat_text === 0 && r.status === 'completed');
-    if (noText.length > 0) warns.push(`${noText.length} runs completados sin features de texto (TF-IDF faltante)`);
+      setChecks(snapshot.checks);
+      setWarnings(snapshot.warnings);
+      setDataSource('api');
+      setLastCheck(new Date().toISOString());
+      return;
+    } catch {
+      const champKey = `${family}__${datasetId}`;
+      const snapshot = buildDiagnosticsSnapshot({
+        family,
+        datasetId,
+        runs: MOCK_RUNS,
+        champion: MOCK_CHAMPIONS[champKey] ?? null,
+      });
 
-    return warns;
-  }, [family, datasetId]);
+      setChecks(snapshot.checks);
+      setWarnings(snapshot.warnings);
+      setDataSource('mock');
+      setLastCheck(new Date().toISOString());
+    }
+  }, [datasetId, family]);
+
+  useEffect(() => {
+    void loadDiagnostics();
+  }, [loadDiagnostics]);
 
   const passCount = checks.filter(c => c.status === 'pass').length;
   const warnCount = checks.filter(c => c.status === 'warn').length;
   const failCount = checks.filter(c => c.status === 'fail').length;
 
+  const healthLabel = useMemo(() => {
+    if (failCount > 0) return 'Unhealthy';
+    if (warnCount > 0) return 'Degraded';
+    return 'Healthy';
+  }, [failCount, warnCount]);
+
   const handleCopyReport = () => {
     const report = [
-      `NeuroCampus Diagnostic Report`,
+      'NeuroCampus Diagnostic Report',
       `Family: ${family}`,
       `Dataset: ${datasetId}`,
       `Date: ${new Date().toISOString()}`,
-      ``,
-      `--- Checks ---`,
+      `Source: ${dataSource === 'api' ? 'backend' : 'mock-fallback'}`,
+      '',
+      '--- Checks ---',
       ...checks.map(c => `[${c.status.toUpperCase()}] ${c.name}: ${c.message}`),
-      ``,
-      `--- Warnings ---`,
+      '',
+      '--- Warnings ---',
       ...warnings.map(w => `⚠ ${w}`),
-      ``,
+      '',
       `Summary: ${passCount} pass, ${warnCount} warn, ${failCount} fail`,
     ].join('\n');
     navigator.clipboard.writeText(report).catch(() => {});
@@ -80,7 +121,7 @@ export function DiagnosticSubTab({ family, datasetId }: DiagnosticSubTabProps) {
               <p className="text-xs text-gray-400">Health</p>
             </div>
             <p className={`text-2xl ${failCount > 0 ? 'text-red-400' : warnCount > 0 ? 'text-yellow-400' : 'text-green-400'}`}>
-              {failCount > 0 ? 'Unhealthy' : warnCount > 0 ? 'Degraded' : 'Healthy'}
+              {healthLabel}
             </p>
           </Card>
         </motion.div>
@@ -119,13 +160,16 @@ export function DiagnosticSubTab({ family, datasetId }: DiagnosticSubTabProps) {
           <div className="flex items-center gap-2">
             <FileCheck className="w-4 h-4 text-cyan-400" />
             <h4 className="text-white">Contract Checks</h4>
+            <Badge className={`text-xs ${dataSource === 'api' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/40'}`}>
+              {dataSource === 'api' ? 'Backend real' : 'Fallback prototipo'}
+            </Badge>
           </div>
           <div className="flex gap-2">
             <Button
               size="sm"
               variant="outline"
               className="border-gray-600 text-gray-300 hover:bg-gray-700 gap-1 text-xs"
-              onClick={handleRevalidate}
+              onClick={() => void loadDiagnostics()}
             >
               <RefreshCw className="w-3 h-3" /> Revalidar
             </Button>
@@ -170,7 +214,9 @@ export function DiagnosticSubTab({ family, datasetId }: DiagnosticSubTabProps) {
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-500 mt-3">Última validación: {new Date(lastCheck).toLocaleString('es-ES')}</p>
+        <p className="text-xs text-gray-500 mt-3">
+          Última validación: {new Date(lastCheck).toLocaleString('es-ES')} · fuente: {dataSource === 'api' ? 'backend real' : 'fallback mock'}
+        </p>
       </Card>
 
       {/* Warnings */}
