@@ -191,6 +191,17 @@ def _try_read_json(path: Path) -> Optional[Dict[str, Any]]:
         return None
 
 
+def _try_read_json_any(path: Path) -> Optional[Any]:
+    """Lee un JSON arbitrario (dict/list/scalar) en modo best-effort."""
+    if not path.exists():
+        return None
+    try:
+        with path.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
 def _write_json(path: Path, payload: Any) -> None:
     with path.open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
@@ -409,6 +420,57 @@ def _load_predictor_manifest(run_dir: Path) -> Optional[Dict[str, Any]]:
     if not p:
         return None
     return _try_read_json(p)
+
+
+def _bundle_checklist_for_run(run_dir: Path) -> Dict[str, bool]:
+    """Checklist explícito de artefactos requeridos por la UI de Modelos.
+
+    La definición replica el contrato visual del prototipo:
+    - predictor.json
+    - metrics.json
+    - job_meta.json
+    - preprocess.json
+    - model/
+    """
+    return {
+        "predictor.json": _find_predictor_path(run_dir) is not None,
+        "metrics.json": _find_metrics_path(run_dir) is not None,
+        "job_meta.json": (run_dir / "job_meta.json").exists(),
+        "preprocess.json": (run_dir / "preprocess.json").exists(),
+        "model/": (run_dir / "model").is_dir(),
+    }
+
+
+
+def _bundle_status_from_checklist(checklist: Dict[str, bool]) -> str:
+    """Resume el checklist a un estado binario estable para frontend."""
+    return "complete" if all(bool(v) for v in checklist.values()) else "incomplete"
+
+
+
+def _bundle_artifacts_for_run(run_dir: Path) -> Dict[str, Any]:
+    """Carga los JSON reales del bundle cuando existen físicamente.
+
+    Importante:
+    - Solo expone contenidos presentes en disco dentro del run.
+    - No usa backfills desde champion para evitar que la UI muestre como
+      existente un archivo que todavía no fue materializado en el bundle.
+    """
+    predictor_path = _find_predictor_path(run_dir)
+    metrics_path = _find_metrics_path(run_dir)
+    model_dir = run_dir / "model"
+
+    payload: Dict[str, Any] = {
+        "predictor": _try_read_json_any(predictor_path) if predictor_path else None,
+        "metrics": _try_read_json_any(metrics_path) if metrics_path else None,
+        "job_meta": _try_read_json_any(run_dir / "job_meta.json"),
+        "preprocess": _try_read_json_any(run_dir / "preprocess.json"),
+        "paths": {
+            "run_dir": _artifacts_ref(run_dir),
+            "model_dir": _artifacts_ref(model_dir) if model_dir.exists() else None,
+        },
+    }
+    return payload
 
 
 def _build_champion_source_map(champions_dir: Path) -> Dict[str, Dict[str, Any]]:
@@ -697,6 +759,14 @@ def list_runs(
 
 
 def load_run_details(run_id: str) -> Optional[Dict[str, Any]]:
+    """Carga el detalle integral de un run desde artifacts.
+
+    Además de las métricas/configuración, esta función materializa señales
+    explícitas del bundle de inferencia para que frontend pueda renderizar:
+    - estado (`bundle_status`)
+    - checklist (`bundle_checklist`)
+    - contenidos JSON reales (`bundle_artifacts`)
+    """
     rd = (RUNS_DIR / str(run_id)).resolve()
     if not rd.exists():
         return None
@@ -704,7 +774,9 @@ def load_run_details(run_id: str) -> Optional[Dict[str, Any]]:
     mp = _find_metrics_path(rd)
     metrics = _try_read_json(mp) or {} if mp else {}
 
-    # Fallback: hidratar desde champion/predictor si no existen métricas en el run
+    # Fallback: hidratar desde champion/predictor si no existen métricas en el run.
+    # Esto mantiene la API útil para UI, pero NO altera bundle_artifacts/checklist,
+    # que siempre reflejan solo archivos presentes físicamente en el directorio.
     if not metrics:
         champ_map = _build_champion_source_map(CHAMPIONS_DIR)
         champ = champ_map.get(str(run_id)) or champ_map.get(rd.name)
@@ -717,13 +789,25 @@ def load_run_details(run_id: str) -> Optional[Dict[str, Any]]:
 
     cfg = _load_yaml_if_exists(rd / "config.snapshot.yaml") or _load_yaml_if_exists(rd / "config.yaml")
     ds = _norm_str(metrics.get("dataset_id")) or _infer_dataset_id(rd, metrics)
+    checklist = _bundle_checklist_for_run(rd)
+    bundle_artifacts = _bundle_artifacts_for_run(rd)
+    model_name = (
+        _norm_str(metrics.get("model_name"))
+        or _norm_str(metrics.get("model"))
+        or _norm_str(predictor.get("model_name"))
+        or _norm_str(predictor.get("model"))
+    )
 
     return {
         "run_id": str(run_id),
         "dataset_id": ds,
+        "model_name": model_name,
         "metrics": metrics,
         "config": cfg,
         "artifact_path": str(rd),
+        "bundle_status": _bundle_status_from_checklist(checklist),
+        "bundle_checklist": checklist,
+        "bundle_artifacts": bundle_artifacts,
     }
 
 
