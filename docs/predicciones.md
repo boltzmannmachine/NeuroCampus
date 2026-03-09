@@ -1,132 +1,191 @@
-# P2 — Predicciones (Backend) — Runbook + Contratos
+# Predicciones (Backend) — Runbook + Contratos vigentes
 
-Este documento describe la fase P2 del backend enfocada en **resolver y validar el predictor bundle** (P2.2)
-usando artifacts generados en P0/P1 (feature-pack, runs, champions).
+Este documento describe el estado actual del módulo **Predicciones** y reemplaza la lectura antigua que lo limitaba a un simple `resolve/validate` del bundle.
 
-> Nota: en P2.2 el endpoint `/predicciones/predict` **no ejecuta inferencia real**; solo resuelve el `run_id`,
-> valida el bundle y retorna metadata. La inferencia real está prevista para P2.4+.
+Hoy conviven dos capas funcionales:
 
-## Conceptos
+- **Endpoints especializados de la pestaña Predicciones**: listados, predicción individual y batch para la family `score_docente`.
+- **Endpoint unificado `POST /predicciones/predict`**: resuelve `run_id` o champion, valida el bundle y puede ejecutar inferencia real sobre el feature-pack cuando `do_inference=true`.
+
+## Alcance actual
+
+La pestaña **Predicciones** del frontend consume exclusivamente la family:
+
+- `score_docente`
+
+La selección del modelo productivo se hace mediante el **champion** activo por `dataset_id`.
+
+## Conceptos clave
 
 ### Rutas lógicas vs rutas físicas
 - **Ruta lógica**: `artifacts/...` (portable entre ambientes).
 - **Ruta física**: carpeta real en disco, controlada por `NC_ARTIFACTS_DIR`.
 
-El backend debe exponer/aceptar preferentemente rutas lógicas. Para resolverlas usa:
-
+Helpers relevantes:
 - `neurocampus.utils.paths.abs_artifact_path(ref)`
 - `neurocampus.utils.paths.rel_artifact_path(path)`
 
 ### Entidades
-- **Feature-pack**: artifacts/features/<dataset_id>/
-- **Run**: artifacts/runs/<run_id>/
-- **Champion**: artifacts/champions/<family>/<dataset_id>/champion.json (nuevo)
-  - fallback: artifacts/champions/<dataset_id>/champion.json (legacy/mirror)
+- **Feature-pack**: `artifacts/features/<dataset_id>/`
+- **Run**: `artifacts/runs/<run_id>/`
+- **Champion**: `artifacts/champions/<family>/<dataset_id>/champion.json`
+- **Predictions run**: `artifacts/predictions/<dataset_id>/score_docente/<pred_run_id>/`
 
 ## Layout esperado de artifacts
 
 ### Feature-pack
 Directorio: `artifacts/features/<dataset_id>/`
 
-Archivos (mínimos):
+Archivos más relevantes:
 - `train_matrix.parquet`
-- `meta.json`
-
-Opcional (pair-level):
 - `pair_matrix.parquet`
+- `meta.json`
 - `pair_meta.json`
+- `teacher_index.json`
+- `materia_index.json`
 
 ### Run
 Directorio: `artifacts/runs/<run_id>/`
 
-Archivos (mínimos para auditoría):
+Archivos importantes para auditoría e inferencia:
 - `metrics.json`
 - `history.json`
-
-Archivos (recomendados P2 para inferencia):
-- `model.bin` (o nombre equivalente: pesos serializados)
-- `predictor.json` (metadatos de inferencia / configuración)
-- `preprocess.json` (mapeos/normalizaciones si aplican)
-
-> Nota: en P2 se formaliza qué debe existir para inferencia (ver sección “Contrato de inferencia”).
+- `job_meta.json`
+- `predictor.json`
+- `preprocess.json`
+- `model/` o equivalente serializado del modelo
 
 ### Champion
 Archivo preferido:
 - `artifacts/champions/<family>/<dataset_id>/champion.json`
 
-Campos relevantes P2:
-- `source_run_id` (run fuente de verdad)
+Campos clave:
+- `source_run_id`
 - `model_name`
-- `metrics` (auditoría offline)
-- `paths.run_dir`, `paths.run_metrics` (refs lógicas)
-- `score` (tier/value para comparar)
+- `metrics`
+- `paths.run_dir`
+- `score`
 
-## Contrato de inferencia (P2)
+### Predictions run (batch)
+Directorio típico:
+- `artifacts/predictions/<dataset_id>/score_docente/<pred_run_id>/`
 
-La inferencia se soporta por **run_id** o por **champion**.
+Archivos relevantes:
+- `meta.json`
+- `predictions.parquet`
+- `schema.json` (si se generó)
 
-### Resolución por run_id
-1) Resolver directorio:
-- `artifacts/runs/<run_id>/`
-2) Leer:
-- `metrics.json` (para conocer `model_name`, `dataset_id`, `task_type`, etc.)
-- `model.bin` (pesos/estado del modelo)
-- `predictor.json` (cómo inferir: input level, target mode, thresholds, etc.)
+## Endpoints vigentes
 
-### Resolución por champion
-1) Resolver `champion.json` (layout nuevo y fallback legacy).
-2) Leer `source_run_id`
-3) Continuar como run_id
-
-## Endpoints implementados (P2.2)
-
-En P2.2 hay dos endpoints estables:
+### Health
 - `GET /predicciones/health`
-- `POST /predicciones/predict` (**resolve/validate**, sin inferencia)
 
-### GET /predicciones/health
-Devuelve estado y la ruta efectiva de artifacts.
+Devuelve estado del módulo y la ruta efectiva de artifacts.
 
-Ejemplo:
-```bash
-curl -s "http://127.0.0.1:8000/predicciones/health"
-```
+### Listados para la pestaña Predicciones
+- `GET /predicciones/datasets`
+- `GET /predicciones/teachers?dataset_id=...`
+- `GET /predicciones/materias?dataset_id=...`
+- `GET /predicciones/runs?dataset_id=...`
 
-### POST /predicciones/predict
-**Objetivo:** resolver `run_id` y validar el bundle mínimo de inferencia.
+Estos endpoints soportan la navegación principal de la UI de Predicciones.
 
-Request (modo run_id directo):
+### Predicción individual
+- `POST /predicciones/individual`
+
+Request mínimo:
 ```json
-{ "run_id": "2025-1__rbm_general__20260216T003747Z__b56428df" }
+{
+  "dataset_id": "2025-1",
+  "teacher_key": "doc_123",
+  "materia_key": "mat_456"
+}
 ```
 
-Request (modo champion):
+Comportamiento:
+- usa el **champion activo** de `score_docente` para el dataset;
+- si el par docente–materia no existe, intenta inferencia en modo **cold_pair**;
+- retorna score, riesgo, confianza, radar, comparación y timeline.
+
+### Batch con polling
+- `POST /predicciones/batch/run`
+- `GET /predicciones/batch/{job_id}`
+
+Request:
 ```json
-{ "use_champion": true, "dataset_id": "2025-1", "family": "sentiment_desempeno" }
+{ "dataset_id": "2025-1" }
 ```
 
-#### Códigos de respuesta esperados
-- `200`: bundle resuelto y válido.
-- `404`: no existe el champion o no existe el bundle del run (por ejemplo faltan `predictor.json`/`model.bin`).
-- `422`: request inválido o predictor “no listo”.
-  - Ejemplos:
-    - `champion.json` existe pero no incluye `source_run_id`.
-    - `model.bin` existe pero es placeholder/no listo.
-- `500`: solo para errores inesperados.
+Comportamiento:
+- valida que exista `pair_matrix.parquet`;
+- valida champion listo para inferencia;
+- ejecuta inferencia sobre todos los pares del dataset;
+- persiste `predictions.parquet` y metadatos del run batch.
 
-## Variables de entorno (P2)
+### Metadata del modelo
+- `GET /predicciones/model-info`
 
-- `NC_ARTIFACTS_DIR`:
-  - Ruta física base de artifacts.
-  - Si no existe: default `<repo>/artifacts`.
+Permite inspeccionar qué predictor se usaría por `run_id` o por champion, sin lanzar inferencia.
 
-- `NC_PROJECT_ROOT`:
-  - Ruta física del repo (ayuda a resolver paths relativos si corres desde otro cwd).
+### Endpoint unificado: resolve/validate + inferencia opcional
+- `POST /predicciones/predict`
 
-## Verificación (manual)
+Este endpoint mantiene compatibilidad con el flujo histórico de `resolve/validate`, pero ya soporta inferencia real bajo control explícito.
+
+#### Modo 1 — Resolver por `run_id` (sin inferencia)
+```json
+{ "run_id": "2025-1__dbm_manual__20260308T120000Z__abcd1234" }
+```
+
+#### Modo 2 — Resolver por champion (sin inferencia)
+```json
+{
+  "use_champion": true,
+  "dataset_id": "2025-1",
+  "family": "score_docente"
+}
+```
+
+#### Modo 3 — Inferencia real sobre feature-pack
+```json
+{
+  "use_champion": true,
+  "dataset_id": "2025-1",
+  "family": "score_docente",
+  "do_inference": true,
+  "limit": 50,
+  "offset": 0,
+  "persist": true
+}
+```
+
+Notas:
+- si `do_inference=false` (default), el endpoint **solo resuelve/valida** el bundle y retorna metadata estable para UI;
+- si `do_inference=true`, retorna además `predictions`, `model_info`, `schema` y opcionalmente `predictions_uri` cuando `persist=true`;
+- `persist=true` requiere `do_inference=true`.
+
+### Outputs persistidos
+- `GET /predicciones/outputs/preview?predictions_uri=...`
+- `GET /predicciones/outputs/file?predictions_uri=...`
+
+Permiten abrir vista previa o descargar un `predictions.parquet` ya persistido.
+
+## Códigos de respuesta esperados
+
+- `200`: resolución correcta; si hubo inferencia, la respuesta incluye predicciones.
+- `202`: job batch aceptado para ejecución asíncrona.
+- `404`: champion no existe, run no existe, faltan índices o faltan artifacts requeridos.
+- `422`: predictor no listo, request inválido o `persist=true` sin `do_inference=true`.
+- `500`: error inesperado del servidor.
+
+## Variables de entorno
+
+- `NC_ARTIFACTS_DIR`: ruta física base de artifacts.
+- `NC_PROJECT_ROOT`: raíz del repo para ayudar a resolver paths relativos.
+
+## Verificación manual
 
 ### 1) Levantar backend
-Ejemplo (ajusta según tu entorno):
 ```bash
 uvicorn neurocampus.app.main:app --reload --app-dir backend/src
 ```
@@ -136,35 +195,50 @@ uvicorn neurocampus.app.main:app --reload --app-dir backend/src
 curl -s "http://127.0.0.1:8000/predicciones/health"
 ```
 
-### 3) Resolver por run_id
+### 3) Resolver bundle por champion
 ```bash
 curl -s -X POST "http://127.0.0.1:8000/predicciones/predict" \
   -H "Content-Type: application/json" \
-  -d '{ "run_id": "<run_id>" }'
+  -d '{ "use_champion": true, "dataset_id": "2025-1", "family": "score_docente" }'
 ```
 
-### 4) Resolver por champion
-Primero promueve un run a champion (P0/P1):
-```bash
-curl -s -X POST "http://127.0.0.1:8000/modelos/champion/promote" \
-  -H "Content-Type: application/json" \
-  -d '{ "dataset_id": "<dataset_id>", "family": "<family>", "run_id": "<run_id>" }'
-```
-
-Luego resuelve:
+### 4) Ejecutar inferencia real y persistir salida
 ```bash
 curl -s -X POST "http://127.0.0.1:8000/predicciones/predict" \
   -H "Content-Type: application/json" \
-  -d '{ "use_champion": true, "dataset_id": "<dataset_id>", "family": "<family>" }'
+  -d '{
+    "use_champion": true,
+    "dataset_id": "2025-1",
+    "family": "score_docente",
+    "do_inference": true,
+    "persist": true,
+    "limit": 25
+  }'
 ```
 
-### 5) Verificar bundle en disco
+### 5) Predicción individual
 ```bash
-ls -la artifacts/runs/<run_id>
-cat artifacts/runs/<run_id>/predictor.json
-cat artifacts/runs/<run_id>/preprocess.json
+curl -s -X POST "http://127.0.0.1:8000/predicciones/individual" \
+  -H "Content-Type: application/json" \
+  -d '{ "dataset_id": "2025-1", "teacher_key": "doc_123", "materia_key": "mat_456" }'
 ```
 
-> Si al resolver por champion obtienes 404 indicando que faltan `predictor.json`/`model.bin`,
-> es muy probable que el champion esté apuntando a un run “viejo” o incompleto.
-> La solución recomendada es promover como champion un run nuevo que sí tenga bundle completo.
+### 6) Batch con polling
+```bash
+curl -s -X POST "http://127.0.0.1:8000/predicciones/batch/run" \
+  -H "Content-Type: application/json" \
+  -d '{ "dataset_id": "2025-1" }'
+
+curl -s "http://127.0.0.1:8000/predicciones/batch/<job_id>"
+```
+
+### 7) Vista previa de salida persistida
+```bash
+curl -s "http://127.0.0.1:8000/predicciones/outputs/preview?predictions_uri=artifacts/predictions/2025-1/score_docente/<pred_run_id>/predictions.parquet"
+```
+
+## Observaciones operativas
+
+- Si el champion existe pero no tiene `source_run_id`, el módulo responde con `422` y conviene re-promover un run reciente.
+- Si faltan `teacher_index.json` o `materia_index.json`, la predicción individual no puede construir el contexto del par.
+- Si el entorno de desarrollo no tiene `pyarrow` o motor equivalente, la persistencia/lectura de parquet fallará aunque el contrato HTTP sea correcto.
