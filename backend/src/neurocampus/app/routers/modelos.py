@@ -3597,7 +3597,12 @@ def get_runs(
     summary="Detalles completos de un run (incluye config si existe)",
 )
 def get_run_details(run_id: str) -> RunDetails:
-    """Devuelve detalles completos de un run leyendo artifacts del filesystem."""
+    """Devuelve detalles completos de un run leyendo artifacts del filesystem.
+
+    El payload resultante incluye, además de métricas/configuración, el estado
+    explícito del bundle de inferencia para que frontend pueda renderizar el
+    checklist y el visor JSON sin depender de mocks.
+    """
     details = load_run_details(run_id)
     if not details:
         raise HTTPException(status_code=404, detail=f"Run {run_id} no encontrado")
@@ -3662,7 +3667,7 @@ def get_run_details(run_id: str) -> RunDetails:
             details[key] = ctx.get(key)
 
     # Enriquecer métricas (sin persistir a disco)
-    for key in ("family", "task_type", "input_level", "target_col", "data_plan", "data_source"):
+    for key in ("family", "model_name", "task_type", "input_level", "target_col", "data_plan", "data_source"):
         if _missing(metrics.get(key)) and (ctx.get(key) is not None):
             metrics[key] = ctx.get(key)
     details["metrics"] = metrics
