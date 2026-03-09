@@ -230,10 +230,20 @@ export interface RunSummaryDto {
   metrics: Record<string, unknown>;
 }
 
+/** Artefactos JSON del bundle expuestos por `GET /modelos/runs/{run_id}`. */
+export interface BundleArtifactsDto {
+  predictor?: Record<string, unknown> | null;
+  metrics?: Record<string, unknown> | null;
+  job_meta?: Record<string, unknown> | null;
+  preprocess?: Record<string, unknown> | null;
+  paths?: Record<string, string> | null;
+}
+
 /** Detalle completo de un run (`GET /modelos/runs/{run_id}`). */
 export interface RunDetailsDto {
   run_id: string;
   dataset_id?: string | null;
+  model_name?: string | null;
 
   family?: Family | null;
   task_type?: TaskType | null;
@@ -245,6 +255,11 @@ export interface RunDetailsDto {
   metrics: Record<string, unknown>;
   config?: Record<string, unknown> | null;
   artifact_path?: string | null;
+
+  /** Estado explícito del bundle expuesto por backend. */
+  bundle_status?: "complete" | "incomplete" | null;
+  bundle_checklist?: Record<string, boolean> | null;
+  bundle_artifacts?: BundleArtifactsDto | null;
 }
 
 /**
@@ -271,6 +286,31 @@ export interface ChampionInfoDto {
 
   metrics?: Record<string, unknown> | null;
   path: string;
+}
+
+/** Request para construir manualmente el feature-pack desde Modelos. */
+export interface PrepareFeaturePackRequestDto {
+  dataset_id: string;
+  input_uri?: string;
+  force?: boolean;
+  text_feats_mode?: "none" | "tfidf_lsa";
+  text_col?: string;
+  text_n_components?: number;
+  text_min_df?: number;
+  text_max_features?: number;
+}
+
+/** Response del endpoint `POST /modelos/feature-pack/prepare`. */
+export interface PrepareFeaturePackResponseDto {
+  dataset_id?: string;
+  input_uri?: string;
+  train_matrix?: string;
+  pair_matrix?: string;
+  meta?: string;
+  pair_meta?: string;
+  teacher_index?: string;
+  materia_index?: string;
+  [key: string]: string | undefined;
 }
 
 /** Readiness (`GET /modelos/readiness`). */
