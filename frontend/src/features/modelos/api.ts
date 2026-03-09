@@ -28,6 +28,9 @@ import {
   type RunDetailsDto,
   type RunSummaryDto,
   type PromoteChampionRequestDto,
+  type PrepareFeaturePackRequestDto,
+  type PrepareFeaturePackResponseDto,
+  type BundleArtifactsDto,
   type Family,
   type ModeloName,
 } from "./types";
@@ -113,7 +116,15 @@ export const modelosApi = {
     return (await modelosService.getReadiness({ dataset_id: datasetId })) as unknown as ReadinessResponseDto;
   },
 
-
+  /**
+   * Construye manualmente el feature-pack desde la pestaña Modelos.
+   *
+   * Se usa para reemplazar la simulación visual por una llamada real al backend,
+   * manteniendo fallback en la UI si el endpoint no estuviera disponible.
+   */
+  async prepareFeaturePack(request: PrepareFeaturePackRequestDto): Promise<PrepareFeaturePackResponseDto> {
+    return (await modelosService.prepareFeaturePack(request as any)) as unknown as PrepareFeaturePackResponseDto;
+  },
 
   /** Lista datasets detectados (para selector). */
   async listDatasets(): Promise<DatasetInfoDto[]> {
@@ -161,6 +172,38 @@ export const modelosApi = {
     });
 
     return mergeRunDetails(baseRecord, details);
+  },
+
+  /**
+   * Obtiene detalle del run + artefactos del bundle en una sola llamada.
+   *
+   * Esto evita que la subpestaña Bundle dependa de mocks cuando el backend ya
+   * expone predictor/metrics/job_meta/preprocess reales.
+   */
+  async getRunBundleUI(runId: string, base?: RunRecord): Promise<{
+    run: RunRecord;
+    artifacts: BundleArtifactsDto | null;
+  }> {
+    const details: RunDetailsDto = await modelosService.getRunDetails(runId);
+
+    const baseRecord = base ?? mapRunSummaryToRunRecord({
+      run_id: details.run_id,
+      model_name: (details as any).model_name ?? "rbm_general",
+      dataset_id: details.dataset_id ?? "unknown",
+      family: details.family ?? "sentiment_desempeno",
+      task_type: details.task_type ?? null,
+      input_level: details.input_level ?? null,
+      target_col: details.target_col ?? null,
+      data_plan: details.data_plan ?? null,
+      data_source: details.data_source ?? null,
+      created_at: new Date().toISOString(),
+      metrics: details.metrics ?? {},
+    });
+
+    return {
+      run: mergeRunDetails(baseRecord, details),
+      artifacts: details.bundle_artifacts ?? null,
+    };
   },
 
   /**
