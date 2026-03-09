@@ -1,20 +1,23 @@
 """
-Schemas de API para Predicciones (P2).
+Schemas de API para Predicciones.
 
 Objetivo
 --------
-Definir contratos HTTP estables para:
+Definir contratos HTTP estables para los endpoints del módulo Predicciones,
+que hoy incluye dos capas complementarias:
 
-- GET /predicciones/health
-- POST /predicciones/predict (P2.2: solo valida/resolve bundle; no inferencia real aún)
+- endpoints especializados para la pestaña ``score_docente``
+  (datasets, teachers, materias, individual, batch, outputs);
+- endpoint unificado ``POST /predicciones/predict`` para resolver/validar el
+  bundle y, opcionalmente, ejecutar inferencia real cuando
+  ``do_inference=true``.
 
 Notas
 -----
-- En P2.2 el endpoint /predict servirá para:
-  - resolver run_id por champion si aplica,
-  - validar existencia del predictor bundle,
-  - devolver metadata (sin ejecutar inferencia).
-- En P2.3/P2.4 se agregará inferencia real y outputs (parquet/JSON).
+- ``/predicciones/predict`` mantiene compatibilidad con el flujo histórico de
+  resolve/validate cuando ``do_inference=false``.
+- Cuando ``do_inference=true``, la respuesta puede incluir ``predictions``,
+  ``schema`` y ``predictions_uri`` si se solicitó persistencia.
 """
 
 from __future__ import annotations
@@ -89,7 +92,7 @@ class PredictRequest(BaseModel):
 
 
 class PredictResolvedResponse(BaseModel):
-    """Respuesta de P2.2: resolución/validación del predictor bundle (sin inferencia)."""
+    """Respuesta estable para resolución/validación del bundle, con inferencia opcional cuando se solicita explícitamente."""
 
     resolved_run_id: str
     resolved_from: str = Field(description="run_id|champion")
@@ -130,7 +133,7 @@ class PredictResolvedResponse(BaseModel):
 
 
 class ModelInfoResponse(BaseModel):
-    """Respuesta de P2.2: metadata del modelo/predictor bundle (sin inferencia)."""
+    """Respuesta de metadata para inspeccionar el predictor bundle sin ejecutar inferencia."""
 
     resolved_run_id: str
     resolved_from: str = Field(description="run_id|champion")
