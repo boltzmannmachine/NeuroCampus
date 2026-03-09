@@ -151,6 +151,11 @@ function parseWarmStartForUI(metrics: Record<string, unknown> | null | undefined
  */
 export function computeBundleStatus(details: RunDetailsDto | null | undefined): BundleStatus {
   if (!details) return "incomplete";
+
+  if (details.bundle_status === "complete" || details.bundle_status === "incomplete") {
+    return details.bundle_status;
+  }
+
   const hasArtifactPath = Boolean(details.artifact_path && details.artifact_path.length > 0);
   return hasArtifactPath ? "complete" : "incomplete";
 }
@@ -164,6 +169,16 @@ export function computeBundleStatus(details: RunDetailsDto | null | undefined): 
  * - Por eso devolvemos un checklist "optimista" cuando hay artifact_path.
  */
 export function computeBundleChecklist(details: RunDetailsDto | null | undefined): BundleChecklist {
+  if (details?.bundle_checklist) {
+    return {
+      "predictor.json": Boolean(details.bundle_checklist["predictor.json"]),
+      "metrics.json": Boolean(details.bundle_checklist["metrics.json"]),
+      "job_meta.json": Boolean(details.bundle_checklist["job_meta.json"]),
+      "preprocess.json": Boolean(details.bundle_checklist["preprocess.json"]),
+      "model/": Boolean(details.bundle_checklist["model/"]),
+    };
+  }
+
   const complete = computeBundleStatus(details) === "complete";
   return {
     "predictor.json": complete,
@@ -263,6 +278,7 @@ export function mapRunSummaryToRunRecord(summary: RunSummaryDto): RunRecord {
     run_id: summary.run_id,
     dataset_id: summary.dataset_id ?? "unknown",
     family,
+    model_name: (details.model_name as ModeloName) ?? record.model_name,
     model_name: (summary.model_name as ModeloName) ?? "rbm_general",
     task_type: summary.task_type ?? fc.taskType,
     input_level: summary.input_level ?? fc.inputLevel,
@@ -443,6 +459,7 @@ export function mergeRunDetails(record: RunRecord, details: RunDetailsDto): RunR
   return {
     ...record,
     family,
+    model_name: (details.model_name as ModeloName) ?? record.model_name,
     task_type: details.task_type ?? record.task_type ?? fc.taskType,
     input_level: details.input_level ?? record.input_level ?? fc.inputLevel,
     target_col: details.target_col ?? record.target_col,
