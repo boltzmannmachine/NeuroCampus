@@ -7,7 +7,7 @@
 //   `frontend/src/features/modelos/mappers.ts`.
 // - Se mantienen endpoints legacy y fallbacks para minimizar reprocesos.
 
-import api from "./apiClient";
+import api, { qs } from "./apiClient";
 
 export type Family = "sentiment_desempeno" | "score_docente";
 export type ModeloName = "rbm_general" | "rbm_restringida" | "dbm_manual";
@@ -211,12 +211,14 @@ export interface RunDetails {
   /**
    * Detalle completo de un run.
    *
-   * - metrics: contenido completo de metrics.json
+   * - metrics: contenido completo de metrics.json (o backfill equivalente para UI)
    * - config: snapshot de configuración si existe (config.snapshot.yaml / config.yaml)
    * - artifact_path: ruta del directorio del run (debug)
+   * - bundle_*: estado explícito de artefactos de inferencia para evitar heurísticas en UI
    */
   run_id: string;
   dataset_id?: string | null;
+  model_name?: string | null;
 
   /** Contexto (Ruta 2). */
   family?: Family | null;
@@ -228,6 +230,25 @@ export interface RunDetails {
   metrics: any;
   config?: any;
   artifact_path?: string;
+
+  /** Estado explícito del bundle para inferencia/despliegue. */
+  bundle_status?: "complete" | "incomplete";
+  bundle_checklist?: Record<string, boolean>;
+
+  /**
+   * Contenido raw de artefactos JSON del bundle cuando existen físicamente.
+   *
+   * Nota:
+   * - Se usa en la subpestaña Bundle para mostrar el JSON real del backend.
+   * - Un artefacto puede venir como `null` si no existe todavía en disco.
+   */
+  bundle_artifacts?: {
+    predictor?: Record<string, unknown> | null;
+    metrics?: Record<string, unknown> | null;
+    job_meta?: Record<string, unknown> | null;
+    preprocess?: Record<string, unknown> | null;
+    paths?: Record<string, string> | null;
+  } | null;
 }
 
 export interface ChampionInfo {
@@ -292,6 +313,50 @@ export function getRunDetails(runId: string) {
   return api.get<RunDetails>(`/modelos/runs/${runId}`).then((r) => r.data);
 }
 
+export type PrepareFeaturePackReq = {
+  dataset_id: string;
+  input_uri?: string;
+  force?: boolean;
+  text_feats_mode?: "none" | "tfidf_lsa";
+  text_col?: string;
+  text_n_components?: number;
+  text_min_df?: number;
+  text_max_features?: number;
+};
+
+export type PrepareFeaturePackResp = {
+  dataset_id?: string;
+  input_uri?: string;
+  train_matrix?: string;
+  pair_matrix?: string;
+  meta?: string;
+  pair_meta?: string;
+  teacher_index?: string;
+  materia_index?: string;
+  [key: string]: string | undefined;
+};
+
+/**
+ * POST /modelos/feature-pack/prepare
+ *
+ * El backend actual modela los parámetros como query-string; por eso este helper
+ * usa `qs(...)` y no body JSON.
+ */
+export async function prepareFeaturePack(req: PrepareFeaturePackReq) {
+  const query = qs({
+    dataset_id: req.dataset_id,
+    input_uri: req.input_uri,
+    force: req.force,
+    text_feats_mode: req.text_feats_mode,
+    text_col: req.text_col,
+    text_n_components: req.text_n_components,
+    text_min_df: req.text_min_df,
+    text_max_features: req.text_max_features,
+  });
+  const { data } = await api.post<PrepareFeaturePackResp>(`/modelos/feature-pack/prepare${query}`);
+  return data;
+}
+
 /**
  * GET /modelos/champion
  * Soporta filtro opcional model_name (y potencialmente dataset/periodo si se define).
@@ -301,7 +366,6 @@ export function getChampion(filters?: { model_name?: string; dataset_id?: string
   if (filters?.model_name) params.set("model_name", filters.model_name);
   if (filters?.dataset_id) params.set("dataset_id", filters.dataset_id);
   if (filters?.periodo) params.set("periodo", filters.periodo);
-  if (filters?.family) params.set("family", filters.family);
   if (filters?.family) params.set("family", filters.family);
 
   const qs = params.toString();
@@ -358,6 +422,9 @@ export type SweepReq = {
 
   /** Auto-promover champion. */
   auto_promote_champion?: boolean;
+
+  /** Límite duro de candidatos en fallback legacy. */
+  max_candidates?: number;
 
   /** Overrides flexibles. */
   hparams_overrides?: Record<string, Record<string, unknown>>;
