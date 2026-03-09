@@ -1,7 +1,7 @@
 # NeuroCampus
 
 MVP para analizar evaluaciones estudiantiles con **FastAPI (backend)**, **RBM Student** y **NLP (BETO)**.  
-Incluye pipeline de preprocesamiento, entrenamiento y endpoints de predicción (**P2.2: resolve/validate del bundle; inferencia real prevista en P2.4+**).
+Incluye pipeline de preprocesamiento, entrenamiento y endpoints de predicción (**/predicciones/predict** resuelve/valida el bundle por defecto y puede ejecutar inferencia real cuando `do_inference=true`).
 
 ---
 
@@ -170,36 +170,68 @@ uvicorn neurocampus.app.main:app --reload --app-dir backend/src
 # Docs en: http://127.0.0.1:8000/docs
 ```
 
-### Predicciones (P2.2: resolve/validate del bundle)
+### Predicciones (resolve/validate + inferencia opcional)
 
-En **P2.2** el endpoint `/predicciones/predict` **NO ejecuta inferencia real**; solo:
-- resuelve `run_id` (directo o por champion),
-- valida que exista el bundle mínimo del predictor,
-- y retorna metadata.
+La pestaña **Predicciones** del frontend opera actualmente sobre la family `score_docente`.
+El backend expone dos capas de uso:
+
+- **Endpoints especializados de la pestaña**: listados de datasets/docentes/materias, predicción individual y batch.
+- **Endpoint unificado `/predicciones/predict`**: resuelve el `run_id` (directo o por champion), valida el bundle y puede ejecutar inferencia sobre el feature-pack cuando `do_inference=true`.
 
 **Health:**
 ```bash
 curl -s "http://127.0.0.1:8000/predicciones/health"
 ```
 
-**Resolver por run_id:**
+**Resolver/validar por run_id (sin inferencia):**
 ```bash
 curl -s -X POST "http://127.0.0.1:8000/predicciones/predict" \
   -H "Content-Type: application/json" \
   -d '{ "run_id": "<run_id>" }'
 ```
 
-**Resolver por champion:**
+**Resolver/validar por champion (sin inferencia):**
 ```bash
 curl -s -X POST "http://127.0.0.1:8000/predicciones/predict" \
   -H "Content-Type: application/json" \
-  -d '{ "use_champion": true, "dataset_id": "<dataset_id>", "family": "<family>" }'
+  -d '{ "use_champion": true, "dataset_id": "<dataset_id>", "family": "score_docente" }'
+```
+
+**Inferir sobre feature-pack y persistir salida:**
+```bash
+curl -s -X POST "http://127.0.0.1:8000/predicciones/predict" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "use_champion": true,
+    "dataset_id": "<dataset_id>",
+    "family": "score_docente",
+    "do_inference": true,
+    "persist": true,
+    "limit": 50
+  }'
+```
+
+**Predicción individual de un par docente–materia:**
+```bash
+curl -s -X POST "http://127.0.0.1:8000/predicciones/individual" \
+  -H "Content-Type: application/json" \
+  -d '{ "dataset_id": "<dataset_id>", "teacher_key": "<teacher_key>", "materia_key": "<materia_key>" }'
+```
+
+**Batch con polling:**
+```bash
+curl -s -X POST "http://127.0.0.1:8000/predicciones/batch/run" \
+  -H "Content-Type: application/json" \
+  -d '{ "dataset_id": "<dataset_id>" }'
+
+curl -s "http://127.0.0.1:8000/predicciones/batch/<job_id>"
 ```
 
 Códigos esperados:
-- `200`: bundle resuelto y válido.
-- `404`: champion no existe o el run/bundle no existe (faltan `predictor.json`/`model.bin`, etc.).
-- `422`: predictor no listo (placeholder) o champion inválido (por ejemplo `champion.json` sin `source_run_id`).
+- `200`: bundle resuelto y válido; si `do_inference=true`, incluye `predictions` y opcionalmente `predictions_uri`.
+- `202`: job batch aceptado para ejecución asíncrona.
+- `404`: champion no existe, el run no existe o faltan artifacts requeridos.
+- `422`: predictor no listo, request inválido o se pidió `persist=true` sin `do_inference=true`.
 
 ---
 
