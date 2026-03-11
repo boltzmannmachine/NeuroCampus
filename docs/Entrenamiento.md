@@ -1,220 +1,525 @@
 # Entrenamiento (NeuroCampus)
 
-Este documento describe **cómo entrenar** el modelo *Student* basado en **RBM** (Restricted Boltzmann Machine) con las calificaciones numéricas y, opcionalmente, con las **probabilidades de sentimiento** generadas por BETO en el preprocesamiento.
+Este documento describe el flujo de **entrenamiento vigente** en NeuroCampus.
 
-> Requisitos previos: haber ejecutado el pipeline de **preprocesamiento** y contar con los parquet en `data/labeled/` (ver `Preprocesamiento.md`).
+En la versión actual del sistema, el entrenamiento recomendado **no** se realiza
+principalmente por scripts CLI aislados, sino a través del router:
 
----
+- `/modelos`
 
-## 0) Nota sobre el estado actual (P2.2)
+Ese flujo produce:
 
-En el estado actual del backend:
-
-- El entrenamiento recomendado para el flujo del sistema se hace **vía API** (`/modelos/entrenar`), que produce un `run_id` y guarda artifacts en `artifacts/runs/<run_id>/`.
-- El endpoint `/predicciones/predict` en **P2.2** es **resolve/validate** del predictor bundle (**no ejecuta inferencia real**).  
-  Para predicciones reales, está previsto avanzar en P2.4+ (ver `docs/predicciones.md`).
-
----
-
-## 1) Datos de entrada al entrenamiento
-
-- **Parquet etiquetado** por el *Teacher* (BETO), típico:
-  - `data/labeled/evaluaciones_2025_beto.parquet`
-  - `data/labeled/evaluaciones_2025_beto_textonly.parquet` (opcional **recomendado**: filas con `has_text==1` y `accepted_by_teacher==1`)
-- **Columnas requeridas**:
-  - `calif_1..calif_10` (numéricas).
-  - **Target**: etiqueta de sentimiento `sentiment_label_teacher` en {`neg`,`neu`,`pos`} (proviene del teacher).
-- **Columnas opcionales** (si se usa texto en el Student):
-  - `p_neg`, `p_neu`, `p_pos` → se agregan como **3 features adicionales** con `--use-text-probs`.
-
-> Sugerencia: Entrenar con **`*_textonly.parquet`** mejora estabilidad cuando el dataset original tiene muchos textos vacíos o ruido.
+- un `job_id` para seguimiento;
+- un `run_id` persistido en `artifacts/runs/<run_id>/`;
+- métricas estructuradas en `metrics.json`;
+- un bundle de inferencia (`predictor.json`, `preprocess.json`, artefactos de modelo);
+- y, cuando corresponde, actualización del **champion** del dataset.
 
 ---
 
-## 2) Comando base de entrenamiento (CLI, útil para debugging)
+## 1. Qué se entrena hoy en el sistema
 
-El módulo de entrenamiento es `neurocampus.models.train_rbm` y expone opciones para el tipo de RBM, escalado de features y uso de probabilidades de texto.
+La pestaña **Modelos** y el router `/modelos` soportan actualmente dos familias
+funcionales principales:
 
-> Ejecuta siempre desde la **raíz del repo** y define `PYTHONPATH` para el backend.
+- **`sentiment_desempeno`**
+  - orientada al modelado basado en variables de evaluación y señales derivadas
+    de sentimiento.
+- **`score_docente`**
+  - orientada a predicción de score agregado por par docente–materia.
 
-```bash
-PYTHONPATH="$PWD/backend/src" python -m neurocampus.models.train_rbm   --type general   --data data/labeled/evaluaciones_2025_beto_textonly.parquet   --job-id auto   --seed 42   --epochs 100 --n-hidden 64   --cd-k 1 --epochs-rbm 1   --batch-size 128   --lr-rbm 5e-3 --lr-head 1e-2   --scale-mode minmax   --use-text-probs
-```
+Además, el backend soporta varias estrategias/modelos, entre ellas:
 
-**Esta es la configuración estable actual** (Día 7):
-- `--type general`: RBM con cabeza de clasificación (softmax) para 3 clases.
-- `--scale-mode minmax`: escalar `calif_1..10` a [0,1] (en datasets con rango 0–5 ayuda).
-- `--use-text-probs`: añade `p_neg/p_neu/p_pos` como features 11–13.
-- `--epochs 100`, `--cd-k 1`, `--epochs-rbm 1`: preentrenamiento RBM ligero en cada época + cabeza supervisada.
-- Tasa de aprendizaje: `--lr-rbm 5e-3`, `--lr-head 1e-2`.
-- `--seed 42`, `--batch-size 128` para reproducibilidad y rendimiento.
+- `rbm_general`
+- `rbm_restringida`
+- `dbm_manual`
 
----
-
-## 3) Otras variantes útiles
-
-### 3.1 Solo calificaciones (sin texto)
-```bash
-PYTHONPATH="$PWD/backend/src" python -m neurocampus.models.train_rbm   --type general   --data data/labeled/evaluaciones_2025_beto_textonly.parquet   --job-id auto   --seed 42   --epochs 80 --n-hidden 64   --cd-k 1 --epochs-rbm 1   --batch-size 128   --lr-rbm 5e-3 --lr-head 1e-2   --scale-mode minmax
-```
-> Quita `--use-text-probs` para entrenar con **10 features** (solo preguntas).
-
-### 3.2 Tipo “restringida”
-```bash
-PYTHONPATH="$PWD/backend/src" python -m neurocampus.models.train_rbm   --type restringida   --data data/labeled/evaluaciones_2025_beto_textonly.parquet   --job-id auto   --seed 42   --epochs 100 --n-hidden 64   --cd-k 1 --epochs-rbm 1   --batch-size 128   --lr-rbm 5e-3 --lr-head 1e-2   --scale-mode minmax   --use-text-probs
-```
-> Útil para comparar arquitecturas. El *general* ha mostrado desempeño más estable en este dataset.
-
-### 3.3 Escalados alternos
-- `--scale-mode standard` → z-score (media 0, var 1).  
-- `--scale-mode scale_0_5` → mapea a [0,5] (solo si tu rúbrica lo exige; para RBM suele ser mejor **minmax**).
+El sistema actual ya no debe entenderse como un único entrenamiento “RBM
+Student” fijo, sino como un flujo de entrenamiento versionado, persistente y
+comparable entre corridas.
 
 ---
 
-## 4) Qué se guarda en cada corrida
+## 2. Insumos previos al entrenamiento
 
-### 4.1 Salida del entrenamiento por CLI (legacy/job)
-Cada corrida por CLI crea un directorio `artifacts/jobs/<YYYYMMDD_HHMMSS>` con:
+Antes de entrenar, NeuroCampus necesita que el dataset tenga listos ciertos
+artefactos. La combinación exacta depende de la familia y del plan de datos,
+pero en términos generales intervienen estas capas:
 
-```
-job_meta.json         # hiperparámetros usados, semilla, dataset, tamaños
-metrics.json          # f1_macro, accuracy, distribución de clases
-vectorizer.json       # configuración de escalado/features
-rbm.pt                # pesos de la RBM (binarios)
-head.pt               # pesos de la cabeza clasificadora (binarios)
-```
+### 2.1 Dataset crudo
+Ubicación típica:
 
-**Ejemplo de salida al finalizar:**
-```
-{'job_dir': 'artifacts\jobs\20251013_173312',
- 'f1_macro': 0.28,
- 'accuracy': 0.75,
- 'classes': ['neg', 'neu', 'pos'],
- 'n_val': 184,
- 'n_labeled_used': 917,
- 'n_features': 13,
- 'type': 'general',
- 'seed': 42}
-```
+- `datasets/<dataset_id>.parquet`
+- `datasets/<dataset_id>.csv`
 
-> **Interpretación:** reportamos métricas en **validación**. En datasets desbalanceados, prioriza **macro-F1** frente a accuracy.
+### 2.2 Dataset procesado
+Ubicación típica:
 
-### 4.2 Salida del entrenamiento vía API (run) — flujo actual recomendado
-El entrenamiento vía API (`/modelos/entrenar`) produce un `run_id` y guarda:
+- `data/processed/<dataset_id>.parquet`
+
+### 2.3 Dataset etiquetado / enriquecido
+Ubicación típica:
+
+- `data/labeled/<dataset_id>_beto.parquet`
+- u otra variante compatible resuelta por el backend.
+
+### 2.4 Feature-pack
+Ubicación típica:
+
+- `artifacts/features/<dataset_id>/train_matrix.parquet`
+- `artifacts/features/<dataset_id>/meta.json`
+- `artifacts/features/<dataset_id>/pair_matrix.parquet`
+- `artifacts/features/<dataset_id>/pair_meta.json`
+
+---
+
+## 3. Verificación de readiness
+
+Antes de lanzar un entrenamiento, el backend expone una verificación explícita:
+
+- `GET /modelos/readiness?dataset_id=<dataset_id>`
+
+Este endpoint informa, entre otros aspectos:
+
+- si existe el dataset etiquetado;
+- si existe `historico/unificado_labeled.parquet`;
+- si existe el feature-pack;
+- si existe la `pair_matrix`;
+- qué `score_col` fue detectada;
+- y qué rutas relevantes está usando el sistema.
+
+### Cuándo usarlo
+Conviene usarlo cuando:
+
+- la UI de **Modelos** no habilita bien los flujos;
+- se sospecha que faltan artefactos;
+- se está depurando por qué una corrida no puede arrancar.
+
+---
+
+## 4. Datasets visibles para la pestaña Modelos
+
+El backend expone:
+
+- `GET /modelos/datasets`
+
+Este endpoint detecta datasets desde varias fuentes del filesystem:
+
+- `artifacts/features/`
+- `data/labeled/`
+- `data/processed/`
+- `datasets/`
+
+Para cada dataset devuelve indicadores como:
+
+- `has_train_matrix`
+- `has_pair_matrix`
+- `has_labeled`
+- `has_processed`
+- `has_raw_dataset`
+- `has_champion_sentiment`
+- `has_champion_score`
+
+Esto convierte a `/modelos/datasets` en la fuente de verdad para poblar el
+selector principal de la pestaña **Modelos**.
+
+---
+
+## 5. Preparación del feature-pack
+
+El entrenamiento actual depende en muchos casos del **feature-pack**. El backend
+permite construirlo o reconstruirlo mediante:
+
+- `POST /modelos/feature-pack/prepare`
+
+### Parámetros principales
+- `dataset_id` (requerido)
+- `input_uri` (opcional)
+- `force` (opcional)
+- `text_feats_mode`
+- `text_col`
+- `text_n_components`
+- `text_min_df`
+- `text_max_features`
+
+### Resolución automática del origen
+Si no se envía `input_uri`, el backend intenta resolver el origen en este orden:
+
+1. `data/labeled/<dataset_id>_beto.parquet`
+2. `data/processed/<dataset_id>.parquet`
+3. `datasets/<dataset_id>.parquet`
+
+### Salida esperada
+Al finalizar correctamente, el proceso deja listo el directorio:
+
+- `artifacts/features/<dataset_id>/`
+
+con artefactos reutilizables para entrenamiento e inferencia.
+
+---
+
+## 6. Entrenamiento recomendado: vía API
+
+El flujo recomendado hoy es:
+
+- `POST /modelos/entrenar`
+
+Este endpoint crea un `job_id`, corre el entrenamiento en background y persiste
+un **run** formal.
+
+### Qué hace internamente
+1. resuelve hiperparámetros efectivos;
+2. determina la fuente de datos (`data_source` / `data_ref`);
+3. prepara el dataset seleccionado;
+4. construye la estrategia del modelo;
+5. ejecuta entrenamiento mediante la plantilla de entrenamiento;
+6. guarda artifacts del run;
+7. intenta construir el bundle de inferencia;
+8. evalúa si debe actualizar el champion.
+
+### Respuesta esperada
+La respuesta devuelve, como mínimo:
+
+- `job_id`
+- `status`
+- `message`
+
+### Seguimiento
+El estado del job se consulta con:
+
+- `GET /modelos/estado/{job_id}`
+
+---
+
+## 7. Estado del job de entrenamiento
+
+El endpoint:
+
+- `GET /modelos/estado/{job_id}`
+
+expone el estado en memoria del job o, en el caso de sweeps, cae a un resumen
+persistido si corresponde.
+
+### Campos relevantes
+Entre los campos que pueden aparecer están:
+
+- `job_id`
+- `status`
+- `progress`
+- `model`
+- `params`
+- `metrics`
+- `history`
+- `run_id`
+- `artifact_path`
+- `champion_promoted`
+- `time_total_ms`
+- `warm_start_trace`
+
+### Estados esperables
+- `running`
+- `completed`
+- `failed`
+- `unknown`
+
+### Qué significa `artifact_path`
+Cuando el run alcanza persistencia, `artifact_path` apunta típicamente a:
+
+- `artifacts/runs/<run_id>`
+
+Eso permite inspeccionar el resultado incluso si hubo una falla posterior en
+etapas auxiliares del pipeline.
+
+---
+
+## 8. Qué se guarda en cada run
+
+Cada entrenamiento exitoso genera un run en:
 
 - `artifacts/runs/<run_id>/`
 
-y típicamente contiene:
+### Artefactos típicos
 - `metrics.json`
-- `preprocess.json`
 - `predictor.json`
-- `model.bin`
+- `preprocess.json`
+- `model/` con archivos exportados del modelo
+- otros archivos auxiliares según el modelo y la familia
+
+### Contrato mínimo de persistencia
+En el sistema actual, un run útil para inferencia y promoción debe contar con:
+
+- métricas persistidas;
+- contexto suficiente del request;
+- bundle de predictor válido;
+- export del modelo compatible con la familia/estrategia entrenada.
+
+### Validación de export
+El backend valida explícitamente la integridad de export para ciertos modelos:
+
+- RBM: `meta.json` + `rbm.pt` / `head.pt`
+- DBM: `meta.json` + `dbm_state.npz`
+
+Si el export está incompleto, el entrenamiento puede terminar como fallido aun
+si parte del run ya fue persistida.
 
 ---
 
-## 5) Promoción de “champion” (modelo activo) — flujo actual
+## 9. Métricas y evaluación
 
-En el backend actual, el “champion” se guarda como:
+El sistema actual normaliza métricas según el contrato de cada familia y
+persiste información que luego consumen:
+
+- la pestaña **Modelos**;
+- la promoción de champion;
+- el router `/predicciones`;
+- y la comparación entre runs.
+
+### Métricas frecuentes
+Según la familia y el task type, pueden aparecer métricas como:
+
+- `primary_metric`
+- `primary_metric_mode`
+- `primary_metric_value`
+- `accuracy`
+- `f1_macro`
+- `val_accuracy`
+- `val_f1_macro`
+- `n_train`
+- `n_val`
+- matriz de confusión
+
+### Interpretación recomendada
+Para comparar corridas no conviene usar solo accuracy. En el flujo actual del
+proyecto, la decisión de campeones y sweeps se apoya principalmente en una
+**métrica primaria** explícita por familia.
+
+---
+
+## 10. Warm start
+
+El entrenamiento actual soporta resolución de **warm start** cuando el request
+lo solicita.
+
+### Qué ocurre
+El backend puede:
+
+- resolver una corrida o modelo base previa;
+- localizar el directorio de modelo exportado;
+- e intentar cargar pesos como punto de partida.
+
+### Trazabilidad
+La ejecución deja rastro en:
+
+- `warm_start_requested`
+- `warm_start_resolved`
+- `warm_started`
+- `warm_start_trace`
+- y, cuando aplica, un objeto `warm_start` en métricas.
+
+### Importancia práctica
+Esto permite distinguir entre:
+
+- un warm start solicitado pero no resuelto;
+- uno resuelto pero no aplicado;
+- y uno efectivamente aplicado.
+
+---
+
+## 11. Sweep de modelos
+
+El backend soporta dos modalidades relacionadas con sweep:
+
+### 11.1 Sweep determinístico síncrono
+- `POST /modelos/sweep`
+
+Entrena un conjunto de modelos bajo condiciones comparables y devuelve el mejor
+candidato según la métrica primaria.
+
+#### Características
+- ejecución síncrona;
+- orden determinístico de candidatos;
+- tie-break reproducible;
+- promoción automática opcional del champion.
+
+### 11.2 Sweep asíncrono
+- `POST /modelos/entrenar/sweep`
+
+Lanza un job de sweep y permite consultar el estado por `job_id`.
+
+### Consulta de resumen de sweep
+- `GET /modelos/sweeps/{sweep_id}`
+
+Este endpoint devuelve:
+
+- `best`
+- `best_overall`
+- `best_by_model`
+- `candidates`
+- `summary_path`
+- `primary_metric`
+- `primary_metric_mode`
+
+---
+
+## 12. Runs disponibles
+
+El sistema permite listar runs con:
+
+- `GET /modelos/runs`
+
+### Filtros soportados
+- `model_name`
+- `dataset`
+- `dataset_id`
+- `periodo`
+- `family`
+
+### Para qué sirve
+Este endpoint alimenta la pestaña **Ejecuciones** y permite:
+
+- comparar corridas;
+- recuperar métricas resumidas;
+- inspeccionar contexto de entrenamiento;
+- identificar runs candidatos a champion;
+- enlazar con detalles completos.
+
+### Detalle de un run
+- `GET /modelos/runs/{run_id}`
+
+Devuelve información más completa del run, incluyendo métricas, contexto y
+estado del bundle de inferencia.
+
+---
+
+## 13. Champion
+
+El modelo activo por dataset/family se consulta con:
+
+- `GET /modelos/champion`
+
+Y puede promoverse manualmente con:
+
+- `POST /modelos/champion/promote`
+
+### Ubicación conceptual
+El champion vive bajo una estructura de este estilo:
 
 - `artifacts/champions/<family>/<dataset_id>/champion.json`
 
-y referencia el `run_id` activo mediante `source_run_id`.
+### Qué representa
+El champion es el run actualmente elegido como referencia operativa para
+consumo posterior, especialmente por el router `/predicciones`.
 
-### 5.1 Promover vía API (recomendado)
-```bash
-curl -s -X POST "http://127.0.0.1:8000/modelos/champion/promote"   -H "Content-Type: application/json"   -d '{
-    "dataset_id": "<dataset_id>",
-    "family": "<family>",
-    "model_name": "<model_name>",
-    "run_id": "<run_id>"
-  }'
-```
+### Promoción manual
+La promoción manual debe usarse cuando:
 
-### 5.2 Verificar en disco
-```bash
-cat artifacts/champions/<family>/<dataset_id>/champion.json
-ls -la artifacts/runs/<run_id>
-```
+- se desea fijar explícitamente una corrida concreta;
+- se está auditando un cambio de champion;
+- o se necesita corregir la selección automática.
 
-> Nota: ya no se usa `CHAMPION_WITH_TEXT` ni rutas tipo `artifacts/champions/with_text/current`.  
-> El layout vigente es por `family` + `dataset_id`.
+### Errores típicos
+- `404` si no existe el run o faltan métricas;
+- `422` si `run_id` es inválido;
+- `409` si la promoción no puede concretarse por inconsistencia operativa.
 
 ---
 
-## 6) Evaluación y análisis rápido
+## 14. Relación con Predicciones
 
-### 6.1 Cargar métricas del job (CLI)
-```bash
-python - <<'PY'
-import json, os
-job = "artifacts/jobs/<JOB_ID>"
-with open(os.path.join(job,"metrics.json"), "r", encoding="utf-8") as f:
-    m = json.load(f)
-print(m)
-PY
-```
+El entrenamiento ya no termina en la simple obtención de métricas. En el flujo
+actual del sistema, un run entrenado se convierte en insumo de:
 
-### 6.2 Distribución de etiquetas (train/val) y matriz de confusión
-Si el job guardó predicciones de validación (opcional), puedes inspeccionar la matriz:
-```bash
-python - <<'PY'
-import os, pandas as pd
-job = "artifacts/jobs/<JOB_ID>"
-ytrue = pd.read_parquet(os.path.join(job, "y_val.parquet"))["y"]
-ypred = pd.read_parquet(os.path.join(job, "y_val_pred.parquet"))["yhat"]
-from sklearn.metrics import classification_report, confusion_matrix
-print(confusion_matrix(ytrue, ypred, labels=[0,1,2]))
-print(classification_report(ytrue, ypred, target_names=["neg","neu","pos"]))
-PY
-```
-> Si tu versión no guarda `y_val*`, revisa `metrics.json` y logs de entrenamiento para señales de *underfitting/overfitting*.
+- `GET /predicciones/model-info`
+- `POST /predicciones/predict`
+- `POST /predicciones/batch/run`
+- `GET /predicciones/runs`
+- `GET /predicciones/outputs/preview`
+- `GET /predicciones/outputs/file`
+
+Por eso, para considerar “cerrado” un entrenamiento útil, no basta con que el
+job termine: debe quedar un run persistido, un bundle válido y, si corresponde,
+un champion consumible.
 
 ---
 
-## 7) Recomendaciones prácticas
+## 15. CLI y scripts legacy
 
-- **Desbalance**: en P2.4+ se prevé aplicar una regla costo-sensible en inferencia para favorecer *neg* cuando la evidencia es suficiente y evitar falsos positivos de *pos*.
-- **Texto ruidoso**: filtra con `--min-tokens 1..2` en el teacher; eleva `threshold/margin/neu-min` para mayor precisión.
-- **Ajuste de hparams**: comienza con el **preset estable** y prueba variaciones pequeñas (hidden 32/128, lr 1e-3–2e-2, cd-k 1–2).
-- **Semilla**: fija `--seed` para corrida reproducible.
-- **Val split**: si tu dataset cambia drásticamente, considerar *stratified split* explícito (por ahora se usa split interno del job).
+Todavía pueden existir scripts CLI útiles para debugging o trabajo experimental,
+pero **ya no representan el flujo principal recomendado del sistema**.
 
----
+En particular:
 
-## 8) Entrenamiento sin texto (baseline de control)
+- la persistencia oficial y consumible por la UI se basa en `artifacts/runs/`;
+- la comparación entre modelos se apoya en el router `/modelos`;
+- y la inferencia operativa se conecta con `/predicciones`, no con salidas
+  manuales aisladas de jobs legacy.
 
-Para validar que el beneficio viene del texto, entrena un baseline **solo con calificaciones** y compara:
-
-```bash
-PYTHONPATH="$PWD/backend/src" python -m neurocampus.models.train_rbm   --type general   --data data/labeled/evaluaciones_2025_beto_textonly.parquet   --job-id auto   --seed 42   --epochs 80 --n-hidden 64   --cd-k 1 --epochs-rbm 1   --batch-size 128   --lr-rbm 5e-3 --lr-head 1e-2   --scale-mode minmax
-```
-
-> Espera menor macro-F1 frente al modelo **con** `--use-text-probs` si los comentarios añaden señal útil.
+Por tanto, la CLI debe entenderse hoy como herramienta auxiliar, no como el
+contrato principal del producto.
 
 ---
 
-## 9) (Opcional) Búsqueda de hiperparámetros
+## 16. Flujo recomendado de punta a punta
 
-Próximo paso del proyecto:
-- **Random Search** 3-fold (15–25 trials) variando: `n_hidden`, `cd_k`, `epochs_rbm`, `lr_head`, `lr_rbm`, `scale_mode`, `use_text_probs`.
-- Selección por **macro-F1** en validación media.
-- Persistir un `search_report.json` y promover automáticamente el mejor run/job.
+El flujo recomendado actual es:
 
----
-
-## 10) Errores comunes
-
-- **FileNotFoundError** → corre desde la **raíz** del repo o ajusta rutas relativas.
-- **CUDA/memoria** → por defecto usamos CPU; si habilitas GPU, baja `batch-size` o cd-k.
-- **Métricas extrañas (accuracy alto vs F1 bajo)** → dataset desbalanceado; usa macro-F1 y revisa la **matriz de confusión**.
-- **Peor desempeño con texto** → revisa `accept_rate` y `text_coverage` del teacher; si son muy bajos, el texto puede no estar aportando.
+1. cargar o procesar un dataset desde **Datos**;
+2. generar labeled dataset si aplica;
+3. preparar el feature-pack;
+4. verificar readiness;
+5. lanzar entrenamiento por `/modelos/entrenar` o `/modelos/sweep`;
+6. seguir el job con `/modelos/estado/{job_id}`;
+7. revisar runs con `/modelos/runs` y `/modelos/runs/{run_id}`;
+8. promover o validar el champion;
+9. consumir el modelo resultante desde **Predicciones**.
 
 ---
 
-## 11) Checklist de cierre (Día 7 → P2.2)
+## 17. Problemas comunes
 
-- [x] Entrenamiento con preset estable ejecutado y **job_dir** identificado (CLI) o `run_id` (API).
-- [x] `metrics.json` con métricas de validación.
-- [x] Run promovido a champion vía `/modelos/champion/promote`.
-- [x] Backend resolviendo bundle con `/predicciones/predict` (P2.2: resolve/validate).
-- [x] Documentación actualizada (este archivo + README + Preprocesamiento + predicciones).
+### El entrenamiento no arranca
+Posibles causas:
+
+- dataset inexistente;
+- feature-pack ausente;
+- labeled dataset no disponible;
+- request incompleto;
+- familia o modelo no soportado.
+
+### El job aparece como completado pero no sirve para inferencia
+Posibles causas:
+
+- export del modelo incompleto;
+- `predictor.json` inválido o ausente;
+- champion no promovido;
+- run persistido sin bundle de inferencia listo.
+
+### El sweep no elige el modelo esperado
+Revisar:
+
+- `primary_metric`
+- `primary_metric_mode`
+- `best_overall`
+- `best_by_model`
+- elegibilidad deployable para predicciones
+
+### Hay diferencias entre request y métricas persistidas
+El backend hace normalización y backfill de contexto. La fuente final de verdad
+para auditoría debe ser el contenido persistido en `metrics.json` y los detalles
+expuestos por `/modelos/runs/{run_id}`.
+
+---
+
+## 18. Resumen operativo
+
+En NeuroCampus, el entrenamiento vigente es un proceso:
+
+- orientado a datasets versionados;
+- persistido por runs;
+- observable por jobs y estados;
+- comparable por métricas estructuradas;
+- y conectado directamente con champion e inferencia.
+
+Por eso, cualquier documentación o flujo operativo nuevo debe tomar como base
+el router `/modelos` y no un pipeline histórico centrado únicamente en una RBM
+entrenada por CLI.
