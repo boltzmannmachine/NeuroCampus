@@ -2,198 +2,384 @@
 
 ## Objetivo
 
-La pestaña **Dashboard** muestra una vista global del desempeño y riesgo
-académico, basada en:
+La pestaña **Dashboard** presenta una vista consolidada del desempeño académico
+e institucional a partir del **histórico unificado** del sistema.
 
-- Datasets históricos de evaluaciones.
-- Predicciones generadas por el modelo campeón.
-- Indicadores y KPIs clave para la toma de decisiones.
+Su propósito es permitir una lectura rápida del estado general de la institución
+mediante indicadores agregados, rankings, comparaciones históricas y contexto
+cualitativo de comentarios.
 
-Permite a coordinadores, directores de programa y analistas:
-
-- Identificar docentes/asignaturas con mayor riesgo de bajo rendimiento.
-- Monitorizar la evolución temporal del desempeño.
-- Comparar real vs predicho y detectar desviaciones.
+A diferencia de otras pestañas, el Dashboard **no trabaja directamente sobre un
+dataset puntual cargado por el usuario**. Su información proviene del histórico
+procesado y, cuando está disponible, del histórico etiquetado con análisis de
+sentimientos.
 
 ---
 
-## Organización de la pantalla
+## Fuente de información
 
-La pantalla se organiza en:
+El Dashboard consume información del backend a través de los endpoints
+`/dashboard/*`.
 
-1. **Zona de filtros (arriba)**
-   - Filtros típicos:
-     - Semestre / periodo.
-     - Facultad / programa.
-     - Docente.
-     - Asignatura.
-   - Botón **«Aplicar filtros»** para actualizar las visualizaciones.
+Las visualizaciones se construyen a partir de dos fuentes principales:
 
-2. **Tarjetas de KPIs (debajo de filtros)**
-   - Pequeñas cards con valores clave:
-     - Predicciones totales.
-     - Exactitud del modelo (en validación / test).
-     - Último dataset registrado.
-     - Número de evaluaciones registradas en el periodo.
-     - Porcentaje de casos en riesgo alto.
+- **Histórico procesado**:
+  - base para KPIs, series temporales, rankings y radar de indicadores.
+- **Histórico etiquetado**:
+  - base para análisis de sentimientos y nube de palabras.
 
-3. **Zona de gráficos (en grid)**
-   - Gráficos organizados en filas, máximo 2 por fila para mantener claridad:
-     - Históricos por docente/asignatura.
-     - Ranking de docentes.
-     - Distribución de riesgo.
-     - Comparación desempeño real vs predicho.
-     - Promedio histórico vs semestres específicos.
+En consecuencia:
+
+- si el histórico procesado no está listo, la pestaña no puede operar con
+  normalidad;
+- si el histórico etiquetado no está listo, algunas visualizaciones cualitativas
+  pueden no estar disponibles temporalmente.
+
+---
+
+## Encabezado y estado de carga
+
+En la parte superior se muestra:
+
+- el título **Dashboard**;
+- el subtítulo **Diagnóstico General de la Institución**;
+- mensajes de estado del sistema.
+
+### Estados que puede mostrar la interfaz
+
+- **Cargando datos del histórico…**
+  - aparece mientras el frontend consulta la información del dashboard.
+- **Error**
+  - aparece si falla la carga de datos desde el backend.
+- **Histórico en actualización…**
+  - aparece cuando el histórico procesado o el histórico etiquetado aún no están
+    listos.
+
+Este comportamiento permite al usuario saber si la información mostrada está
+disponible completamente o si alguna parte del pipeline todavía está pendiente.
 
 ---
 
 ## Filtros globales
 
-### 1. Selección de ámbito
+La barra de filtros actual contiene **tres controles**:
 
-- **Semestre / periodo**:
-  - Selecciona uno o varios semestres para analizar (por ejemplo, `2023-2`,
-    `2024-1`).
-- **Programa / facultad**:
-  - Limita el análisis a un subconjunto de la institución (por ejemplo,
-    “Ingeniería”, “Ciencias Económicas”).
-- **Docente / asignatura**:
-  - Permite enfocarse en un docente o asignatura concreta.
+1. **Semestre / Periodo**
+2. **Asignatura**
+3. **Docente**
 
-### 2. Aplicar y limpiar filtros
+### 1. Semestre / Periodo
 
-- **Aplicar filtros**:
-  - Refresca todos los KPIs y gráficos con el contexto actual.
-- **Limpiar filtros** (opcional):
-  - Vuelve a la vista global de la institución.
+Este filtro permite seleccionar:
 
----
+- un periodo específico, por ejemplo `2024-2`;
+- o la opción **Histórico (todo)**.
 
-## Tarjetas de KPIs
+#### Comportamiento
 
-Ejemplos de KPIs que pueden aparecer:
+- Cuando se elige un **periodo específico**, los KPIs y rankings se calculan
+  sobre ese periodo.
+- Cuando se elige **Histórico (todo)**, el dashboard usa el rango completo de
+  periodos disponibles en el histórico.
 
-- **Predicciones totales**:
-  - Número total de predicciones generadas en el periodo filtrado.
-- **Exactitud del modelo**:
-  - Métrica de desempeño del modelo en el conjunto de evaluación.
-- **Último dataset registrado**:
-  - Identificador y fecha del último dataset cargado.
-- **Número de evaluaciones registradas**:
-  - Cantidad de encuestas o registros en el rango temporal seleccionado.
-- **Porcentaje de riesgo alto**:
-  - Proporción de casos clasificados como alto riesgo de bajo rendimiento.
+### 2. Asignatura
 
-Estas tarjetas se actualizan al modificar los filtros y sirven como resumen
-rápido antes de entrar en el detalle de los gráficos.
+Permite limitar la vista a:
 
----
+- **Todas las Asignaturas**, o
+- una asignatura específica disponible en el catálogo del periodo/rango actual.
 
-## Gráficos principales
+### 3. Docente
 
-### 1. Histórico por docente y por asignatura
+Permite limitar la vista a:
 
-- **Gráfico de líneas o barras**:
-  - Eje X: semestres o periodos.
-  - Eje Y: indicador de desempeño (real o predicho, según configuración).
-- Permite analizar:
-  - Tendencias de cada docente o asignatura.
-  - Mejoras o deterioros a lo largo del tiempo.
-- En modo multi-serie, se pueden comparar varios docentes o asignaturas
-  simultáneamente (con posibilidad de activar/desactivar series en la leyenda).
+- **Todos los Docentes**, o
+- un docente específico disponible en el catálogo del periodo/rango actual.
 
-### 2. Ranking de docentes por desempeño proyectado
+### Observaciones importantes sobre los filtros
 
-- **Gráfico de barras horizontales**:
-  - Eje Y: docentes (ordenados de mejor a peor o viceversa).
-  - Eje X: indicador de desempeño (predicho o combinado).
-- Usado para:
-  - Identificar rápidamente a los mejores docentes según las evaluaciones.
-  - Localizar casos con desempeño significativamente por debajo de la media.
-
-### 3. Riesgo en caso de bajo rendimiento
-
-- **Gráfico de barras apiladas**:
-  - Eje X: asignaturas o programas.
-  - Eje Y: número de evaluaciones/casos.
-  - Segmentos apilados:
-    - Bajo riesgo,
-    - Riesgo medio,
-    - Alto riesgo.
-- Permite observar “dónde se acumula el problema”:
-  - Programas con un gran volumen de casos en riesgo alto.
-  - Asignaturas con concentración de evaluaciones negativas.
+- Los catálogos de docente y asignatura se recalculan según el periodo o rango
+  seleccionado.
+- Si un docente o una asignatura dejan de existir en el catálogo filtrado,
+  la interfaz reinicia ese filtro a la opción general.
+- En la versión actual de la UI, el backend soporta también filtro por
+  **programa**, pero ese control **no está expuesto** todavía en la barra visual
+  del Dashboard.
 
 ---
 
-## Comparación desempeño real vs predicho
+## Tarjetas KPI
 
-Cuando se dispone de datos reales y predicciones para los mismos casos:
+Debajo de los filtros se muestran **cuatro tarjetas principales**.
 
-### 1. Gráfico de dispersión (scatter plot)
+### 1. Predicciones Totales
 
-- Eje X: desempeño real.
-- Eje Y: desempeño predicho.
-- Puntos cercanos a la diagonal `y = x` indican buena calibración del modelo.
+Indica el número total de predicciones persistidas para el contexto filtrado.
 
-Complementos:
+Se calcula a partir de los artefactos de predicción asociados al periodo o rango
+seleccionado.
 
-- Línea diagonal (ideal).
-- Colores por rango de riesgo o por programa.
+### 2. Exactitud del Modelo
 
-### 2. Gráfico de barras agrupadas
+Muestra la exactitud del modelo campeón en forma de porcentaje.
 
-- Eje X: docentes o asignaturas.
-- Eje Y: indicador de desempeño.
-- Dos barras por grupo:
-  - Real.
-  - Predicho.
-- Útil para identificar sistemáticas de sobreestimación o subestimación.
+En la interfaz actual esta tarjeta se presenta como:
 
----
+- **Exactitud del Modelo**
+- subtítulo: **F1-Score Champion**
 
-## Promedio histórico vs semestres específicos
+Esta tarjeta se mantiene para conectar el Dashboard con el rendimiento del modelo
+activo, aunque conceptualmente no proviene del mismo histórico que las otras
+métricas agregadas.
 
-### 1. Gráfico de líneas o barras
+### 3. Evaluaciones Registradas
 
-Se comparan dos series:
+Indica la cantidad de evaluaciones presentes en el histórico filtrado.
 
-- **Promedio histórico general**:
-  - Media de desempeño en un rango amplio de semestres.
-- **Promedio del semestre seleccionado**:
-  - Media de desempeño en el semestre filtrado.
+Es uno de los indicadores básicos para validar el volumen de información que
+soporta las visualizaciones del dashboard.
 
-Ejes típicos:
+### 4. % Alto Rendimiento
 
-- Eje X: semestres.
-- Eje Y: promedio de desempeño global o por unidad académica.
+Representa el porcentaje agregado de alto rendimiento en el contexto
+seleccionado.
 
-Esto permite contestar preguntas como:
-
-- “¿El último semestre ha mejorado o empeorado respecto a la media histórica?”
-- “¿Está este programa por encima o por debajo del promedio institucional?”
+Sirve como señal rápida del estado general del desempeño en el periodo,
+docente o asignatura filtrados.
 
 ---
 
-## Recomendaciones de uso
+## Sección: «¿Cómo estamos ahora?»
 
-- Usa los filtros para **acotar el contexto** antes de interpretar gráficos:
-  - No es lo mismo analizar un docente aislado que un programa completo.
-- Combina las visualizaciones:
-  - Por ejemplo, revisa el **ranking de docentes** y luego observa el
-    **histórico de los casos en la parte baja del ranking**.
-- Utiliza la comparación **real vs predicho** para:
-  - Evaluar la confianza en el modelo.
-  - Detectar áreas donde el modelo puede necesitar ajustes o reentrenamiento.
+Esta sección ofrece una **vista transversal del estado actual** mediante dos
+visualizaciones.
+
+### 1. Distribución de Riesgo por Asignatura
+
+Se muestra como un **gráfico de barras apiladas**.
+
+#### Qué representa
+
+Para cada asignatura se presentan tres segmentos:
+
+- **Bajo Riesgo**
+- **Medio Riesgo**
+- **Alto Riesgo**
+
+#### Utilidad
+
+Permite identificar rápidamente:
+
+- asignaturas con mayor concentración de riesgo;
+- distribución comparativa entre asignaturas;
+- áreas que requieren atención o intervención.
+
+### 2. Ranking de Docentes
+
+Se muestra como un **gráfico de barras horizontales**.
+
+#### Modos disponibles
+
+La interfaz permite alternar entre dos vistas:
+
+- **Top Mejores**
+- **A Intervenir**
+
+#### Interpretación
+
+- **Top Mejores** prioriza docentes con mejor score.
+- **A Intervenir** prioriza docentes con menor score o mayor necesidad de
+  seguimiento.
+
+#### Utilidad
+
+Este gráfico facilita:
+
+- identificar referentes de buen desempeño;
+- detectar casos prioritarios para acompañamiento;
+- comparar docentes dentro del contexto filtrado.
+
+---
+
+## Sección: «Análisis de Indicadores - Comparación Histórica vs Semestre Actual»
+
+Esta sección usa un **gráfico radar** para comparar indicadores agregados.
+
+### Qué compara
+
+El radar muestra dos perfiles:
+
+- **Promedio Histórico (Todos los Semestres)**
+- **Semestre seleccionado**
+
+### Qué representa
+
+Cada eje corresponde a un indicador derivado de preguntas o dimensiones del
+histórico procesado.
+
+### Utilidad
+
+Este gráfico ayuda a responder preguntas como:
+
+- ¿el semestre actual está por encima o por debajo del promedio histórico?
+- ¿en qué dimensiones se observan mejoras o retrocesos?
+- ¿el perfil actual mantiene un comportamiento estable o cambia de forma clara?
+
+### Comportamiento contextual
+
+- Si el usuario selecciona un docente, el radar se interpreta como el perfil de
+  ese docente dentro del contexto filtrado.
+- Si no hay un docente específico seleccionado, el radar se interpreta como un
+  **perfil global de indicadores**.
+
+---
+
+## Sección: «¿Cómo hemos cambiado? - Vista Temporal»
+
+Esta sección presenta dos gráficos de evolución histórica.
+
+### 1. Histórico por Entidad Seleccionada
+
+Se muestra como un **gráfico de líneas**.
+
+#### Qué representa
+
+- si hay un docente seleccionado, se visualiza el histórico de ese docente;
+- si no lo hay, se presenta un histórico agregado de la entidad filtrada.
+
+#### Utilidad
+
+Permite observar:
+
+- evolución del desempeño a lo largo de varios periodos;
+- estabilidad o variación temporal;
+- patrones de mejora o deterioro.
+
+### 2. Promedio Histórico vs Semestre Actual
+
+También se muestra como un **gráfico de líneas**.
+
+#### Series comparadas
+
+- **Promedio Histórico**
+- **Semestre Actual**
+
+#### Utilidad
+
+Sirve para contrastar:
+
+- el comportamiento general acumulado,
+- frente al valor del periodo activo.
+
+Es una visualización útil para detectar desviaciones del semestre más reciente
+respecto al comportamiento histórico.
+
+---
+
+## Sección: «Contexto Cualitativo - Tendencias en Comentarios»
+
+La parte final de la pestaña muestra una **nube de palabras** derivada del
+análisis textual de comentarios.
+
+### Nube de palabras
+
+Cada término se representa con:
+
+- tamaño relativo según su frecuencia;
+- color según su polaridad estimada.
+
+### Convención visual
+
+- **Verde**: positivo
+- **Gris**: neutral
+- **Rojo**: negativo
+
+### Utilidad
+
+La nube de palabras permite:
+
+- identificar conceptos recurrentes en comentarios;
+- detectar señales cualitativas positivas o negativas;
+- complementar la lectura cuantitativa del Dashboard con contexto textual.
+
+### Disponibilidad
+
+Esta visualización depende del histórico etiquetado.
+
+Si el backend aún no dispone del histórico etiquetado, la UI puede mostrar una
+versión de respaldo o dejar esta sección con información no definitiva hasta que
+el proceso esté completo.
+
+---
+
+## Comportamiento general de la pestaña
+
+### Carga de datos
+
+La pestaña realiza consultas al backend para obtener:
+
+- estado del histórico;
+- periodos disponibles;
+- catálogos;
+- KPIs;
+- series históricas;
+- rankings;
+- radar;
+- sentimiento;
+- nube de palabras.
+
+### Deshabilitación de controles
+
+Los filtros pueden quedar deshabilitados temporalmente cuando:
+
+- la pestaña está cargando datos;
+- el histórico procesado aún no está listo.
+
+### Reacción a cambios de filtros
+
+Cada vez que cambia el periodo, docente o asignatura:
+
+- se recalculan KPIs;
+- se actualizan rankings;
+- se actualizan series históricas;
+- se reconstruyen gráficos agregados;
+- se recalculan las visualizaciones cualitativas cuando aplica.
+
+---
+
+## Alcance real del Dashboard en la versión actual
+
+En la implementación actual, esta pestaña está orientada a:
+
+- monitoreo agregado;
+- análisis histórico;
+- apoyo a toma de decisiones;
+- priorización institucional.
+
+No está diseñada para:
+
+- cargar archivos manualmente;
+- editar datasets;
+- lanzar entrenamientos;
+- ejecutar predicciones individuales o masivas.
+
+Es una pestaña de **consulta y análisis**, no de operación del pipeline.
 
 ---
 
 ## Relación con otras pestañas
 
-- La pestaña **Dashboard** se nutre de:
-  - Los datasets cargados y preprocesados en **Datos**.
-  - Los modelos entrenados y validados en **Modelos**.
-  - Las predicciones generadas en **Predicciones** (especialmente en modo lote).
+El Dashboard depende indirectamente del trabajo realizado en otras áreas del
+sistema:
 
-Es la vista que cierra el ciclo: de los datos brutos y el entrenamiento de
-modelos, hasta la toma de decisiones basada en indicadores agregados.
+- **Datos**
+  - aporta los insumos que alimentan el histórico institucional.
+- **Modelos**
+  - define el modelo campeón y el contexto de rendimiento predictivo.
+- **Predicciones**
+  - genera resultados persistidos que se reflejan en parte de los KPIs del
+    dashboard.
+
+Por tanto, el Dashboard actúa como la **vista consolidada final** del sistema:
+resume y presenta en una sola pantalla el estado general construido a partir del
+histórico, los modelos y las predicciones.
