@@ -1,81 +1,153 @@
 # Changelog
-All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Este archivo resume los cambios funcionales y documentales relevantes de
+NeuroCampus a partir del estado actual verificable del repositorio.
+
+> Nota editorial:
+> el repositorio contiene rastros de etapas intermedias del proyecto
+> (por ejemplo, referencias a “Día 7”, “P2.2” y layouts legacy). Como parte de la
+> normalización documental, este changelog se reorganiza para reflejar el
+> **estado vigente del software** y dejar explícito qué elementos pertenecen a
+> flujos heredados o ya superados.
+>
+> Cuando no fue posible reconstruir con certeza una cronología fina por versión,
+> se prefirió consolidar el cambio por capacidades reales del sistema antes que
+> mantener hitos históricos ambiguos.
+
+The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
-### Added
-- **Predicciones (P2.2)**: endpoints `/predicciones/health` y `/predicciones/predict` (modo *resolve/validate* del predictor bundle; sin inferencia real).
 
 ### Changed
-- **Rutas de predicción**: se reemplazan endpoints legacy `/prediccion/*` por `/predicciones/*` (P2.2).
-- **Champions**: nueva convención `artifacts/champions/<family>/<dataset_id>/champion.json` con `source_run_id` (reemplaza `CHAMPION_WITH_TEXT` y `artifacts/champions/with_text/current/`).
+- Se alinea la documentación del proyecto con la implementación vigente de la
+  aplicación.
+- Se actualizan los manuales de usuario de:
+  - `Dashboard`
+  - `Datos`
+  - `Modelos`
+  - `Predicciones`
+- Se actualiza la documentación de arquitectura para reflejar la estructura real
+  de frontend, backend y pipeline de modelos.
+- Se amplía la documentación de API backend para cubrir routers activos que no
+  estaban integrados completamente en Sphinx:
+  - `/dashboard`
+  - `/modelos`
+  - `/prediccion`
+  - `/predicciones`
+  - `/admin/cleanup`
+- Se actualizan documentos técnicos operativos fuera de `docs/source/`,
+  incluyendo contratos frontend-backend, entrenamiento, preprocesamiento,
+  inferencia y scripts auxiliares.
 
 ### Fixed
-- **/predicciones/predict**: cuando el bundle del run no existe/incompleto, responde `404` (en lugar de `500`).
-- **Tests**: `NC_ARTIFACTS_DIR` se fuerza a un directorio temporal en `tests/conftest.py` para ejecuciones deterministas.
+- Se corrige el índice principal de Sphinx y la navegación de la documentación
+  publicada.
+- Se elimina la desalineación entre documentación antigua de la UI y las
+  pestañas reales del frontend.
+- Se corrige la descripción de la capa de predicción, separando claramente:
+  - predicción directa (`/prediccion`)
+  - predicción operativa persistida (`/predicciones`)
 
-## [0.7.0] - 2025-10-14 — Día 7 (Release Closing)
+---
+
+## [0.6.0]
+
+Versión base actualmente reflejada por la API en `backend/src/neurocampus/app/main.py`.
+
 ### Added
-- **Pipeline NLP (Teacher, BETO)**: `cmd_preprocesar_beto` con `--beto-mode (probs|simple)`, `--threshold`, `--margin`, `--neu-min`, `--min-tokens`, `--batch-size`.
-  - Genera columnas: `_texto_clean`, `_texto_lemmas`, `token_count`, `has_text`, `p_neg`, `p_neu`, `p_pos`, `sentiment_label_teacher`, `sentiment_conf`, `accepted_by_teacher`.
-  - Escribe meta: `*.meta.json` con parámetros y tasa de aceptación.
-- **Entrenamiento Student**: `neurocampus.models.train_rbm` con soporte:
-  - `--type (general|restringida)`, `--use-text-probs`, `--scale-mode (minmax|standard|scale_0_5)`.
-  - Hiperparámetros: `--n-hidden`, `--epochs`, `--cd-k`, `--epochs-rbm`, `--batch-size`, `--lr-rbm`, `--lr-head`, `--seed`.
-  - Persistencia en `artifacts/jobs/<JOB_ID>`: `vectorizer.json`, `rbm.pt`, `head.pt`, `job_meta.json`, `metrics.json`.
-- **Promoción de champion (legacy 0.7.0)**: convención `artifacts/champions/with_text/current/` (binarios + `CHAMPION.json`). (Reemplazado en P2.2 por `artifacts/champions/<family>/<dataset_id>/champion.json`.)
-- **Endpoint de predicción (legacy 0.7.0)**: reglas costo-sensibles en *facade* (prioriza `pos` si `p_pos≥0.55`, `neg` si `p_neg≥0.35` o `p_neg−p_neu≥0.05`, si no `neu`). (En P2.2, `/predicciones/predict` opera en modo *resolve/validate*; inferencia real prevista para P2.4+.)
-- **Reporte agregado**: `cmd_score_docente` para estimar `prob_bueno_pct` por (`codigo materia`, `grupo`). Intervalo Jeffreys y score combinado (sentimiento + calificaciones).
-- **Documentación**: `README.md`, `Preprocesamiento.md`, `Entrenamiento.md`, `Inferencia_API.md`, `Reporte_Docente.md`.
-- **Dummies versionables**: guía para `examples/reports/` y artefactos ignorados en `artifacts/`.
+- Backend FastAPI con routers activos para:
+  - `/datos`
+  - `/jobs`
+  - `/modelos`
+  - `/prediccion`
+  - `/dashboard`
+  - `/predicciones`
+  - `/admin/cleanup`
+- Dashboard institucional basado en histórico unificado y, cuando existe,
+  histórico etiquetado.
+- Flujo de datos con:
+  - validación de archivos,
+  - carga de datasets por periodo,
+  - resumen de dataset,
+  - preview tabular,
+  - análisis de sentimientos,
+  - unificación histórica,
+  - preparación de feature-pack.
+- Flujo de modelos con soporte para:
+  - detección de datasets disponibles,
+  - verificación de readiness,
+  - construcción de feature-pack,
+  - entrenamiento de runs,
+  - sweeps síncronos y asíncronos,
+  - consulta de runs,
+  - diagnóstico de estado,
+  - promoción y consulta de champion.
+- Flujo de predicciones con soporte para:
+  - exploración de datasets disponibles,
+  - listado de docentes y materias,
+  - predicción individual por par docente–materia,
+  - ejecución batch asíncrona,
+  - historial de runs de predicción,
+  - preview y descarga de outputs persistidos.
+- Ruta de predicción directa para inferencia online y batch ligero a través de
+  `/prediccion`.
+- Mecanismos de observabilidad y trazabilidad:
+  - `Correlation-Id`
+  - logging contextual
+  - wiring seguro de eventos `training.*` y `prediction.*`
+- Límite de tamaño de subida configurable para endpoints de datos.
 
 ### Changed
-- **Cargador de dataset**: `cmd_cargar_dataset` ahora detecta preguntas con **espacios o guion bajo** (`pregunta 1` / `pregunta_1`) y mapea a `calif_1..calif_10`. Soporta `--meta-list` para conservar metadatos existentes.
-- **Router de predicción**: parsing robusto de `pregunta_#` con espacio o `_` y normalización del comentario.
-- **RBM General/Restringida**: mejoras menores de estabilidad y vectorización (escala/normalización alineada con `vectorizer.json`).
+- La arquitectura documental pasa a describir la aplicación real organizada en
+  cuatro pestañas principales:
+  - `Dashboard`
+  - `Datos`
+  - `Modelos`
+  - `Predicciones`
+- El concepto de champion se documenta y usa según el layout vigente basado en:
+  `artifacts/champions/<family>/<dataset_id>/champion.json`.
+- El flujo de entrenamiento recomendado se centra en la API de `/modelos` y en
+  los artefactos persistidos bajo `artifacts/runs/<run_id>/`.
+- El flujo de predicciones se apoya en feature-packs y artefactos persistidos,
+  no solo en inferencia puntual en memoria.
 
 ### Fixed
-- **Argparse** en `cmd_preprocesar_beto`: corrección del nombre de argumento `--beto-mode` (bug de `Namespace`).
-- **Windows Git Bash**: instrucción `printf` con comillas simples para evitar `event not found` al generar `.gitignore` con `!.gitkeep`.
-- **Validación FastAPI**: documentación del body con clave `input` para evitar 422.
+- Se evita seguir documentando como “actual” el flujo histórico de RBM Student
+  y de predicción P2.2 como si representaran el estado vigente completo del
+  sistema.
+- Se aclara que algunas rutas o convenciones antiguas permanecen por
+  compatibilidad o legado, pero no son la referencia principal para operar la
+  plataforma hoy.
 
-### Deprecated
-- **Teacher simulado**: reemplazado por versión con `transformers` (BETO/robertuito). Mantener solo para pruebas puntuales.
+---
 
-### Migration notes
-- **API online**: enviar `{"input": {...}}` (antes algunos clientes enviaban body plano).
-- **Datasets**: re-ejecutar `cmd_preprocesar_beto` para obtener `has_text` y `accepted_by_teacher` antes de entrenar.
-- **Campeón**: copiar el mejor `JOB_ID` a `artifacts/champions/with_text/current/` para habilitar inferencia.
-- **Git**: añadir `.gitignore` para `__pycache__`, `node_modules`, `artifacts/*`, `data/**/*.parquet` y mantener solo `examples/` versionables.
+## Legacy / migración documental
 
-## [0.6.0] - 2025-10-13 — Integración BETO inicial y entrenamiento RBM
-### Added
-- `teacher_labeling.py` con soporte de `transformers` (BETO/robertuito) y etiquetas `neg/neu/pos`.
-- Primera versión de `train_rbm` (general/restringida) y guardado de artefactos.
+Los siguientes elementos aparecen en el repositorio como parte de etapas
+anteriores, auditorías puntuales o snapshots de implementación, y no deben
+interpretarse como la referencia activa del sistema:
 
-### Changed
-- Normalización de columnas de texto y limpieza/lematización base.
+- documentación de paridad o checklist temporal de UI;
+- documentos de validación puntual de datasets o ejemplos cerrados;
+- referencias a layouts legacy de champions;
+- documentación que describe `/predicciones/predict` únicamente como
+  `resolve/validate` de una fase intermedia del proyecto;
+- snapshots históricos del frontend o de la arquitectura previos a la versión
+  actual de las pestañas.
 
-## [0.5.0] - 2025-10-12 — Estandarización de datasets
-### Added
-- `cmd_cargar_dataset` con heurística numérica y mapeo a `calif_#`.
-- Soporte de `--meta-list` para conservar columnas (`codigo_materia`, `docente`, `grupo`, `periodo`).
+Estos materiales se conservan por trazabilidad, pero la fuente de verdad para el
+estado actual debe ser:
 
-### Fixed
-- Filtros para evitar tomar columnas numéricas ajenas a preguntas (IDs, etc.).
-
-## [0.4.0] - 2025-10-11 — API base
-### Added
-- Backend FastAPI con routers legacy (`/prediccion/online`, `/prediccion/batch`). (Reemplazados en P2.2 por `/predicciones/health` y `/predicciones/predict`.)
-
-## [0.1.0] - 2025-10-07 — Bootstrap
-### Added
-- Estructura inicial del repositorio (backend + frontend), CI local mínima, mockups.
+- `README.md`
+- `docs/source/`
+- la documentación técnica operativa actualizada bajo `docs/`
 
 ---
 
 ## Notas
-- Fechas aproximadas por hitos del proyecto **Día 1–7**.
-- Si cambian los contratos (endpoints, columnas), actualizar este changelog junto con la documentación.
+
+- Este changelog prioriza exactitud funcional sobre reconstrucción histórica
+  exhaustiva.
+- Si en el futuro se decide formalizar releases con mayor precisión temporal,
+  conviene reconstruirlos a partir del historial Git y no únicamente desde los
+  documentos heredados del repositorio.
