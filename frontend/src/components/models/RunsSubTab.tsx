@@ -16,8 +16,9 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { modelosApi } from '@/features/modelos/api';
+import { normalizeDatasetIdForBackend } from '@/features/modelos/utils/datasetId';
 import {
-  MOCK_RUNS, DATASETS, MODEL_STRATEGIES, FAMILY_CONFIGS, formatDate, formatDuration,
+  MOCK_RUNS, MODEL_STRATEGIES, FAMILY_CONFIGS, formatDate, formatDuration,
   type Family, type RunRecord,
 } from './mockData';
 import {
@@ -46,9 +47,9 @@ export function RunsSubTab({
   useEffect(() => {
     let cancelled = false;
 
-    // El UI usa IDs tipo "ds_2025_1"; el backend suele usar "2025-1".
-    // Si el dataset no existe en DATASETS, usamos el valor tal cual.
-    const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
+    // La conversión se centraliza para evitar que cada subpestaña mantenga
+    // reglas distintas entre datasets legacy y el histórico unificado.
+    const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
 
     (async () => {
       try {
@@ -323,8 +324,8 @@ function RunDetail({
     setIsPromoting(true);
 
     try {
-      // Map UI dataset id (ds_2025_1) -> backend id (2025-1) cuando aplica.
-      const backendDatasetId = DATASETS.find(d => d.id === run.dataset_id)?.period ?? run.dataset_id;
+      // Reutiliza la misma regla central de normalización que el resto de tabs.
+      const backendDatasetId = normalizeDatasetIdForBackend(run.dataset_id);
 
       await modelosApi.promote({
         dataset_id: backendDatasetId,
