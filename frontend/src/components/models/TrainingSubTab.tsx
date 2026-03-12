@@ -15,8 +15,9 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { modelosApi } from '@/features/modelos/api';
+import { normalizeDatasetIdForBackend } from '@/features/modelos/utils/datasetId';
 import {
-  DATASETS, MODEL_STRATEGIES, FAMILY_CONFIGS,
+  MODEL_STRATEGIES, FAMILY_CONFIGS,
   type Family, type ModelStrategy, type RunRecord, type WarmStartFrom,
 } from './mockData';
 import { RunStatusBadge, WarmStartBadge } from './SharedBadges';
@@ -54,6 +55,7 @@ export function TrainingSubTab({
   const [trainingProgress, setTrainingProgress] = useState(0);
   const [trainedRun, setTrainedRun] = useState<RunRecord | null>(null);
   const [trainingError, setTrainingError] = useState<string | null>(null);
+  const [trainingNotice, setTrainingNotice] = useState<string | null>(null);
 
   // Ref de cancelación para polling (evita setState tras un unmount)
   const isCancelledRef = useRef(false);
@@ -87,9 +89,10 @@ export function TrainingSubTab({
     isCancelledRef.current = false;
     setFeaturePackStatus('preparing');
     setTrainingError(null);
+    setTrainingNotice(null);
 
-    // datasetId en UI usa ids tipo ds_2025_1; el backend usa el periodo 2025-1.
-    const backendDatasetId = DATASETS.find((d) => d.id === datasetId)?.period ?? datasetId;
+    // La normalización se centraliza para soportar datasets legacy e histórico.
+    const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
 
     try {
       const readinessBefore = await modelosApi.readiness(backendDatasetId);
@@ -116,6 +119,7 @@ export function TrainingSubTab({
       }
       return;
     } catch {
+      setTrainingNotice('No se pudo validar el feature-pack real en backend; se conserva el comportamiento simulado del prototipo.');
       // Ignorar: caemos al fallback del prototipo.
     }
 
@@ -183,12 +187,13 @@ export function TrainingSubTab({
 
     // Reset UI state
     setTrainingError(null);
+    setTrainingNotice(null);
     setTrainedRun(null);
     setTrainingStatus('queued');
     setTrainingProgress(0);
 
-    // datasetId en UI usa ids tipo ds_2025_1; el backend usa el periodo 2025-1.
-    const backendDatasetId = DATASETS.find((d) => d.id === datasetId)?.period ?? datasetId;
+    // La resolución del dataset se centraliza para cubrir IDs legacy e histórico.
+    const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
 
     /**
      * El backend acepta `hparams` heterogéneos (number/string/boolean/null).
@@ -314,6 +319,7 @@ export function TrainingSubTab({
       onTrainingComplete(finalRun);
       return;
     } catch {
+      setTrainingNotice('No se pudo completar el entrenamiento real en backend; se muestra un resultado simulado para preservar la UI operativa.');
       // Si backend está incompleto/offline, mantenemos exactamente el flujo del prototipo.
     }
 
@@ -420,8 +426,8 @@ export function TrainingSubTab({
   const handlePromoteChampion = async () => {
     if (!trainedRun) return;
 
-    // datasetId en UI usa ids tipo ds_2025_1; el backend usa el periodo 2025-1.
-    const backendDatasetId = DATASETS.find((d) => d.id === datasetId)?.period ?? datasetId;
+    // La resolución del dataset se centraliza para cubrir IDs legacy e histórico.
+    const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
 
     try {
       await modelosApi.promote({
@@ -431,11 +437,12 @@ export function TrainingSubTab({
         family,
       } as any);
 
-      alert(`Champion actualizado: ${trainedRun.run_id}`);
+      setTrainingNotice(`Champion actualizado correctamente: ${trainedRun.run_id}`);
+      setTrainingError(null);
       return;
-    } catch {
-      // Fallback 1:1 (prototipo)
-      alert(`Champion actualizado: ${trainedRun.run_id}`);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Error desconocido.';
+      setTrainingError(`No se pudo promover el run a champion. ${msg}`);
     }
   };
 
@@ -603,6 +610,13 @@ export function TrainingSubTab({
           <div className="mt-3 bg-red-500/10 border border-red-500/30 rounded-md px-3 py-2 text-sm text-red-400 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4" />
             {trainingError}
+          </div>
+        )}
+
+        {/* Mensajes informativos (modo mock / promoción exitosa) */}
+        {trainingNotice && (
+          <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
+            {trainingNotice}
           </div>
         )}
       </Card>
