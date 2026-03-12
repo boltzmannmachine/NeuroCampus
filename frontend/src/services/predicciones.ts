@@ -23,6 +23,12 @@ export type DatasetInfo = {
   n_materias: number;
   has_champion: boolean;
   created_at: string | null;
+  /** Nombre legible sugerido por backend para mostrar en la UI. */
+  display_name?: string | null;
+  /** Marca datasets virtuales o especiales construidos desde histórico. */
+  is_historical?: boolean;
+  /** URI de origen del dataset cuando backend decide exponerla. */
+  source_uri?: string | null;
 };
 
 /** Información de un docente disponible en el dataset. */
