@@ -9,8 +9,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Award, Eye, ExternalLink, CheckCircle2, XCircle, Flame, FileText } from 'lucide-react';
 import { motion } from 'motion/react';
 import { modelosApi } from '@/features/modelos/api';
+import { normalizeDatasetIdForBackend } from '@/features/modelos/utils/datasetId';
 import {
-  DATASETS, MOCK_CHAMPIONS, MOCK_RUNS, FAMILY_CONFIGS, formatDate, formatDuration,
+  MOCK_CHAMPIONS, MOCK_RUNS, FAMILY_CONFIGS, formatDate, formatDuration,
   type Family, type ChampionRecord, type RunRecord,
 } from './mockData';
 import { BundleStatusBadge, WarmStartBadge, TextFeaturesBadge } from './SharedBadges';
@@ -27,13 +28,13 @@ export function SummarySubTab({ family, datasetId, onNavigateToRun, onUsePredict
   const champKey = `${family}__${datasetId}`;
 
   /**
-   * Dataset ID usado por la UI (ej. "ds_2025_1") no siempre coincide con el backend
-   * (ej. "2025-1"). Para evitar acoplar UI a backend, convertimos usando `DATASETS`.
+   * Normaliza el dataset activo a la forma canónica esperada por backend.
+   *
+   * Importante:
+   * - Los datasets legacy siguen entrando como `ds_YYYY_N` en la UI.
+   * - El histórico unificado permanece como `historico-unificado`.
    */
-  const backendDatasetId = useMemo(
-    () => DATASETS.find(d => d.id === datasetId)?.period ?? datasetId,
-    [datasetId]
-  );
+  const backendDatasetId = useMemo(() => normalizeDatasetIdForBackend(datasetId), [datasetId]);
 
   // ---------------------------------------------------------------------------
   // Estado UI (inicialmente mocks para mantener paridad 1:1).
