@@ -187,9 +187,23 @@ class DatasetInfoResponse(BaseModel):
     """Información de un dataset disponible para predicción.
 
     Expone metadatos del dataset (derivados de pair_matrix/pair_meta) junto al estado del champion.
+    También soporta datasets históricos publicados como opciones de primera clase
+    en la UI, aunque sus artefactos se construyan bajo demanda.
     """
 
-    dataset_id: str = Field(description="Identificador del dataset (ej. '2024-2').")
+    dataset_id: str = Field(description="Identificador canónico del dataset (ej. '2024-2' o 'historico-unificado').")
+    display_name: Optional[str] = Field(
+        default=None,
+        description="Nombre legible para la UI. Si es None, la UI puede mostrar dataset_id.",
+    )
+    is_historical: bool = Field(
+        default=False,
+        description="True cuando el dataset corresponde a una vista histórica consolidada.",
+    )
+    source_uri: Optional[str] = Field(
+        default=None,
+        description="Ruta lógica del archivo fuente principal que alimenta el dataset.",
+    )
     n_pairs: int = Field(default=0, description="Número de pares docente–materia en pair_matrix.")
     n_docentes: int = Field(default=0, description="Número de docentes únicos.")
     n_materias: int = Field(default=0, description="Número de materias únicas.")
