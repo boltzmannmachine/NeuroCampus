@@ -14,8 +14,9 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { modelosApi } from '@/features/modelos/api';
+import { normalizeDatasetIdForBackend } from '@/features/modelos/utils/datasetId';
 import {
-  generateMockSweep, MODEL_STRATEGIES, FAMILY_CONFIGS, DATASETS,
+  generateMockSweep, MODEL_STRATEGIES, FAMILY_CONFIGS,
   type Family, type SweepResult, type RunRecord, type WarmStartFrom,
 } from './mockData';
 import {
@@ -52,6 +53,7 @@ export function SweepSubTab({
   const [sweepProgress, setSweepProgress] = useState(0);
   const [sweepResult, setSweepResult] = useState<SweepResult | null>(null);
   const [showComparator, setShowComparator] = useState(false);
+  const [sweepMessage, setSweepMessage] = useState<string | null>(null);
 
   /**
    * Ejecuta el sweep.
@@ -88,8 +90,9 @@ export function SweepSubTab({
     setSweepStatus('running');
     setSweepProgress(0);
     setSweepResult(null);
+    setSweepMessage(null);
 
-    const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
+    const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
 
     try {
       /**
@@ -151,6 +154,7 @@ export function SweepSubTab({
       return;
     } catch (err) {
       console.error('SweepSubTab.handleRunSweep', err);
+      setSweepMessage('No se pudo completar el sweep real en backend; se muestran resultados simulados para conservar la UI operativa.');
       // Fallback a mocks: exactamente como prototipo (no bloquea UI).
     }
 
@@ -267,6 +271,12 @@ export function SweepSubTab({
             <p className="text-xs text-gray-400 mt-1">Entrenando 3 modelos... {Math.round(sweepProgress)}%</p>
           </div>
         )}
+
+        {sweepMessage && (
+          <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+            {sweepMessage}
+          </div>
+        )}
       </Card>
 
       {/* Results */}
@@ -320,7 +330,7 @@ export function SweepSubTab({
                     size="sm"
                     className="bg-yellow-600 hover:bg-yellow-700 gap-1 text-xs"
                     onClick={() => void (async () => {
-                      const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
+                      const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
                       try {
                         await modelosApi.promote({
                           dataset_id: backendDatasetId,
@@ -328,10 +338,11 @@ export function SweepSubTab({
                           model_name: winner.model_name as any,
                           family,
                         } as any);
-                      } catch {
-                        // Si backend no soporta promote aún, mantenemos feedback del prototipo.
+                        setSweepMessage(`Champion actualizado correctamente: ${winner.run_id}`);
+                      } catch (error) {
+                        const msg = error instanceof Error ? error.message : 'Error desconocido.';
+                        setSweepMessage(`No se pudo promover el winner a champion. ${msg}`);
                       }
-                      alert(`Champion actualizado: ${winner.run_id}`);
                     })()}
                   >
                     <Award className="w-3 h-3" /> Promover Champion
