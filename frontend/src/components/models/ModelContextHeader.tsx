@@ -9,9 +9,9 @@ import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { Search, Zap } from 'lucide-react';
 import { modelosApi } from '@/features/modelos/api';
-import { normalizeDatasetIdForBackend, normalizeDatasetIdForUi } from '@/features/modelos/utils/datasetId';
+import { buildDatasetIdBridge, normalizeDatasetIdForUi } from '@/features/modelos/utils/datasetId';
 import {
-  DATASETS, FAMILY_CONFIGS, MOCK_CHAMPIONS,
+  DATASETS, FAMILY_CONFIGS, MOCK_CHAMPIONS, MOCK_RUNS,
   type Family, type ModelResolveSource, type ResolvedModel,
 } from './mockData';
 import { BundleStatusBadge, MetricChip } from './SharedBadges';
@@ -34,6 +34,9 @@ export function ModelContextHeader({
   const [resolveError, setResolveError] = useState<string | null>(null);
   const [backendDatasets, setBackendDatasets] = useState<Array<{
     dataset_id: string;
+    display_name?: string | null;
+    is_historical?: boolean | null;
+    source_uri?: string | null;
     n_rows?: number | null;
     n_pairs?: number | null;
     has_pair_matrix: boolean;
@@ -61,6 +64,9 @@ export function ModelContextHeader({
 
         const normalized = (list || []).map((d) => ({
           dataset_id: d.dataset_id,
+          display_name: d.display_name ?? null,
+          is_historical: d.is_historical ?? null,
+          source_uri: d.source_uri ?? null,
           n_rows: d.n_rows ?? null,
           n_pairs: d.n_pairs ?? null,
           has_pair_matrix: Boolean(d.has_pair_matrix),
@@ -98,9 +104,10 @@ export function ModelContextHeader({
         if (typeof d.n_pairs === 'number') bits.push(`${d.n_pairs} pares`);
         if (d.has_train_matrix) bits.push('train_matrix');
         if (d.has_pair_matrix) bits.push('pair_matrix');
+        if (d.is_historical) bits.push('histórico');
         return {
           value: normalizeDatasetIdForUi(d.dataset_id),
-          label: normalizeDatasetIdForUi(d.dataset_id),
+          label: d.display_name?.trim() || normalizeDatasetIdForUi(d.dataset_id),
           detail: bits.length ? bits.join(' · ') : null,
         };
       });
@@ -128,8 +135,9 @@ export function ModelContextHeader({
   const handleResolve = async () => {
     setResolveError(null);
 
-    // Mapea dataset UI -> dataset backend (periodo). Si no hay match, usa el id tal cual.
-    const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
+    // Resolver ambas representaciones en un solo paso evita divergencias entre
+    // datasets legacy y el dataset histórico canónico.
+    const { backendDatasetId } = buildDatasetIdBridge(datasetId);
 
     try {
       if (resolveSource === 'champion') {
@@ -175,7 +183,7 @@ export function ModelContextHeader({
         onResolve(null);
         return;
       }
-      const run = MOCK_RUNS.find(r => r.run_id === champ.run_id);
+      const run = MOCK_RUNS.find((r) => r.run_id === champ.run_id);
       onResolve({
         resolved_run_id: champ.run_id,
         source: 'champion',
@@ -187,7 +195,7 @@ export function ModelContextHeader({
         dataset_id: champ.dataset_id,
       });
     } else {
-      const run = MOCK_RUNS.find(r => r.run_id === resolveRunId);
+      const run = MOCK_RUNS.find((r) => r.run_id === resolveRunId);
       if (!run) {
         setResolveError(`404: Run "${resolveRunId}" no encontrado.`);
         onResolve(null);
