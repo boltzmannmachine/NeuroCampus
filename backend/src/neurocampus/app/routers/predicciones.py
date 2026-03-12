@@ -68,6 +68,7 @@ from neurocampus.utils.paths import (
     rel_artifact_path,
     resolve_champion_json_candidates,
     first_existing,
+    project_root,
 )
 from neurocampus.utils.score_postprocess import (
     build_comparison,
@@ -82,7 +83,7 @@ from neurocampus.utils.predictions_run_io import (
     write_pred_meta,
 )
 from neurocampus.predictions.bundle import bundle_paths
-from neurocampus.data.features_prepare import load_feature_pack
+from neurocampus.data.features_prepare import prepare_feature_pack
 
 logger = logging.getLogger(__name__)
 
@@ -102,6 +103,104 @@ _PRED_ESTADOS: Dict[str, Dict[str, Any]] = {}
 _FAMILY = "score_docente"
 """Family fija para todos los endpoints de predicción de esta pestaña."""
 
+HISTORICAL_DATASET_ID = "historico-unificado"
+"""Dataset ID canónico expuesto a la UI para el archivo histórico consolidado."""
+
+
+def _is_historical_dataset_id(dataset_id: Optional[str]) -> bool:
+    """Indica si ``dataset_id`` apunta al dataset histórico consolidado."""
+    return str(dataset_id or "").strip().lower() == HISTORICAL_DATASET_ID
+
+
+def _resolve_historical_input_ref(*, prefer_labeled: bool = True) -> str:
+    """Resuelve la ruta lógica del parquet histórico consolidado.
+
+    Orden de preferencia
+    -------------------
+    1. ``historico/unificado_labeled.parquet``
+    2. ``historico/unificado.parquet``
+
+    Returns
+    -------
+    str
+        Ruta lógica relativa a la raíz del proyecto. Si aún no existe ningún
+        archivo, retorna el path preferido para mantener un contrato estable.
+    """
+    preferred = "historico/unificado_labeled.parquet"
+    legacy = "historico/unificado.parquet"
+
+    preferred_exists = abs_artifact_path(preferred).exists()
+    legacy_exists = abs_artifact_path(legacy).exists()
+
+    if prefer_labeled:
+        if preferred_exists:
+            return preferred
+        if legacy_exists:
+            return legacy
+        return preferred
+
+    if preferred_exists:
+        return preferred
+    if legacy_exists:
+        return legacy
+    return preferred
+
+
+def _historical_source_exists() -> bool:
+    """True si existe un archivo histórico consolidado consumible por Predicciones."""
+    return abs_artifact_path(_resolve_historical_input_ref(prefer_labeled=False)).exists()
+
+
+def _ensure_prediction_dataset_ready(dataset_id: str) -> None:
+    """Asegura los artefactos mínimos del dataset antes de predecir/listar entidades.
+
+    En esta primera intervención solo auto-preparamos el dataset histórico
+    consolidado. Para datasets regulares se mantiene el comportamiento actual:
+    los artefactos deben existir previamente.
+
+    El objetivo es que ``historico-unificado`` funcione exactamente igual que un
+    dataset normal dentro de Predicciones: ``pair_matrix.parquet``, índices y
+    metas viven bajo ``artifacts/features/historico-unificado/``.
+    """
+    ds = str(dataset_id or "").strip()
+    if not _is_historical_dataset_id(ds):
+        return
+
+    feat_dir = artifacts_dir() / "features" / ds
+    required = [
+        feat_dir / "pair_matrix.parquet",
+        feat_dir / "pair_meta.json",
+        feat_dir / "teacher_index.json",
+        feat_dir / "materia_index.json",
+    ]
+    if all(p.exists() for p in required):
+        return
+
+    input_ref = _resolve_historical_input_ref(prefer_labeled=False)
+    input_abs = abs_artifact_path(input_ref)
+    if not input_abs.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "No existe historico/unificado_labeled.parquet (ni su fallback legacy) "
+                "para construir el dataset histórico de Predicciones."
+            ),
+        )
+
+    try:
+        prepare_feature_pack(
+            base_dir=project_root(),
+            dataset_id=ds,
+            input_uri=input_ref,
+            output_dir=str(feat_dir.resolve()),
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error construyendo feature-pack para dataset_id={ds}: {e}",
+        ) from e
+
+
 def _period_key(ds: str) -> tuple:
     """Ordena dataset_ids tipo 'YYYY-N' cronológicamente."""
     m = re.match(r"^\s*(\d{4})-(\d{1,2})\s*$", str(ds))
@@ -111,14 +210,28 @@ def _period_key(ds: str) -> tuple:
 
 
 def _list_pair_datasets() -> List[str]:
-    """Lista dataset_ids que tienen pair_matrix.parquet disponible."""
+    """Lista datasets visibles para la pestaña Predicciones.
+
+    Regla
+    -----
+    - Incluye cualquier ``dataset_id`` con ``pair_matrix.parquet`` ya materializado.
+    - Incluye además ``historico-unificado`` si existe la fuente histórica, aunque
+      su feature-pack aún no haya sido construido.
+
+    Esto permite que la UI muestre el dataset histórico como opción seleccionable
+    y que los endpoints posteriores construyan artefactos bajo demanda.
+    """
+    ids: set[str] = set()
     base = artifacts_dir() / "features"
-    if not base.exists():
-        return []
-    return sorted(
-        [p.name for p in base.iterdir() if (p / "pair_matrix.parquet").exists()],
-        key=_period_key,
-    )
+    if base.exists():
+        for p in base.iterdir():
+            if p.is_dir() and (p / "pair_matrix.parquet").exists():
+                ids.add(p.name)
+
+    if _historical_source_exists():
+        ids.add(HISTORICAL_DATASET_ID)
+
+    return sorted(ids, key=_period_key)
 
 
 def _champion_exists(dataset_id: str) -> bool:
@@ -224,9 +337,15 @@ def list_datasets() -> List[DatasetInfoResponse]:
             except (json.JSONDecodeError, OSError):
                 pass
 
+        is_historical = _is_historical_dataset_id(ds)
+        source_uri = _resolve_historical_input_ref(prefer_labeled=False) if is_historical else None
+
         result.append(
             DatasetInfoResponse(
                 dataset_id=ds,
+                display_name="Histórico unificado" if is_historical else None,
+                is_historical=is_historical,
+                source_uri=source_uri,
                 n_pairs=int(pair_meta.get("n_pairs", 0)),
                 n_docentes=int(pair_meta.get("n_docentes", 0)),
                 n_materias=int(pair_meta.get("n_materias", 0)),
@@ -442,6 +561,7 @@ def _load_entity_name_maps(dataset_id: str) -> tuple[Dict[str, str], Dict[str, s
     summary="Lista docentes únicos de un dataset",
 )
 def list_teachers(dataset_id: str) -> List[TeacherInfoResponse]:
+    _ensure_prediction_dataset_ready(str(dataset_id))
     feat_dir = artifacts_dir() / "features" / str(dataset_id)
     idx_path = feat_dir / "teacher_index.json"
 
@@ -489,6 +609,7 @@ def list_teachers(dataset_id: str) -> List[TeacherInfoResponse]:
     summary="Lista materias únicas de un dataset",
 )
 def list_materias(dataset_id: str) -> List[MateriaInfoResponse]:
+    _ensure_prediction_dataset_ready(str(dataset_id))
     feat_dir = artifacts_dir() / "features" / str(dataset_id)
     idx_path = feat_dir / "materia_index.json"
 
@@ -783,6 +904,7 @@ def _build_timeline(
 )
 def batch_run(req: BatchRunRequest, bg: BackgroundTasks) -> BatchJobResponse:
     ds = str(req.dataset_id).strip()
+    _ensure_prediction_dataset_ready(ds)
 
     pair_path = artifacts_dir() / "features" / ds / "pair_matrix.parquet"
     if not pair_path.exists():
