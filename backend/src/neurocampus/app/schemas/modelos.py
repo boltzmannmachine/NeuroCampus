@@ -1173,24 +1173,43 @@ class DatasetInfo(BaseModel):
     - Evitar desalineamiento UI-backend (p.ej. UI usa ds_2025_1)
     - Permitir seleccionar IDs reales (ej. '2025-1' o 'evaluaciones_2025')
       detectados desde artifacts/data.
+
+    Notes
+    -----
+    Este schema también soporta datasets *virtuales* derivados de una única
+    fuente histórica, por ejemplo ``historico-unificado``. En esos casos el
+    backend expone el dataset como una opción seleccionable normal, aunque el
+    archivo de origen viva fuera de ``datasets/`` o ``data/labeled/``.
     '''
 
-    dataset_id: str
+    dataset_id: str = Field(description="Identificador canónico consumido por backend y frontend.")
+    display_name: Optional[str] = Field(
+        default=None,
+        description="Nombre legible para la UI. Si es None, la UI puede mostrar dataset_id.",
+    )
+    is_historical: bool = Field(
+        default=False,
+        description="True cuando el dataset representa una vista histórica consolidada.",
+    )
+    source_uri: Optional[str] = Field(
+        default=None,
+        description="Ruta lógica del archivo fuente principal usado para construir el feature-pack.",
+    )
 
     # Disponibilidad de artifacts
-    has_train_matrix: bool = False
-    has_pair_matrix: bool = False
+    has_train_matrix: bool = Field(default=False, description="True si existe train_matrix.parquet.")
+    has_pair_matrix: bool = Field(default=False, description="True si existe pair_matrix.parquet.")
 
     # Disponibilidad de insumos previos (para preparar feature-pack)
-    has_labeled: bool = False
-    has_processed: bool = False
-    has_raw_dataset: bool = False
+    has_labeled: bool = Field(default=False, description="True si existe una fuente labeled consumible por Modelos.")
+    has_processed: bool = Field(default=False, description="True si existe data/processed/<dataset_id>.")
+    has_raw_dataset: bool = Field(default=False, description="True si existe datasets/<dataset_id>.")
 
     # Conteos (si están disponibles via meta.json / pair_meta.json)
-    n_rows: Optional[int] = None
-    n_pairs: Optional[int] = None
-    created_at: Optional[str] = None
+    n_rows: Optional[int] = Field(default=None, description="Número de filas del train_matrix si meta.json lo expone.")
+    n_pairs: Optional[int] = Field(default=None, description="Número de pares docente-materia si pair_meta.json lo expone.")
+    created_at: Optional[str] = Field(default=None, description="Timestamp ISO asociado al feature-pack o pair-matrix.")
 
     # Champion por family (existencia, no necesariamente deployable)
-    has_champion_sentiment: bool = False
-    has_champion_score: bool = False
+    has_champion_sentiment: bool = Field(default=False, description="True si existe champion para sentiment_desempeno.")
+    has_champion_score: bool = Field(default=False, description="True si existe champion para score_docente.")
