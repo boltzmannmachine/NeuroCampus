@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast
@@ -766,6 +767,212 @@ def prepare_feature_pack(
         "pair_matrix": _rel(pair_path),
         "pair_meta": _rel(out_dir / "pair_meta.json"),
     }
+
+def _normalize_period_label(value: Any) -> str:
+    """Normaliza etiquetas de periodo a un formato cronológico estable.
+
+    Acepta variantes comunes del repositorio, por ejemplo:
+
+    - ``2024-2``
+    - ``2024_2``
+    - ``ds_2024_2``
+    - ``ds-2024-2``
+
+    Si el valor no coincide con un patrón conocido, se retorna el texto original
+    recortado. Esto evita destruir etiquetas legacy al construir históricos.
+    """
+    raw = str(value or "").strip()
+    if not raw:
+        return raw
+
+    m = re.match(r"^(?:ds[_-])?(\d{4})[_-](\d{1,2})$", raw, flags=re.IGNORECASE)
+    if m:
+        return f"{int(m.group(1))}-{int(m.group(2))}"
+
+    m = re.match(r"^(\d{4})-(\d{1,2})$", raw)
+    if m:
+        return f"{int(m.group(1))}-{int(m.group(2))}"
+
+    return raw
+
+
+def _period_sort_key(value: Any) -> tuple[int, int, str]:
+    """Genera una clave de orden cronológico tolerante a aliases de periodo."""
+    norm = _normalize_period_label(value)
+    m = re.match(r"^(\d{4})-(\d{1,2})$", norm)
+    if not m:
+        return (0, 0, norm)
+    return (int(m.group(1)), int(m.group(2)), norm)
+
+
+def build_historical_pair_artifacts_from_feature_packs(
+    *,
+    base_dir: Path,
+    dataset_id: str,
+    output_dir: str,
+    source_dataset_ids: Optional[List[str]] = None,
+) -> Dict[str, str]:
+    """Construye el histórico pair-level a partir de feature-packs ya procesados.
+
+    Este builder existe para el caso ``historico-unificado`` de ``score_docente``.
+    En lugar de reconstruir el histórico desde ``historico/unificado_labeled.parquet``
+    o ``historico/unificado.parquet``, concatena los ``pair_matrix.parquet`` ya
+    materializados en ``artifacts/features/<dataset_id>/``.
+
+    Ventajas
+    --------
+    - Reutiliza exactamente la misma lógica/shape producida por cada dataset ya
+      procesado en la pestaña Datos/Modelos.
+    - Evita desalineaciones entre el histórico y los feature-packs operativos.
+    - Permite recomputar ``teacher_id`` y ``materia_id`` de forma estable sobre la
+      unión completa del histórico, usando ``teacher_key`` y ``materia_key``.
+
+    Notes
+    -----
+    - Solo construye artefactos **pair-level**. No genera ``train_matrix`` porque
+      los ``teacher_id``/``materia_id`` de los ``train_matrix`` existentes son
+      locales a cada dataset y no se pueden concatenar sin sus claves originales.
+    - El caller debe usar este helper únicamente cuando el flujo consuma
+      ``pair_matrix.parquet`` (por ejemplo, ``family=score_docente``).
+    """
+    out_dir = Path(output_dir)
+    if not out_dir.is_absolute():
+        out_dir = (base_dir / out_dir).resolve()
+    _ensure_dir(out_dir)
+
+    features_root = (base_dir / 'artifacts' / 'features').resolve()
+    if not features_root.exists():
+        raise FileNotFoundError(f'No existe la raíz de feature-packs: {features_root}')
+
+    allowed = {str(x).strip() for x in (source_dataset_ids or []) if str(x).strip()}
+    entries: List[tuple[str, Path]] = []
+    for ds_dir in features_root.iterdir():
+        if not ds_dir.is_dir():
+            continue
+        ds_name = str(ds_dir.name).strip()
+        if not ds_name or ds_name == str(dataset_id).strip() or ds_name.startswith('.'):
+            continue
+        if allowed and ds_name not in allowed:
+            continue
+        pair_path = ds_dir / 'pair_matrix.parquet'
+        if pair_path.exists():
+            entries.append((ds_name, pair_path))
+
+    if not entries:
+        raise FileNotFoundError(
+            'No se encontraron pair_matrix.parquet fuente en artifacts/features/* para construir el histórico.'
+        )
+
+    entries = sorted(entries, key=lambda item: _period_sort_key(item[0]))
+
+    frames: List[pd.DataFrame] = []
+    source_ids: List[str] = []
+    source_meta_targets: List[str] = []
+
+    for ds_name, pair_path in entries:
+        df_pair = pd.read_parquet(pair_path)
+        if df_pair.empty:
+            continue
+        if 'teacher_key' not in df_pair.columns or 'materia_key' not in df_pair.columns:
+            raise ValueError(
+                f'El pair_matrix fuente {pair_path} no contiene teacher_key/materia_key; no se puede historizar.'
+            )
+
+        source_ids.append(ds_name)
+        meta_path = pair_path.with_name('pair_meta.json')
+        if meta_path.exists():
+            try:
+                meta = json.loads(meta_path.read_text(encoding='utf-8'))
+                target_col = str((meta or {}).get('target_col') or '').strip()
+                if target_col:
+                    source_meta_targets.append(target_col)
+            except Exception:
+                pass
+
+        tmp = df_pair.copy()
+        fallback_period = _normalize_period_label(ds_name)
+        if 'periodo' not in tmp.columns:
+            tmp['periodo'] = fallback_period
+        else:
+            periodo = tmp['periodo'].fillna('').astype(str).str.strip().map(_normalize_period_label)
+            tmp['periodo'] = periodo.mask(periodo.eq(''), fallback_period)
+
+        tmp['source_dataset_id'] = ds_name
+        frames.append(tmp)
+
+    if not frames:
+        raise ValueError('Todos los pair_matrix fuente están vacíos; no se pudo construir el histórico.')
+
+    pair = pd.concat(frames, ignore_index=True, sort=False)
+    pair['teacher_key'] = pair['teacher_key'].fillna('').astype(str).str.strip()
+    pair['materia_key'] = pair['materia_key'].fillna('').astype(str).str.strip()
+    pair['periodo'] = pair['periodo'].fillna('').astype(str).str.strip().map(_normalize_period_label)
+
+    if pair['teacher_key'].eq('').all() or pair['materia_key'].eq('').all():
+        raise ValueError('Los pair_matrix fuente no contienen claves válidas de docente/materia.')
+
+    teacher_index = _build_index(pair['teacher_key'])
+    materia_index = _build_index(pair['materia_key'])
+    pair['teacher_id'] = pair['teacher_key'].map(lambda x: teacher_index.get(str(x).strip(), -1)).astype(int)
+    pair['materia_id'] = pair['materia_key'].map(lambda x: materia_index.get(str(x).strip(), -1)).astype(int)
+
+    pair['_period_sort'] = pair['periodo'].map(_period_sort_key)
+    pair = pair.sort_values(['_period_sort', 'teacher_key', 'materia_key'], kind='stable').drop(columns=['_period_sort'])
+    pair = pair.reset_index(drop=True)
+
+    pair_path_out = out_dir / 'pair_matrix.parquet'
+    pair.to_parquet(pair_path_out, index=False)
+
+    (out_dir / 'teacher_index.json').write_text(json.dumps(teacher_index, ensure_ascii=False, indent=2), encoding='utf-8')
+    (out_dir / 'materia_index.json').write_text(json.dumps(materia_index, ensure_ascii=False, indent=2), encoding='utf-8')
+
+    target_col = next((x for x in source_meta_targets if x), 'target_score')
+    pair_meta: Dict[str, Any] = {
+        'dataset_id': str(dataset_id),
+        'created_at': dt.datetime.now(dt.UTC).isoformat().replace('+00:00', 'Z'),
+        'input_uri': None,
+        'builder': 'historical_pair_artifacts_from_feature_packs',
+        'target_col': target_col,
+        'row_granularity': 'teacher-materia-periodo',
+        'has_multi_period': True,
+        'n_periodos': int(pair['periodo'].nunique(dropna=True)),
+        'n_pairs': int(len(pair)),
+        'n_docentes': int(pair['teacher_key'].nunique(dropna=True)),
+        'n_materias': int(pair['materia_key'].nunique(dropna=True)),
+        'source_dataset_ids': source_ids,
+        'source_dataset_count': int(len(source_ids)),
+        'derived_from_feature_packs': True,
+        'columns': pair.columns.tolist(),
+    }
+    (out_dir / 'pair_meta.json').write_text(json.dumps(pair_meta, ensure_ascii=False, indent=2), encoding='utf-8')
+
+    meta: Dict[str, Any] = {
+        'dataset_id': str(dataset_id),
+        'created_at': pair_meta['created_at'],
+        'builder': 'historical_pair_artifacts_from_feature_packs',
+        'output_dir': str(out_dir),
+        'source_dataset_ids': source_ids,
+        'notes': [
+            'Artefacto histórico construido desde pair_matrix ya procesados.',
+            'No se genera train_matrix porque los ids de train_matrix son locales a cada dataset fuente.',
+        ],
+    }
+    (out_dir / 'meta.json').write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding='utf-8')
+
+    def _rel(p: Path) -> str:
+        try:
+            return str(p.resolve().relative_to(base_dir.resolve())).replace('\\', '/')
+        except Exception:
+            return str(p)
+
+    return {
+        'pair_matrix': _rel(pair_path_out),
+        'pair_meta': _rel(out_dir / 'pair_meta.json'),
+        'teacher_index': _rel(out_dir / 'teacher_index.json'),
+        'materia_index': _rel(out_dir / 'materia_index.json'),
+        'meta': _rel(out_dir / 'meta.json'),
+    }
+
 
 def _resolve_artifacts_root(*, artifacts_root: Path | None = None) -> Path:
     """Resuelve la raíz de artifacts de forma compatible con el backend.
