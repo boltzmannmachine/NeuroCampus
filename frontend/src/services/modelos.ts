@@ -154,6 +154,19 @@ export type EstadoResp = {
 
 export type DatasetInfo = {
   dataset_id: string;
+
+  /**
+   * Nombre amigable opcional para mostrar datasets especiales sin depender del
+   * identificador técnico. Backend lo usa, por ejemplo, para el histórico.
+   */
+  display_name?: string | null;
+
+  /** Marca datasets sintéticos o derivados como el histórico unificado. */
+  is_historical?: boolean | null;
+
+  /** Ruta/URI de origen expuesta para trazabilidad y documentación. */
+  source_uri?: string | null;
+
   has_train_matrix: boolean;
   has_pair_matrix: boolean;
   has_labeled: boolean;
