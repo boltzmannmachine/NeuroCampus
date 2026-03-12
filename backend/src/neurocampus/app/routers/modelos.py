@@ -99,6 +99,64 @@ from ...data.datos_dashboard import resolve_labeled_path
 
 router = APIRouter()
 
+# ---------------------------------------------------------------------------
+# Dataset histórico consolidado
+# ---------------------------------------------------------------------------
+
+HISTORICAL_DATASET_ID = "historico-unificado"
+"""Dataset ID canónico expuesto a la UI para el archivo histórico consolidado."""
+
+
+def _is_historical_dataset_id(dataset_id: Optional[str]) -> bool:
+    """Indica si ``dataset_id`` corresponde al dataset histórico consolidado.
+
+    Este helper centraliza la comparación para que Modelos trate el histórico
+    como un dataset de primera clase, sin dispersar strings mágicos por el
+    router.
+    """
+    return str(dataset_id or "").strip().lower() == HISTORICAL_DATASET_ID
+
+
+def _resolve_historical_input_ref(*, prefer_labeled: bool = True) -> str:
+    """Resuelve la ruta lógica del parquet histórico consolidado.
+
+    Orden de preferencia
+    -------------------
+    1. ``historico/unificado_labeled.parquet``
+    2. ``historico/unificado.parquet``
+
+    Parameters
+    ----------
+    prefer_labeled:
+        Si es ``True`` (default), prioriza el parquet labeled moderno. Si es
+        ``False``, acepta también el fallback legacy para no bloquear la UI
+        mientras se migra el histórico.
+
+    Returns
+    -------
+    str
+        Ruta lógica relativa al proyecto. Si aún no existe ningún archivo,
+        retorna el path preferido para mantener un contrato estable.
+    """
+    preferred = "historico/unificado_labeled.parquet"
+    legacy = "historico/unificado.parquet"
+
+    preferred_exists = _abs_path(preferred).exists()
+    legacy_exists = _abs_path(legacy).exists()
+
+    if prefer_labeled:
+        if preferred_exists:
+            return preferred
+        if legacy_exists:
+            return legacy
+        return preferred
+
+    if preferred_exists:
+        return preferred
+    if legacy_exists:
+        return legacy
+    return preferred
+
 
 # ---------------------------------------------------------------------------
 # Base path (raíz del repo)
@@ -1210,10 +1268,13 @@ def _auto_prepare_if_needed(req: EntrenarRequest, data_ref: str) -> None:
         text_max_features = int(getattr(req, "text_max_features", 20000) or 20000)
         text_random_state = int(getattr(req, "text_random_state", 42) or 42)
 
-        # Caso histórico (acumulado / ventana)
-        if metodologia in ("acumulado", "ventana"):
-            _ensure_unified_labeled()
-            input_uri = "historico/unificado_labeled.parquet"
+        # Caso histórico (dataset virtual o metodologías acumuladas/ventana).
+        #
+        # Tratamos ``historico-unificado`` como un dataset normal: genera su
+        # feature-pack en ``artifacts/features/historico-unificado/...`` y la UI
+        # lo consume igual que cualquier otro dataset.
+        if _is_historical_dataset_id(ds) or metodologia in ("acumulado", "ventana"):
+            input_uri = _ensure_unified_labeled()
             force_fp = False
         else:
             # Caso normal: preferimos LABELED si existe (trae BETO y score_total_0_50 cuando aplica)
@@ -1823,6 +1884,11 @@ def _list_dataset_ids_any() -> list[str]:
         for f in list(raw_dir.glob("*.parquet")) + list(raw_dir.glob("*.csv")):
             ids.add(f.stem)
 
+    # 5) histórico consolidado publicado como dataset virtual de primera clase
+    hist_ref = _resolve_historical_input_ref(prefer_labeled=False)
+    if _abs_path(hist_ref).exists():
+        ids.add(HISTORICAL_DATASET_ID)
+
     return sorted([i for i in ids if str(i).strip()], key=_dataset_sort_key)
 
 
@@ -1855,18 +1921,33 @@ def list_datasets() -> List[DatasetInfo]:
         meta: dict = _read_json_if_exists(_relpath(meta_path)) if meta_path.exists() else {}
         pair_meta: dict = _read_json_if_exists(_relpath(pair_meta_path)) if pair_meta_path.exists() else {}
 
-        # labeled
+        is_historical = _is_historical_dataset_id(ds)
+        source_uri: Optional[str] = None
+
+        # labeled / fuente primaria del dataset
         has_labeled = False
-        try:
-            lp = resolve_labeled_path(ds)
-            has_labeled = bool(lp and Path(lp).exists())
-        except Exception:
-            # fallback: intenta el patrón más común
-            has_labeled = (BASE_DIR / "data" / "labeled" / f"{ds}_beto.parquet").exists()
+        if is_historical:
+            source_uri = _resolve_historical_input_ref(prefer_labeled=False)
+            has_labeled = _abs_path(source_uri).exists()
+        else:
+            try:
+                lp = resolve_labeled_path(ds)
+                has_labeled = bool(lp and Path(lp).exists())
+                source_uri = _relpath(Path(lp)) if lp and Path(lp).exists() else None
+            except Exception:
+                # fallback: intenta el patrón más común
+                fallback_labeled = BASE_DIR / "data" / "labeled" / f"{ds}_beto.parquet"
+                has_labeled = fallback_labeled.exists()
+                source_uri = _relpath(fallback_labeled) if fallback_labeled.exists() else None
 
         # processed / raw
         has_processed = (BASE_DIR / "data" / "processed" / f"{ds}.parquet").exists() or (BASE_DIR / "data" / "processed" / f"{ds}.csv").exists()
         has_raw = (BASE_DIR / "datasets" / f"{ds}.parquet").exists() or (BASE_DIR / "datasets" / f"{ds}.csv").exists()
+        if is_historical:
+            # El histórico se publica desde ``historico/``; no debe depender de
+            # ``data/processed`` ni ``datasets/`` para aparecer como entrenable.
+            has_processed = False
+            has_raw = False
 
         # champion
         has_champ_sent = first_existing(resolve_champion_json_candidates(dataset_id=ds, family="sentiment_desempeno")) is not None
@@ -1877,6 +1958,9 @@ def list_datasets() -> List[DatasetInfo]:
         out.append(
             DatasetInfo(
                 dataset_id=ds,
+                display_name="Histórico unificado" if is_historical else None,
+                is_historical=is_historical,
+                source_uri=source_uri,
                 has_train_matrix=bool(has_train),
                 has_pair_matrix=bool(has_pair),
                 has_labeled=bool(has_labeled),
@@ -1908,15 +1992,19 @@ def readiness(dataset_id: str) -> ReadinessResponse:
     - Reporta score_col (target) desde pair_meta/meta.json
     - Expone meta de calibración del score_total desde el labeled (si existe)
     """
-    try:
-        labeled_path = resolve_labeled_path(dataset_id)
-        labeled_ref = _relpath(labeled_path)
+    if _is_historical_dataset_id(dataset_id):
+        labeled_ref = _resolve_historical_input_ref(prefer_labeled=False)
         labeled_ok = _abs_path(labeled_ref).exists()
-    except Exception:
-        labeled_ref = f"data/labeled/{dataset_id}_beto.parquet"
-        labeled_ok = _abs_path(labeled_ref).exists()
+    else:
+        try:
+            labeled_path = resolve_labeled_path(dataset_id)
+            labeled_ref = _relpath(labeled_path)
+            labeled_ok = _abs_path(labeled_ref).exists()
+        except Exception:
+            labeled_ref = f"data/labeled/{dataset_id}_beto.parquet"
+            labeled_ok = _abs_path(labeled_ref).exists()
 
-    unified_ref = "historico/unificado_labeled.parquet"
+    unified_ref = _resolve_historical_input_ref(prefer_labeled=False)
     unified_ok = _abs_path(unified_ref).exists()
 
     feat_ref = f"artifacts/features/{dataset_id}/train_matrix.parquet"
