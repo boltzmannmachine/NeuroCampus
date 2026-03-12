@@ -12,9 +12,9 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { modelosApi } from '@/features/modelos/api';
+import { normalizeDatasetIdForBackend } from '@/features/modelos/utils/datasetId';
 import {
   MOCK_RUNS, MOCK_CHAMPIONS, MOCK_PREDICTOR_JSON, MOCK_METRICS_JSON, MOCK_JOB_META_JSON,
-  DATASETS,
   FAMILY_CONFIGS,
   type Family, type ModelResolveSource,
   type RunRecord,
@@ -73,8 +73,9 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
     setRemoteRun(null);
     setRemoteArtifacts(null);
 
-    // Map UI datasetId ("ds_2025_1") a backend datasetId ("2025-1") cuando aplica.
-    const backendDatasetId = DATASETS.find(d => d.id === datasetId)?.period ?? datasetId;
+    // Resolver el dataset en un solo punto evita divergencias entre tabs
+    // cuando el selector trabaja con IDs legacy o con el histórico canónico.
+    const backendDatasetId = normalizeDatasetIdForBackend(datasetId);
 
     // -------------------------------------------------------------------------
     // Intento backend (tolerante)
