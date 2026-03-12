@@ -43,6 +43,38 @@ function normalizeIndicatorScale(value: number | null | undefined): number {
   return Math.min(numeric, 5);
 }
 
+/**
+ * Devuelve el nombre legible del dataset para renderizado en selectores, badges
+ * y tarjetas de contexto.
+ *
+ * Se prioriza `display_name` para que datasets virtuales como
+ * `historico-unificado` se presenten de forma amigable sin perder el id
+ * canónico que el backend necesita para ejecutar predicciones.
+ */
+function getDatasetDisplayName(dataset: DatasetInfo | null | undefined): string {
+  if (!dataset) return '—';
+  const displayName = String(dataset.display_name ?? '').trim();
+  return displayName || dataset.dataset_id;
+}
+
+/** Indica si el dataset actual corresponde al dataset histórico virtual. */
+function isHistoricalDataset(dataset: DatasetInfo | null | undefined): boolean {
+  return Boolean(dataset?.is_historical);
+}
+
+/**
+ * Construye una etiqueta compacta y estable para las opciones del selector.
+ *
+ * El objetivo es mantener el `dataset_id` como valor real del control, mientras
+ * la UI muestra un nombre más claro y metadata operativa útil para el usuario.
+ */
+function formatDatasetOptionLabel(dataset: DatasetInfo): string {
+  const displayName = getDatasetDisplayName(dataset);
+  const sourceTag = dataset.is_historical ? 'histórico' : 'dataset';
+  const championTag = dataset.has_champion ? '✓ champion' : '⚠ sin champion';
+  return `${displayName} · ${dataset.n_pairs} pares · ${sourceTag} · ${championTag}`;
+}
+
 export function PredictionsTab() {
   // --- Modo ---
   const [predictionMode, setPredictionMode] = useState<'individual' | 'batch'>('individual');
@@ -127,6 +159,15 @@ export function PredictionsTab() {
 
   const hasModelsContext = Boolean(selectedModelFamily || requestedPredictionRunId || predictionSource);
   const predictionsSupportsSelectedFamily = !selectedModelFamily || selectedModelFamily === 'score_docente';
+  const selectedDatasetInfo = useMemo(
+    () => datasets.find((dataset) => dataset.dataset_id === selectedDataset) ?? null,
+    [datasets, selectedDataset],
+  );
+  const activeDatasetInfo = useMemo(
+    () => datasets.find((dataset) => dataset.dataset_id === activeDatasetId) ?? null,
+    [datasets, activeDatasetId],
+  );
+  const selectedDatasetLabel = getDatasetDisplayName(selectedDatasetInfo);
 
   // Cargar datasets al montar (respetando el dataset activo global si existe)
   useEffect(() => {
@@ -481,7 +522,12 @@ export function PredictionsTab() {
               <div className="flex flex-wrap gap-2">
                 {activeDatasetId && (
                   <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-                    dataset {activeDatasetId}
+                    dataset {getDatasetDisplayName(activeDatasetInfo)}
+                  </Badge>
+                )}
+                {isHistoricalDataset(activeDatasetInfo) && (
+                  <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
+                    fuente histórica
                   </Badge>
                 )}
                 {selectedFamilyLabel && (
@@ -543,13 +589,14 @@ export function PredictionsTab() {
                       <SelectContent className="bg-[#1a1f2e] border-gray-700">
                         {datasets.map((ds) => (
                           <SelectItem key={ds.dataset_id} value={ds.dataset_id}>
-                            {ds.dataset_id} — {ds.n_pairs} pares {ds.has_champion ? '✓' : '⚠'}
+                            {formatDatasetOptionLabel(ds)}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-gray-500 mt-1">
-                      Seleccione un conjunto de datos previamente cargado en la pestaña Datos
+                      Seleccione un conjunto de datos disponible para inferencia. Si el backend expone
+                      el histórico unificado, aparecerá aquí como un dataset más con su mismo flujo operativo.
                     </p>
                   </div>
 
@@ -616,7 +663,11 @@ export function PredictionsTab() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-gray-400">Conjunto de datos</p>
-                    <p className="text-white">{selectedDataset || '—'}</p>
+                    <p className="text-white">{selectedDatasetLabel}</p>
+                    <p className="text-xs text-gray-500">
+                      ID canónico: {selectedDataset || '—'}
+                      {isHistoricalDataset(selectedDatasetInfo) ? ' · fuente histórica' : ''}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Docente</p>
@@ -830,13 +881,14 @@ export function PredictionsTab() {
                   <SelectContent className="bg-[#1a1f2e] border-gray-700">
                     {datasets.map((ds) => (
                     <SelectItem key={ds.dataset_id} value={ds.dataset_id}>
-                      {ds.dataset_id} — {ds.n_pairs} pares {ds.has_champion ? '✓' : '⚠'}
+                      {formatDatasetOptionLabel(ds)}
                     </SelectItem>
                   ))}
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Seleccione un conjunto de datos previamente cargado en la pestaña Datos
+                  Seleccione un conjunto de datos listo para inferencia batch, incluido el dataset histórico
+                  cuando backend lo publique como opción operativa.
                 </p>
               </div>
               <div>
