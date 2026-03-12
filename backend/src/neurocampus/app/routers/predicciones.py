@@ -20,6 +20,7 @@ import json
 from functools import lru_cache
 import logging
 import os
+from pathlib import Path
 import re
 import uuid
 from typing import Any, Dict, List, Optional
@@ -202,11 +203,59 @@ def _ensure_prediction_dataset_ready(dataset_id: str) -> None:
 
 
 def _period_key(ds: str) -> tuple:
-    """Ordena dataset_ids tipo 'YYYY-N' cronológicamente."""
+    """Ordena dataset_ids tipo ``YYYY-N`` cronológicamente."""
     m = re.match(r"^\s*(\d{4})-(\d{1,2})\s*$", str(ds))
     if not m:
         return (0, 0)
     return (int(m.group(1)), int(m.group(2)))
+
+
+def _period_rank(value: Any) -> int:
+    """Convierte un periodo a un entero sortable.
+
+    Se usa para elegir el registro más reciente cuando un ``pair_matrix``
+    contiene múltiples filas para el mismo par docente-materia (caso típico del
+    dataset histórico consolidado).
+    """
+    year, sem = _period_key(str(value or ""))
+    if year <= 0:
+        return -1
+    return int(year) * 100 + int(sem)
+
+
+def _latest_pair_rows(df_pair: pd.DataFrame) -> pd.DataFrame:
+    """Reduce un ``pair_matrix`` a la vista operativa más reciente por par.
+
+    Notes
+    -----
+    - El entrenamiento puede usar múltiples periodos por par.
+    - La pestaña Predicciones necesita una sola fila operativa por par
+      docente-materia; por eso, cuando existe ``periodo``, se conserva la fila
+      del periodo más reciente.
+    """
+    required = {"teacher_key", "materia_key"}
+    if df_pair.empty or not required.issubset(df_pair.columns):
+        return df_pair
+    if "periodo" not in df_pair.columns:
+        return df_pair
+
+    out = df_pair.copy()
+    out["_period_rank"] = out["periodo"].map(_period_rank)
+    out = out.sort_values(["teacher_key", "materia_key", "_period_rank"], kind="stable")
+    out = out.drop_duplicates(["teacher_key", "materia_key"], keep="last")
+    return out.drop(columns=["_period_rank"]).reset_index(drop=True)
+
+
+def _pair_matrix_columns(pair_path: Path) -> List[str]:
+    """Lista columnas de un ``pair_matrix`` sin cargar el archivo completo."""
+    try:
+        import pyarrow.parquet as pq
+        return list(pq.ParquetFile(pair_path).schema.names)
+    except Exception:
+        try:
+            return list(pd.read_parquet(pair_path).columns)
+        except Exception:
+            return []
 
 
 def _list_pair_datasets() -> List[str]:
@@ -580,7 +629,11 @@ def list_teachers(dataset_id: str) -> List[TeacherInfoResponse]:
     pair_path = feat_dir / "pair_matrix.parquet"
     if pair_path.exists():
         try:
-            df_pair = pd.read_parquet(pair_path, columns=["teacher_key", "n_docente"])
+            cols = ["teacher_key", "n_docente"]
+            if "periodo" in _pair_matrix_columns(pair_path):
+                cols.append("periodo")
+            df_pair = pd.read_parquet(pair_path, columns=cols)
+            df_pair = _latest_pair_rows(df_pair)
             counts = (
                 df_pair.drop_duplicates("teacher_key")
                 .set_index("teacher_key")["n_docente"]
@@ -628,7 +681,11 @@ def list_materias(dataset_id: str) -> List[MateriaInfoResponse]:
     pair_path = feat_dir / "pair_matrix.parquet"
     if pair_path.exists():
         try:
-            df_pair = pd.read_parquet(pair_path, columns=["materia_key", "n_materia"])
+            cols = ["materia_key", "n_materia"]
+            if "periodo" in _pair_matrix_columns(pair_path):
+                cols.append("periodo")
+            df_pair = pd.read_parquet(pair_path, columns=cols)
+            df_pair = _latest_pair_rows(df_pair)
             counts = (
                 df_pair.drop_duplicates("materia_key")
                 .set_index("materia_key")["n_materia"]
@@ -661,10 +718,18 @@ def list_materias(dataset_id: str) -> List[MateriaInfoResponse]:
     summary="Predicción individual de score para un par docente–materia",
 )
 def predict_individual(req: IndividualPredictionRequest) -> IndividualPredictionResponse:
+    """Predice un par docente-materia usando la evidencia operativa más reciente.
+
+    Para datasets multi-periodo, como ``historico-unificado``, el entrenamiento
+    conserva una fila por ``teacher-materia-periodo``. En Predicciones, sin
+    embargo, se selecciona la observación del periodo más reciente para cada par
+    con el fin de mantener una semántica consistente con la UI actual.
+    """
     ds = str(req.dataset_id).strip()
     teacher_key = str(req.teacher_key).strip()
     materia_key = str(req.materia_key).strip()
 
+    _ensure_prediction_dataset_ready(ds)
     pair_path = artifacts_dir() / "features" / ds / "pair_matrix.parquet"
     if not pair_path.exists():
         raise HTTPException(
@@ -676,10 +741,11 @@ def predict_individual(req: IndividualPredictionRequest) -> IndividualPrediction
         )
 
     try:
-        df_pair = pd.read_parquet(pair_path)
+        df_pair_raw = pd.read_parquet(pair_path)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error cargando pair_matrix: {e}") from e
 
+    df_pair = _latest_pair_rows(df_pair_raw)
     mask = (df_pair["teacher_key"] == teacher_key) & (df_pair["materia_key"] == materia_key)
     row_df = df_pair[mask]
 
@@ -862,33 +928,56 @@ def _build_timeline(
     current_ds: str,
     score_total_pred: float,
 ) -> List[Dict[str, Any]]:
+    """Construye la serie temporal para el radar/timeline de Predicciones.
+
+    Si un ``pair_matrix`` incluye múltiples periodos internos (por ejemplo,
+    ``historico-unificado``), se devuelve un punto por cada periodo disponible.
+    Para datasets de un solo semestre se mantiene el comportamiento original: un
+    punto por ``dataset_id``.
+    """
     result: List[Dict[str, Any]] = []
     for ds in _list_pair_datasets():
         pair_path = artifacts_dir() / "features" / ds / "pair_matrix.parquet"
         if not pair_path.exists():
             continue
         try:
-            df = pd.read_parquet(
-                pair_path,
-                columns=["teacher_key", "materia_key", "mean_score_total_0_50", "n_par"],
-            )
+            df = pd.read_parquet(pair_path)
         except Exception:
             continue
 
+        required = {"teacher_key", "materia_key", "mean_score_total_0_50"}
+        if not required.issubset(df.columns):
+            continue
+
         mask = (df["teacher_key"] == teacher_key) & (df["materia_key"] == materia_key)
-        sub = df[mask]
+        sub = df[mask].copy()
         if len(sub) == 0:
             continue
 
-        point: Dict[str, Any] = {
-            "semester": ds,
-            "real": round(float(sub["mean_score_total_0_50"].iloc[0]), 2),
-        }
-        if ds == current_ds:
-            point["predicted"] = round(float(score_total_pred), 2)
+        if "periodo" in sub.columns:
+            sub["periodo"] = sub["periodo"].fillna(ds).astype(str)
+            sub["_period_rank"] = sub["periodo"].map(_period_rank)
+            sub = sub.sort_values(["_period_rank"], kind="stable")
 
-        result.append(point)
+            for i, row in enumerate(sub.itertuples(index=False), start=1):
+                semester = str(getattr(row, "periodo", ds) or ds)
+                point: Dict[str, Any] = {
+                    "semester": semester,
+                    "real": round(float(getattr(row, "mean_score_total_0_50", 0.0) or 0.0), 2),
+                }
+                if ds == current_ds and i == len(sub):
+                    point["predicted"] = round(float(score_total_pred), 2)
+                result.append(point)
+        else:
+            point = {
+                "semester": ds,
+                "real": round(float(sub["mean_score_total_0_50"].iloc[0]), 2),
+            }
+            if ds == current_ds:
+                point["predicted"] = round(float(score_total_pred), 2)
+            result.append(point)
 
+    result.sort(key=lambda p: _period_rank(p.get("semester")))
     return result
 
 
@@ -903,6 +992,12 @@ def _build_timeline(
     summary="Lanza un job de predicción por lote (todos los pares del dataset)",
 )
 def batch_run(req: BatchRunRequest, bg: BackgroundTasks) -> BatchJobResponse:
+    """Lanza un batch sobre una sola fila operativa por par docente-materia.
+
+    Cuando el ``pair_matrix`` contiene múltiples periodos por par, este endpoint
+    delega en :func:`_run_batch_job`, que reduce el dataframe al periodo más
+    reciente por par antes de inferir.
+    """
     ds = str(req.dataset_id).strip()
     _ensure_prediction_dataset_ready(ds)
 
@@ -965,7 +1060,8 @@ def _run_batch_job(job_id: str, dataset_id: str) -> None:
     st["progress"] = 0.05
 
     try:
-        df_pair = pd.read_parquet(artifacts_dir() / "features" / dataset_id / "pair_matrix.parquet")
+        df_pair_raw = pd.read_parquet(artifacts_dir() / "features" / dataset_id / "pair_matrix.parquet")
+        df_pair = _latest_pair_rows(df_pair_raw)
         st["progress"] = 0.15
 
         bundle = load_predictor_by_champion(dataset_id=dataset_id, family=_FAMILY, use_cache=False)
@@ -1000,6 +1096,7 @@ def _run_batch_job(job_id: str, dataset_id: str) -> None:
                     "cold_pair": n_par == 0,
                     "mean_score_total_0_50": float(row.get("mean_score_total_0_50", 0.0) or 0.0),
                     "std_score_total_0_50": round(std_score, 3),
+                    "periodo": str(row.get("periodo", dataset_id) or dataset_id),
                 }
             )
 
