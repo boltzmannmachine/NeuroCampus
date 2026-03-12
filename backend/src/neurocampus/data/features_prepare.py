@@ -281,7 +281,19 @@ def _build_pair_matrix(
     materia_col: str,
     score_col: str,
 ) -> tuple[pd.DataFrame, Dict[str, Any]]:
-    """Construye pair_matrix (1 fila = 1 par teacher_id-materia_id) + meta."""
+    """Construye ``pair_matrix`` y su metadata asociada.
+
+    Notes
+    -----
+    - Para datasets regulares (un solo semestre) se mantiene la granularidad
+      clásica: ``1 fila = 1 par teacher-materia``.
+    - Para fuentes multi-periodo, como ``historico-unificado``, se preserva la
+      columna ``periodo`` en la granularidad del parquet para evitar colapsar
+      varios semestres en una sola fila.
+    - Cuando el input contiene múltiples periodos, los conteos y agregados de
+      entidad también se calculan por periodo, reproduciendo la misma lógica que
+      tendría cada dataset subido individualmente.
+    """
 
     out = df.copy()
     out["teacher_key"] = out[teacher_col].fillna("").astype(str).str.strip()
@@ -289,6 +301,16 @@ def _build_pair_matrix(
 
     if "teacher_id" not in out.columns or "materia_id" not in out.columns:
         raise ValueError("pair_matrix requiere teacher_id y materia_id (feature-pack ids)")
+
+    raw_periodo = out["periodo"].fillna("").astype(str).str.strip() if "periodo" in out.columns else None
+    has_real_periodo = raw_periodo is not None and raw_periodo.ne("").any()
+    n_periodos_input = int(raw_periodo[raw_periodo.ne("")].nunique()) if has_real_periodo else 0
+    use_period_grouping = bool(has_real_periodo and n_periodos_input > 1)
+
+    if has_real_periodo:
+        out["periodo"] = raw_periodo.mask(raw_periodo.eq(""), str(dataset_id))
+    else:
+        out["periodo"] = str(dataset_id)
 
     has_text = "has_text" in out.columns
     has_accept = any(c in out.columns for c in ("accepted_by_teacher", "teacher_accepted", "accepted"))
@@ -317,6 +339,11 @@ def _build_pair_matrix(
     tfidf_cols = _pick_tfidf_cols(out)
 
     group_cols = ["teacher_id", "materia_id", "teacher_key", "materia_key"]
+    if use_period_grouping:
+        # Mantener ``periodo`` en la clave evita mezclar semestres dentro del
+        # histórico y deja el layout alineado con el que produciría cada periodo
+        # si hubiese sido subido de manera independiente.
+        group_cols = ["periodo"] + group_cols
 
     agg: Dict[str, tuple[str, str]] = {
         "n_par": ("teacher_id", "size"),
@@ -352,11 +379,26 @@ def _build_pair_matrix(
         if c.startswith("std_"):
             pair[c] = pd.to_numeric(pair[c], errors="coerce").fillna(0.0)
 
-    docente_counts = out.groupby("teacher_id", dropna=False).size().rename("n_docente").reset_index()
-    materia_counts = out.groupby("materia_id", dropna=False).size().rename("n_materia").reset_index()
-
-    pair = pair.merge(docente_counts, on="teacher_id", how="left")
-    pair = pair.merge(materia_counts, on="materia_id", how="left")
+    if use_period_grouping:
+        docente_counts = (
+            out.groupby(["periodo", "teacher_id"], dropna=False)
+            .size()
+            .rename("n_docente")
+            .reset_index()
+        )
+        materia_counts = (
+            out.groupby(["periodo", "materia_id"], dropna=False)
+            .size()
+            .rename("n_materia")
+            .reset_index()
+        )
+        pair = pair.merge(docente_counts, on=["periodo", "teacher_id"], how="left")
+        pair = pair.merge(materia_counts, on=["periodo", "materia_id"], how="left")
+    else:
+        docente_counts = out.groupby("teacher_id", dropna=False).size().rename("n_docente").reset_index()
+        materia_counts = out.groupby("materia_id", dropna=False).size().rename("n_materia").reset_index()
+        pair = pair.merge(docente_counts, on="teacher_id", how="left")
+        pair = pair.merge(materia_counts, on="materia_id", how="left")
 
     def _agg_entity(key: str) -> pd.DataFrame:
         cols_num: List[str] = []
@@ -368,33 +410,43 @@ def _build_pair_matrix(
             cols_num.append("has_text")
 
         if not cols_num:
+            if use_period_grouping:
+                return out[["periodo", key]].drop_duplicates().reset_index(drop=True)
             return pd.DataFrame({key: out[key].unique()})
 
-        tmp = out[[key] + cols_num].copy()
+        base_cols = [key] + cols_num
+        if use_period_grouping:
+            base_cols = ["periodo"] + base_cols
+
+        tmp = out[base_cols].copy()
         for c in cols_num:
             tmp[c] = pd.to_numeric(tmp[c], errors="coerce")
 
         agg_map = {c: "mean" for c in cols_num}
-        ent = tmp.groupby(key, dropna=False).agg(agg_map)
+        group_keys = [key]
+        if use_period_grouping:
+            group_keys = ["periodo"] + group_keys
+
+        ent = tmp.groupby(group_keys, dropna=False).agg(agg_map)
         ent.columns = [f"{key}_mean_{c}" for c in cols_num]
         return ent.reset_index()
 
     docente_agg = _agg_entity("teacher_id")
     materia_agg = _agg_entity("materia_id")
 
-    pair = pair.merge(docente_agg, on="teacher_id", how="left")
-    pair = pair.merge(materia_agg, on="materia_id", how="left")
+    if use_period_grouping:
+        pair = pair.merge(docente_agg, on=["periodo", "teacher_id"], how="left")
+        pair = pair.merge(materia_agg, on=["periodo", "materia_id"], how="left")
+    else:
+        pair = pair.merge(docente_agg, on="teacher_id", how="left")
+        pair = pair.merge(materia_agg, on="materia_id", how="left")
 
     pair["teacher_id"] = pd.to_numeric(pair["teacher_id"], errors="coerce").fillna(-1).astype(int)
     pair["materia_id"] = pd.to_numeric(pair["materia_id"], errors="coerce").fillna(-1).astype(int)
     pair["n_par"] = pd.to_numeric(pair["n_par"], errors="coerce").fillna(0).astype(int)
     pair["n_docente"] = pd.to_numeric(pair.get("n_docente"), errors="coerce").fillna(0).astype(int)
     pair["n_materia"] = pd.to_numeric(pair.get("n_materia"), errors="coerce").fillna(0).astype(int)
-
-    # Asegurar columna de trazabilidad temporal para incremental window / split temporal
-    if "periodo" not in pair.columns:
-        pair = pair.copy()
-        pair["periodo"] = str(dataset_id)
+    pair["periodo"] = pair["periodo"].fillna(str(dataset_id)).astype(str).str.strip()
 
     meta: Dict[str, Any] = {
         "dataset_id": str(dataset_id),
@@ -407,6 +459,9 @@ def _build_pair_matrix(
         "has_accept": bool(has_accept),
         "has_periodo": True,
         "periodo_col": "periodo",
+        "has_multi_period": bool(use_period_grouping),
+        "n_periodos": int(pair["periodo"].nunique(dropna=True)) if "periodo" in pair.columns else 0,
+        "row_granularity": "teacher-materia-periodo" if use_period_grouping else "teacher-materia",
         "n_pairs": int(len(pair)),
         "n_docentes": int(pair["teacher_id"].nunique(dropna=True)) if "teacher_id" in pair.columns else 0,
         "n_materias": int(pair["materia_id"].nunique(dropna=True)) if "materia_id" in pair.columns else 0,
