@@ -437,6 +437,25 @@ export type {
 
 export interface DatasetInfoDto {
   dataset_id: string;
+
+  /**
+   * Etiqueta opcional enviada por backend para presentar datasets especiales
+   * (por ejemplo el histórico unificado) sin acoplar la UI al `dataset_id`.
+   */
+  display_name?: string | null;
+
+  /**
+   * Marca datasets sintéticos o derivados. Se usa para etiquetar el histórico
+   * sin introducir reglas ad-hoc en cada subpestaña.
+   */
+  is_historical?: boolean | null;
+
+  /**
+   * URI de origen del dataset cuando backend la expone. Útil para auditoría y
+   * documentación posterior del flujo de datos.
+   */
+  source_uri?: string | null;
+
   has_train_matrix: boolean;
   has_pair_matrix: boolean;
   has_labeled: boolean;
