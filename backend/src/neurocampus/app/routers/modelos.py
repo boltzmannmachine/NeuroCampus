@@ -1016,11 +1016,19 @@ def _resolve_by_data_source(req: EntrenarRequest) -> str:
 
 
 
-def _ensure_unified_labeled() -> None:
-    """Asegura `historico/unificado_labeled.parquet`."""
+def _ensure_unified_labeled() -> str:
+    """Asegura ``historico/unificado_labeled.parquet`` y retorna su ruta lógica.
+
+    Returns
+    -------
+    str
+        Referencia relativa al parquet histórico labeled. Se retorna incluso
+        cuando el archivo ya existía, para que los callers no terminen pasando
+        ``None`` como ``input_uri`` al builder de feature-pack.
+    """
     out = BASE_DIR / "historico" / "unificado_labeled.parquet"
     if out.exists():
-        return
+        return "historico/unificado_labeled.parquet"
     try:
         from neurocampus.data.strategies.unificacion import UnificacionStrategy
     except Exception as e:
@@ -1034,6 +1042,73 @@ def _ensure_unified_labeled() -> None:
 
     strat = UnificacionStrategy(base_uri=f"localfs://{BASE_DIR.as_posix()}")
     strat.acumulado_labeled()
+
+    if not out.exists():
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Se ejecutó acumulado_labeled pero no se materializó historico/unificado_labeled.parquet."
+            ),
+        )
+    return "historico/unificado_labeled.parquet"
+
+
+def _ensure_historical_pair_feature_pack_from_existing(*, force: bool = False) -> Dict[str, str]:
+    """Construye el histórico pair-level desde feature-packs ya procesados.
+
+    Este helper es la vía principal para ``historico-unificado`` cuando la
+    family es ``score_docente``. En lugar de reconstruir pares desde raw/labeled,
+    concatena los ``pair_matrix.parquet`` existentes bajo
+    ``artifacts/features/<dataset_id>/`` y reindexa docente/materia de forma
+    estable sobre toda la unión.
+    """
+    out_dir = _abs_path(f"artifacts/features/{HISTORICAL_DATASET_ID}")
+    pair_path = out_dir / "pair_matrix.parquet"
+    pair_meta_path = out_dir / "pair_meta.json"
+    teacher_index_path = out_dir / "teacher_index.json"
+    materia_index_path = out_dir / "materia_index.json"
+
+    artifacts_rel: Dict[str, str] = {
+        "pair_matrix": _relpath(pair_path),
+        "pair_meta": _relpath(pair_meta_path),
+        "teacher_index": _relpath(teacher_index_path),
+        "materia_index": _relpath(materia_index_path),
+        "meta": _relpath(out_dir / "meta.json"),
+    }
+
+    if all(p.exists() for p in (pair_path, pair_meta_path, teacher_index_path, materia_index_path)) and not force:
+        return artifacts_rel
+
+    try:
+        from neurocampus.data.features_prepare import build_historical_pair_artifacts_from_feature_packs
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "No se pudo importar el builder histórico basado en pair_matrix ya procesados."
+            ),
+        ) from e
+
+    try:
+        return build_historical_pair_artifacts_from_feature_packs(
+            base_dir=BASE_DIR,
+            dataset_id=HISTORICAL_DATASET_ID,
+            output_dir=str(out_dir.resolve()),
+        )
+    except FileNotFoundError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "No hay pair_matrix históricos fuente para construir historico-unificado. "
+                "Primero genera feature-packs por periodo en artifacts/features/<dataset_id>/pair_matrix.parquet. "
+                f"Detalle: {e}"
+            ),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error construyendo histórico pair-level desde feature-packs: {e}",
+        ) from e
 
 
 def _ensure_feature_pack(
@@ -1273,7 +1348,15 @@ def _auto_prepare_if_needed(req: EntrenarRequest, data_ref: str) -> None:
         # Tratamos ``historico-unificado`` como un dataset normal: genera su
         # feature-pack en ``artifacts/features/historico-unificado/...`` y la UI
         # lo consume igual que cualquier otro dataset.
-        if _is_historical_dataset_id(ds) or metodologia in ("acumulado", "ventana"):
+        if _is_historical_dataset_id(ds):
+            pair_like_source = data_source in ("pair_matrix", "pairs", "pair")
+            if family == "score_docente" and pair_like_source:
+                _ensure_historical_pair_feature_pack_from_existing(force=False)
+                return
+
+            input_uri = _ensure_unified_labeled()
+            force_fp = False
+        elif metodologia in ("acumulado", "ventana"):
             input_uri = _ensure_unified_labeled()
             force_fp = False
         else:
@@ -1351,7 +1434,8 @@ def _period_key(ds: str) -> tuple[int, int]:
     Ordena dataset_id tipo 'YYYY-N' (ej. 2025-1, 2024-3).
     Si no parsea, lo manda al inicio.
     """
-    m = re.match(r"^\s*(\d{4})-(\d{1,2})\s*$", str(ds))
+    raw = str(ds or '').strip()
+    m = re.match(r"^(?:ds[_-])?(\d{4})[_-](\d{1,2})$", raw, flags=re.IGNORECASE)
     if not m:
         return (0, 0)
     return (int(m.group(1)), int(m.group(2)))
