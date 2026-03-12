@@ -84,7 +84,10 @@ from neurocampus.utils.predictions_run_io import (
     write_pred_meta,
 )
 from neurocampus.predictions.bundle import bundle_paths
-from neurocampus.data.features_prepare import prepare_feature_pack
+from neurocampus.data.features_prepare import (
+    build_historical_pair_artifacts_from_feature_packs,
+    prepare_feature_pack,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +155,46 @@ def _historical_source_exists() -> bool:
     return abs_artifact_path(_resolve_historical_input_ref(prefer_labeled=False)).exists()
 
 
+def _ensure_historical_pair_dataset_ready(*, force: bool = False) -> None:
+    """Construye ``historico-unificado`` desde pair_matrix ya procesados.
+
+    Predicciones necesita una vista pair-level operativa. Para mantener el mismo
+    formato que los datasets ya cargados, el histórico se materializa uniendo los
+    ``pair_matrix.parquet`` existentes en ``artifacts/features/*`` y reindexando
+    docente/materia sobre la unión completa.
+    """
+    feat_dir = artifacts_dir() / 'features' / HISTORICAL_DATASET_ID
+    required = [
+        feat_dir / 'pair_matrix.parquet',
+        feat_dir / 'pair_meta.json',
+        feat_dir / 'teacher_index.json',
+        feat_dir / 'materia_index.json',
+    ]
+    if all(p.exists() for p in required) and not force:
+        return
+
+    try:
+        build_historical_pair_artifacts_from_feature_packs(
+            base_dir=project_root(),
+            dataset_id=HISTORICAL_DATASET_ID,
+            output_dir=str(feat_dir.resolve()),
+        )
+    except FileNotFoundError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                'No hay pair_matrix fuente para construir historico-unificado. '
+                'Primero genera feature-packs por periodo en artifacts/features/<dataset_id>/pair_matrix.parquet. '
+                f'Detalle: {e}'
+            ),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f'Error construyendo histórico pair-level desde feature-packs: {e}',
+        ) from e
+
+
 def _ensure_prediction_dataset_ready(dataset_id: str) -> None:
     """Asegura los artefactos mínimos del dataset antes de predecir/listar entidades.
 
@@ -177,34 +220,13 @@ def _ensure_prediction_dataset_ready(dataset_id: str) -> None:
     if all(p.exists() for p in required):
         return
 
-    input_ref = _resolve_historical_input_ref(prefer_labeled=False)
-    input_abs = abs_artifact_path(input_ref)
-    if not input_abs.exists():
-        raise HTTPException(
-            status_code=404,
-            detail=(
-                "No existe historico/unificado_labeled.parquet (ni su fallback legacy) "
-                "para construir el dataset histórico de Predicciones."
-            ),
-        )
-
-    try:
-        prepare_feature_pack(
-            base_dir=project_root(),
-            dataset_id=ds,
-            input_uri=input_ref,
-            output_dir=str(feat_dir.resolve()),
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error construyendo feature-pack para dataset_id={ds}: {e}",
-        ) from e
+    _ensure_historical_pair_dataset_ready(force=False)
 
 
 def _period_key(ds: str) -> tuple:
     """Ordena dataset_ids tipo ``YYYY-N`` cronológicamente."""
-    m = re.match(r"^\s*(\d{4})-(\d{1,2})\s*$", str(ds))
+    raw = str(ds or '').strip()
+    m = re.match(r"^(?:ds[_-])?(\d{4})[_-](\d{1,2})$", raw, flags=re.IGNORECASE)
     if not m:
         return (0, 0)
     return (int(m.group(1)), int(m.group(2)))
