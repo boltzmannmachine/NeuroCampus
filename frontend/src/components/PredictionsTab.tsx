@@ -783,7 +783,7 @@ export function PredictionsTab() {
                           <PolarRadiusAxis
                             angle={90}
                             domain={[0, 5]}
-                            ticks={[0, 1, 2, 3, 4, 5]}
+                            tickCount={6}
                             stroke="#9CA3AF"
                           />
                           <Radar name="Promedio Actual" dataKey="actual" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
