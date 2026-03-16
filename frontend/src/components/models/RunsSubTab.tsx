@@ -43,6 +43,7 @@ export function RunsSubTab({
   // Backend integration (tolerante): list runs con fallback a mocks.
   // ---------------------------------------------------------------------------
   const [remoteRuns, setRemoteRuns] = useState<RunRecord[] | null>(null);
+  const [runsSource, setRunsSource] = useState<'api' | 'mock'>('mock');
 
   useEffect(() => {
     let cancelled = false;
@@ -58,10 +59,16 @@ export function RunsSubTab({
         // Mantener paridad visual del prototipo:
         // - `dataset_id` se conserva como el ID UI seleccionado para que los filtros existentes funcionen.
         const uiRuns = runs.map(r => ({ ...r, dataset_id: datasetId }));
-        if (!cancelled) setRemoteRuns(uiRuns);
+        if (!cancelled) {
+          setRemoteRuns(uiRuns);
+          setRunsSource('api');
+        }
       } catch {
         // Si el backend aún no está listo, dejamos `remoteRuns` en null y la UI usa MOCK_RUNS.
-        if (!cancelled) setRemoteRuns(null);
+        if (!cancelled) {
+          setRemoteRuns(null);
+          setRunsSource('mock');
+        }
       }
     })();
 
@@ -148,6 +155,15 @@ export function RunsSubTab({
 
   return (
     <div className="space-y-4">
+      {runsSource === 'mock' && (
+        <Card className="border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-200">
+          <div className="flex items-center justify-between gap-3">
+            <p>La tabla de runs está usando datos del prototipo porque el backend no respondió para este dataset y familia.</p>
+            <Badge className="border-yellow-500/40 bg-yellow-500/20 text-yellow-200 text-xs">Fuente prototipo</Badge>
+          </div>
+        </Card>
+      )}
+
       {/* Filters */}
       <Card className="bg-[#1a1f2e] border-gray-800 p-4">
         <div className="flex flex-wrap items-end gap-3">
