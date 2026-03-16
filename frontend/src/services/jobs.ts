@@ -195,8 +195,14 @@ export interface RbmSearchJob {
   last_run_id?: string | null;
 }
 
+/**
+ * Lanza un job de búsqueda RBM.
+ *
+ * - Si `configPath` no se envía, el backend utilizará `config/rbm_search.yaml`.
+ * - Si se envía una ruta relativa, el backend la resolverá contra la raíz del repositorio.
+ */
 export function launchRbmSearch(configPath?: string) {
-  const body = configPath ? { config: configPath } : {};
+  const body = { config: configPath?.trim() || null };
   return api.post<RbmSearchJob>("/jobs/training/rbm-search", body).then((r) => r.data);
 }
 
