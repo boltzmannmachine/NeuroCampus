@@ -9,7 +9,6 @@ import {
 } from "recharts";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
 import { Progress } from "./ui/progress";
@@ -74,7 +73,6 @@ export function DataTab() {
   // UI local state (mantiene la dinámica del prototipo)
   const [isProcessing, setIsProcessing] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [applyPreprocessing, setApplyPreprocessing] = useState(true);
   const [runSentiment, setRunSentiment] = useState(true);
 
   // Flags del pipeline "Datos" (sin cambiar UI/estilos)
@@ -82,7 +80,6 @@ export function DataTab() {
   const [emptyAsNoText, setEmptyAsNoText] = useState(true);
   const [forcePreprocessing, setForcePreprocessing] = useState(false);
 
-  const [datasetName, setDatasetName] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -395,16 +392,6 @@ export function DataTab() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Nombre del Dataset</label>
-                <Input
-                  placeholder="e.g., Evaluations_2025_1"
-                  className="bg-[#0f1419] border-gray-700"
-                  value={datasetName}
-                  onChange={(e) => setDatasetName(e.target.value)}
-                />
-              </div>
-
-              <div>
                 <label className="block text-sm text-gray-400 mb-2">Semestre</label>
                 <Select value={activePeriodo} onValueChange={handlePeriodoChange}>
                   <SelectTrigger className="bg-[#0f1419] border-gray-700">
@@ -421,15 +408,14 @@ export function DataTab() {
                 </Select>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={applyPreprocessing}
-                    onCheckedChange={(checked) => setApplyPreprocessing(checked as boolean)}
-                  />
-                  <label className="text-sm text-gray-400">Aplica pre-procesamiento</label>
-                </div>
+              <div className="rounded-lg border border-blue-900/40 bg-blue-950/20 p-3">
+                <p className="text-sm text-blue-100">
+                  El identificador operativo del dataset se define con el semestre seleccionado.
+                  Para este flujo, el backend usa ese valor como <code className="text-blue-200">dataset_id</code>.
+                </p>
+              </div>
 
+              <div className="space-y-3">
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     checked={runSentiment}
