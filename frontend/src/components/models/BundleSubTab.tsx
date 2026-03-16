@@ -20,6 +20,7 @@ import {
   type RunRecord,
 } from './mockData';
 import { BundleStatusBadge } from './SharedBadges';
+import { Badge } from '../ui/badge';
 
 interface BundleSubTabProps {
   family: Family;
@@ -39,6 +40,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
   // reemplaza el bundle resuelto por mocks manteniendo la UI 1:1.
   const [remoteRun, setRemoteRun] = useState<RunRecord | null>(null);
   const [remoteArtifacts, setRemoteArtifacts] = useState<Record<string, object | null> | null>(null);
+  const [bundleSource, setBundleSource] = useState<'api' | 'mock' | null>(null);
 
   // Si cambia el contexto (family/dataset), invalidamos el bundle resuelto.
   useEffect(() => {
@@ -46,6 +48,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
     setResolveError(null);
     setRemoteRun(null);
     setRemoteArtifacts(null);
+    setBundleSource(null);
   }, [family, datasetId]);
 
   const champKey = `${family}__${datasetId}`;
@@ -72,6 +75,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
     setResolveError(null);
     setRemoteRun(null);
     setRemoteArtifacts(null);
+    setBundleSource(null);
 
     // Resolver el dataset en un solo punto evita divergencias entre tabs
     // cuando el selector trabaja con IDs legacy o con el histórico canónico.
@@ -95,6 +99,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
           preprocess: bundle.artifacts.preprocess ?? null,
         } : null);
         setResolved(true);
+        setBundleSource('api');
         return;
       }
 
@@ -112,6 +117,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
       }
       setRemoteRun({ ...run, dataset_id: datasetId });
       setResolved(true);
+      setBundleSource('api');
       return;
     } catch {
       // Fallback a mocks
@@ -127,6 +133,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
         return;
       }
       setResolved(true);
+      setBundleSource('mock');
     } else {
       const run = MOCK_RUNS.find(r => r.run_id === resolveRunId);
       if (!run) {
@@ -138,6 +145,7 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
         setResolveError('422: Bundle incompleto — falta artefactos para inferencia completa.');
       }
       setResolved(true);
+      setBundleSource('mock');
     }
   };
 
@@ -194,7 +202,14 @@ export function BundleSubTab({ family, datasetId }: BundleSubTabProps) {
     <div className="space-y-6">
       {/* Resolver */}
       <Card className="bg-[#1a1f2e] border-gray-800 p-5">
-        <h4 className="text-white mb-3">Seleccionar Bundle</h4>
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <h4 className="text-white">Seleccionar Bundle</h4>
+          {bundleSource && (
+            <Badge className={`text-xs ${bundleSource === 'api' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-yellow-500/20 text-yellow-300 border-yellow-500/40'}`}>
+              {bundleSource === 'api' ? 'Bundle real' : 'Bundle prototipo'}
+            </Badge>
+          )}
+        </div>
         <div className="flex items-end gap-3">
           <div>
             <label className="block text-xs text-gray-400 mb-1">Fuente</label>
