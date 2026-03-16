@@ -49,6 +49,7 @@ export function SummarySubTab({ family, datasetId, onNavigateToRun, onUsePredict
       .filter(r => r.family === family && r.dataset_id === datasetId && r.status === 'completed')
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   );
+  const [summarySource, setSummarySource] = useState<'api' | 'mock' | 'mixed'>('mock');
 
   const lastRun: RunRecord | undefined = familyRuns[0];
 
@@ -62,6 +63,9 @@ export function SummarySubTab({ family, datasetId, onNavigateToRun, onUsePredict
     let cancelled = false;
 
     async function load() {
+      let championLoadedFromApi = false;
+      let runsLoadedFromApi = false;
+
       try {
         const champResp = await modelosApi.getChampionUI({
           datasetId: backendDatasetId,
@@ -77,6 +81,7 @@ export function SummarySubTab({ family, datasetId, onNavigateToRun, onUsePredict
           const champRunDetails = await modelosApi.getRunDetailsUI(champRecord.run_id);
           const runUI: RunRecord = { ...champRunDetails, dataset_id: datasetId };
           setChampRun(runUI);
+          championLoadedFromApi = true;
         }
       } catch {
         // Backend incompleto/offline: conservar mocks.
@@ -96,9 +101,16 @@ export function SummarySubTab({ family, datasetId, onNavigateToRun, onUsePredict
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
           setFamilyRuns(completed);
+          runsLoadedFromApi = true;
         }
       } catch {
         // Backend incompleto/offline: conservar mocks.
+      }
+
+      if (!cancelled) {
+        if (championLoadedFromApi && runsLoadedFromApi) setSummarySource('api');
+        else if (championLoadedFromApi || runsLoadedFromApi) setSummarySource('mixed');
+        else setSummarySource('mock');
       }
     }
 
@@ -110,6 +122,21 @@ export function SummarySubTab({ family, datasetId, onNavigateToRun, onUsePredict
 
   return (
     <div className="space-y-6">
+      {summarySource !== 'api' && (
+        <Card className="border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-200">
+          <div className="flex items-center justify-between gap-3">
+            <p>
+              {summarySource === 'mixed'
+                ? 'Parte del resumen proviene del backend y parte sigue en modo prototipo por falta de respuesta completa.'
+                : 'El resumen se está mostrando en modo prototipo porque el backend todavía no respondió para este contexto.'}
+            </p>
+            <Badge className="border-yellow-500/40 bg-yellow-500/20 text-yellow-200 text-xs">
+              {summarySource === 'mixed' ? 'Fuente mixta' : 'Fuente prototipo'}
+            </Badge>
+          </div>
+        </Card>
+      )}
+
       {/* Main cards row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Champion Card */}
