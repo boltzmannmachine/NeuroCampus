@@ -447,7 +447,21 @@ def _build_pair_matrix(
     pair["n_par"] = pd.to_numeric(pair["n_par"], errors="coerce").fillna(0).astype(int)
     pair["n_docente"] = pd.to_numeric(pair.get("n_docente"), errors="coerce").fillna(0).astype(int)
     pair["n_materia"] = pd.to_numeric(pair.get("n_materia"), errors="coerce").fillna(0).astype(int)
-    pair["periodo"] = pair["periodo"].fillna(str(dataset_id)).astype(str).str.strip()
+
+    # Compatibilidad defensiva:
+    # - Si el input es multiperiodo, ``periodo`` queda en la clave del groupby.
+    # - Si el input trae un solo periodo (o no lo trae), el groupby clásico por
+    #   teacher-materia NO conserva esa columna.
+    #
+    # A partir de Ruta 2 varios consumers asumen que ``pair_matrix`` siempre
+    # expone ``periodo``. En esos casos debemos reinyectarlo con un valor
+    # estable para evitar KeyError y para mantener un contrato homogéneo entre
+    # datasets simples, datasets mínimos de test e históricos multiperiodo.
+    if "periodo" in pair.columns:
+        pair["periodo"] = pair["periodo"].fillna(str(dataset_id)).astype(str).str.strip()
+        pair["periodo"] = pair["periodo"].mask(pair["periodo"].eq(""), str(dataset_id))
+    else:
+        pair["periodo"] = str(dataset_id)
 
     meta: Dict[str, Any] = {
         "dataset_id": str(dataset_id),
