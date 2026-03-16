@@ -27,7 +27,14 @@ export function useFeaturesPrepareJob(jobId: string | null, opts?: { intervalMs?
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!jobId) return;
+    // Si no hay job activo, limpiamos el estado para evitar mostrar
+    // información obsoleta al cambiar de dataset o reiniciar el flujo.
+    if (!jobId) {
+      setJob(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
 
     const id = jobId; // <- Narrowing explícito para TypeScript
 
