@@ -910,6 +910,16 @@ def list_features_prepare_jobs(limit: int = 20) -> list[FeaturesPrepareJob]:
     jobs = _list_features_jobs(limit=limit)
     return [FeaturesPrepareJob(**j) for j in jobs]
 
+class RbmSearchRequest(BaseModel):
+    """Parámetros para lanzar la búsqueda de hiperparámetros de RBM.
+
+    - config: ruta opcional al archivo YAML de configuración.
+      Si no se envía, se usa `config/rbm_search.yaml`.
+    """
+
+    config: Optional[str] = None
+
+
 class RbmSearchJob(BaseModel):
     id: str
     status: JobStatus
@@ -983,12 +993,23 @@ def _run_rbm_search_job(job_id: str) -> None:
     response_model=RbmSearchJob,
     summary="Lanza un job de búsqueda de hiperparámetros para RBM",
 )
-def launch_rbm_search(background: BackgroundTasks, config: str | None = None) -> RbmSearchJob:
+def launch_rbm_search(req: RbmSearchRequest, background: BackgroundTasks) -> RbmSearchJob:
+    """Lanza un job de búsqueda RBM usando una configuración YAML.
+
+    Comportamiento:
+    - Si `req.config` viene vacío o no se envía, usa `config/rbm_search.yaml`.
+    - Si `req.config` es relativo, se resuelve contra la raíz del repositorio.
+    - Si `req.config` es absoluto, se usa tal cual.
     """
-    Si no se pasa config, usa config/rbm_search.yaml por defecto.
-    """
-    base_dir = BASE_DIR  # ya definido arriba
-    config_path = Path(config) if config else (base_dir / "configs" / "rbm_search.yaml")
+    config_ref = str(req.config or "").strip()
+
+    if config_ref:
+        config_path = Path(config_ref)
+        if not config_path.is_absolute():
+            config_path = (BASE_DIR / config_path).resolve()
+    else:
+        config_path = (BASE_DIR / "config" / "rbm_search.yaml").resolve()
+
     if not config_path.exists():
         raise HTTPException(status_code=400, detail=f"No existe config en {config_path}")
 
