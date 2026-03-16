@@ -82,8 +82,8 @@ export function TrainingSubTab({
    * 3) Revalidar readiness antes de marcar el estado como listo.
    *
    * Compatibilidad:
-   * - Si el backend no expone todavía el endpoint o falla la llamada, mantenemos el
-   *   fallback visual del prototipo para no bloquear la exploración de la UI.
+   * - Si el backend falla o todavía no expone el endpoint, la UI debe reflejar
+   *   el error real y no simular un resultado exitoso.
    */
   const handlePrepareFeaturePack = async () => {
     isCancelledRef.current = false;
@@ -118,15 +118,12 @@ export function TrainingSubTab({
         setTrainingError('El backend respondió, pero el feature-pack aún no aparece como disponible.');
       }
       return;
-    } catch {
-      setTrainingNotice('No se pudo validar el feature-pack real en backend; se conserva el comportamiento simulado del prototipo.');
-      // Ignorar: caemos al fallback del prototipo.
+    } catch (error) {
+      if (isCancelledRef.current) return;
+      setFeaturePackStatus('idle');
+      const msg = error instanceof Error ? error.message : 'Error desconocido al preparar el feature-pack.';
+      setTrainingError(`No se pudo preparar el feature-pack en backend. ${msg}`);
     }
-
-    // Fallback 1:1 (prototipo)
-    setTimeout(() => {
-      if (!isCancelledRef.current) setFeaturePackStatus('ready');
-    }, 2000);
   };
 
 
@@ -318,101 +315,13 @@ export function TrainingSubTab({
       setTrainingStatus('completed');
       onTrainingComplete(finalRun);
       return;
-    } catch {
-      setTrainingNotice('No se pudo completar el entrenamiento real en backend; se muestra un resultado simulado para preservar la UI operativa.');
-      // Si backend está incompleto/offline, mantenemos exactamente el flujo del prototipo.
-    }
-
-    // ---------------------------------------------------------------------
-    // Fallback (mocks) — exactamente como el prototipo (con guards de cancelación).
-    // ---------------------------------------------------------------------
-    // Validate hparams JSON
-    try {
-      JSON.parse(hparamsJson);
-      setHparamsError(null);
-    } catch {
-      setHparamsError('JSON inválido en hparams_overrides');
-      return;
-    }
-
-    if (!warmStartValid) {
-      setTrainingError('Warm start por Run ID requiere un run_id válido.');
-      return;
-    }
-
-    setTrainingError(null);
-    setTrainingStatus('queued');
-    setTrainingProgress(0);
-
-    setTimeout(() => {
+    } catch (error) {
       if (isCancelledRef.current) return;
-      setTrainingStatus('running');
-      let prog = 0;
-      const interval = setInterval(() => {
-        prog += Math.random() * 15 + 5;
-        if (prog >= 100) {
-          prog = 100;
-          clearInterval(interval);
-          // Build mock result
-          const isCls = family === 'sentiment_desempeno';
-          const pmv = isCls ? 0.84 + Math.random() * 0.05 : 0.15 + Math.random() * 0.05;
-          const runId = `run_${Date.now().toString(36)}`;
-
-          const newRun: RunRecord = {
-            run_id: runId,
-            dataset_id: datasetId,
-            family,
-            model_name: modelo,
-            task_type: fc.taskType,
-            input_level: fc.inputLevel,
-            data_source: fc.dataSource,
-            target_col: isCls ? 'sentiment_label' : 'score_final',
-            primary_metric: fc.primaryMetric,
-            metric_mode: fc.metricMode,
-            primary_metric_value: +pmv.toFixed(4),
-            metrics: isCls
-              ? { val_f1_macro: +pmv.toFixed(4), val_accuracy: +(pmv + 0.02).toFixed(4) }
-              : { val_rmse: +pmv.toFixed(4), val_mae: +(pmv * 0.85).toFixed(4), val_r2: +(0.80 + Math.random() * 0.15).toFixed(4) },
-            status: 'completed',
-            bundle_version: '2.1.0',
-            bundle_status: 'complete',
-            bundle_checklist: {
-              'predictor.json': true,
-              'metrics.json': true,
-              'job_meta.json': true,
-              'preprocess.json': true,
-              'model/': true,
-            },
-            warm_started: warmStart,
-            warm_start_from: warmStart ? warmStartFrom : 'none',
-            warm_start_source_run_id: warmStart && warmStartFrom === 'run_id' ? warmStartRunId : null,
-            warm_start_path: warmStart ? `artifacts/runs/${warmStartRunId || 'champion'}/model/` : null,
-            warm_start_result: warmStart ? 'ok' : null,
-            n_feat_total: 52,
-            n_feat_text: 7,
-            text_feat_cols: ['tfidf_claridad', 'tfidf_metodologia', 'tfidf_evaluacion', 'tfidf_apoyo', 'tfidf_recursos', 'tfidf_dinamico', 'tfidf_innovador'],
-            epochs_data: Array.from({ length: epochs }, (_, i) => ({
-              epoch: i + 1,
-              train_loss: +(0.7 - 0.5 * ((i + 1) / epochs)).toFixed(4),
-              val_loss: +(0.75 - 0.45 * ((i + 1) / epochs)).toFixed(4),
-              train_metric: +(0.55 + 0.35 * ((i + 1) / epochs)).toFixed(4),
-              val_metric: +(0.50 + 0.33 * ((i + 1) / epochs) + Math.random() * 0.02).toFixed(4),
-            })),
-            created_at: new Date().toISOString(),
-            duration_seconds: Math.floor(100 + Math.random() * 200),
-            seed,
-            epochs,
-            confusion_matrix: isCls ? [[148, 19], [15, 138]] : undefined,
-          };
-
-          if (isCancelledRef.current) return;
-          setTrainedRun(newRun);
-          setTrainingStatus('completed');
-          onTrainingComplete(newRun);
-        }
-        if (!isCancelledRef.current) setTrainingProgress(Math.min(prog, 100));
-      }, 300);
-    }, 800);
+      const msg = error instanceof Error ? error.message : 'Error desconocido durante el entrenamiento.';
+      setTrainingStatus('failed');
+      setTrainingProgress(0);
+      setTrainingError(`No se pudo completar el entrenamiento real en backend. ${msg}`);
+    }
   };
 
 
