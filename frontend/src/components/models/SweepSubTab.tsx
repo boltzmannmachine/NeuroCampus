@@ -16,7 +16,7 @@ import { motion } from 'motion/react';
 import { modelosApi } from '@/features/modelos/api';
 import { normalizeDatasetIdForBackend } from '@/features/modelos/utils/datasetId';
 import {
-  generateMockSweep, MODEL_STRATEGIES, FAMILY_CONFIGS,
+  MODEL_STRATEGIES, FAMILY_CONFIGS,
   type Family, type SweepResult, type RunRecord, type WarmStartFrom,
 } from './mockData';
 import {
@@ -49,7 +49,7 @@ export function SweepSubTab({
   });
 
   // Status
-  const [sweepStatus, setSweepStatus] = useState<'idle' | 'running' | 'completed'>('idle');
+  const [sweepStatus, setSweepStatus] = useState<'idle' | 'running' | 'completed' | 'failed'>('idle');
   const [sweepProgress, setSweepProgress] = useState(0);
   const [sweepResult, setSweepResult] = useState<SweepResult | null>(null);
   const [showComparator, setShowComparator] = useState(false);
@@ -59,11 +59,11 @@ export function SweepSubTab({
    * Ejecuta el sweep.
    *
    * Estrategia:
-   * 1) Intentar ejecutar sweep real vía `modelosApi` (backend).
-   * 2) Si el backend no está listo, usar `generateMockSweep` (prototipo).
+   * 1) Intentar ejecutar el sweep real vía `modelosApi` (backend).
+   * 2) Si el backend falla, reflejar el error real y evitar resultados simulados.
    *
    * Nota:
-   * - Se mantiene el progress bar del prototipo para paridad visual.
+   * - Se mantiene el progress bar durante el job real para conservar feedback visual.
    * - `datasetId` en UI usa IDs tipo "ds_2025_1"; se mapea a periodo backend
    *   usando `DATASETS[].period` (ej. "2025-1") cuando exista.
    */
@@ -154,18 +154,12 @@ export function SweepSubTab({
       return;
     } catch (err) {
       console.error('SweepSubTab.handleRunSweep', err);
-      setSweepMessage('No se pudo completar el sweep real en backend; se muestran resultados simulados para conservar la UI operativa.');
-      // Fallback a mocks: exactamente como prototipo (no bloquea UI).
+      const msg = err instanceof Error ? err.message : 'Error desconocido durante el sweep.';
+      setSweepStatus('failed');
+      setSweepProgress(0);
+      setSweepResult(null);
+      setSweepMessage(`No se pudo completar el sweep real en backend. ${msg}`);
     }
-
-    // ---------------------------------------------------------------------
-    // Fallback (mocks) — exactamente como el prototipo.
-    // ---------------------------------------------------------------------
-    const mockResult = generateMockSweep(family, datasetId);
-    setSweepProgress(100);
-    setSweepResult(mockResult);
-    setSweepStatus('completed');
-    onSweepComplete(mockResult.candidates);
   };
 
   const winner = sweepResult?.candidates.find(c => c.run_id === sweepResult.winner_run_id);
@@ -273,7 +267,13 @@ export function SweepSubTab({
         )}
 
         {sweepMessage && (
-          <div className="mt-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+          <div
+            className={`mt-3 rounded-md px-3 py-2 text-xs ${
+              sweepStatus === 'failed'
+                ? 'border border-red-500/30 bg-red-500/10 text-red-300'
+                : 'border border-amber-500/30 bg-amber-500/10 text-amber-300'
+            }`}
+          >
             {sweepMessage}
           </div>
         )}
