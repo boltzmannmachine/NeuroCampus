@@ -1,3 +1,8 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia técnica de una etapa anterior del proyecto, centrada en auditoría y resultados experimentales de RBM.
+> No debe usarse como fuente principal de documentación del sistema actual.
+>
+> ---
 # Día 10 · Paso 6.4 — Informe de Auditoría RBM (K-Fold)
 
 **Fecha de generación:** 2025-11-04 18:03
