@@ -1,3 +1,13 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia de etapas anteriores del proyecto y puede no reflejar la arquitectura actual del software.
+>
+> **Documentación activa relacionada:**
+> - `docs/source/arquitectura/vision_general.md`
+> - `docs/source/arquitectura/frontend.md`
+> - `docs/source/arquitectura/backend.md`
+> - `docs/source/arquitectura/pipeline_modelos.md`
+>
+> ---
 # Apéndice A — Arquitectura (Día 2, referencia histórica)
 
 # Arquitectura — NeuroCampus (Día 2)
