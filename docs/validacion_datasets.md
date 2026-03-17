@@ -1,3 +1,12 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia de una etapa anterior del flujo de validación e ingesta de datasets y puede no reflejar el comportamiento actual del sistema.
+>
+> **Documentación activa relacionada:**
+> - `docs/source/api_backend/datos.md`
+> - `docs/Preprocesamiento.md`
+> - `docs/frontend_api_contracts.md`
+>
+> ---
 # Validación e Ingesta de Datasets — Diagnóstico (Día 6)
 
 ## Objetivo general
