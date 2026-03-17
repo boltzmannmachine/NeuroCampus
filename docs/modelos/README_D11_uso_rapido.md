@@ -1,3 +1,8 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia técnica de una etapa anterior del proyecto, centrada en entrenamiento y auditoría RBM del Día 11.
+> No debe usarse como fuente principal de documentación del sistema actual.
+>
+> ---
 
 # README — Uso rápido modelos RBM (Día 11)
 
