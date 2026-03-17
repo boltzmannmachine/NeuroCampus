@@ -1,3 +1,7 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como ejemplo de una etapa anterior del flujo de validación y no debe usarse como fuente principal de documentación del sistema actual.
+>
+> ---
 # Ejemplo de reporte de validación (Día 3)
 Resumen + top de issues reales capturados en pruebas locales.
 > Útil para Miembro B (UI) y para revisión rápida.
