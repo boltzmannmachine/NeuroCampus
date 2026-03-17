@@ -1,3 +1,10 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia de una etapa anterior del proyecto y puede no reflejar el flujo actual de limpieza y administración.
+>
+> **Documentación activa relacionada:**
+> - `docs/source/api_backend/admin.md`
+>
+> ---
 # Limpieza de artefactos y temporales (Días 1–4)
 
 ## Comandos
