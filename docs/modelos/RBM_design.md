@@ -1,3 +1,8 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia técnica de una etapa anterior del proyecto, centrada en variantes RBM y auditorías experimentales.
+> No debe usarse como fuente principal de documentación del sistema actual.
+>
+> ---
 
 # Día 11 · Documentación de Modelos RBM — NeuroCampus
 
