@@ -1,3 +1,17 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia de una etapa anterior del proyecto y puede no reflejar el comportamiento actual del software.
+>
+> **Documentación activa relacionada:**
+> - `docs/source/api_backend/index.md`
+> - `docs/source/api_backend/datos.md`
+> - `docs/source/api_backend/jobs.md`
+> - `docs/source/api_backend/admin.md`
+> - `docs/source/api_backend/dashboard.md`
+> - `docs/source/api_backend/prediccion.md`
+> - `docs/source/api_backend/predicciones.md`
+> - `docs/source/api_backend/modelos.md`
+>
+> ---
 ### v0.3.0 (resumen histórico)
 - `POST /datos/validar` (multipart) y mejoras de lectura/normalización/coerción de tipos.
 - Documentación de equivalencias de encabezados y JSON Schema.
