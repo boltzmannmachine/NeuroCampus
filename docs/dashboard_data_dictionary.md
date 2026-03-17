@@ -1,3 +1,11 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia técnica de una etapa anterior del proyecto y puede no reflejar la documentación principal vigente del Dashboard.
+>
+> **Documentación activa relacionada:**
+> - `docs/source/api_backend/dashboard.md`
+> - `docs/source/manual/dashboard.md`
+>
+> ---
 # Dashboard — Diccionario de datos (histórico)
 
 Este documento describe las columnas y métricas principales usadas por la pestaña **Dashboard** en NeuroCampus.
