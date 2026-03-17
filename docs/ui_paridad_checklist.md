@@ -1,3 +1,8 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia de una etapa anterior de validación visual del frontend.
+> No debe usarse como fuente principal de documentación del sistema actual.
+>
+> ---
 # Checklist de Paridad Visual 1:1
 
 Antes de marcar cualquier fase como "Done", asegúrate de que todos los componentes y rutas cumplen con las especificaciones visuales del prototipo.
