@@ -1,3 +1,11 @@
+> **Estado:** Legacy / histórico.
+> Este documento se conserva como referencia de una etapa anterior del proyecto y puede no reflejar la documentación principal vigente del Dashboard.
+>
+> **Documentación activa relacionada:**
+> - `docs/source/api_backend/dashboard.md`
+> - `docs/source/manual/dashboard.md`
+>
+> ---
 # Dashboard API (histórico-only)
 
 > **Propósito:** Documentar el contrato HTTP del Dashboard de NeuroCampus.  
