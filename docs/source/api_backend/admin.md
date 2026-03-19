@@ -79,7 +79,7 @@ el impacto potencial de una limpieza antes de ejecutarla.
 
 ### Ejemplo conceptual
 
-```http
+```text
 GET /admin/cleanup/inventory?retention_days=120&keep_last=5
 Authorization: Bearer dev-admin-token
 ```

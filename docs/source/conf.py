@@ -12,6 +12,7 @@ import sys
 # --- Paths para encontrar el backend (paquete neurocampus) ---
 ROOT_DIR = os.path.abspath(os.path.join(__file__, "..", "..", ".."))
 BACKEND_SRC = os.path.join(ROOT_DIR, "backend", "src")
+DOCS_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BACKEND_SRC)
 
 project = 'NeuroCampus'
@@ -23,13 +24,7 @@ language = 'es'
 # --- Extensiones de Sphinx ---
 extensions = [
     "myst_parser",           # Markdown con MyST
-    "sphinx.ext.autodoc",    # API Python
-    "sphinx.ext.autosummary",
-    "sphinx.ext.napoleon",   # docstrings estilo Google/NumPy
-    "sphinx.ext.viewcode",
 ]
-
-autosummary_generate = True
 
 # Configuración MyST (para poder usar toctree en .md)
 myst_enable_extensions = [
@@ -42,4 +37,9 @@ html_theme = "sphinx_rtd_theme"
 
 templates_path = ["_templates"]
 exclude_patterns = []
+if not os.path.isdir(os.path.join(DOCS_DIR, "_templates")):
+    templates_path = []
+
 html_static_path = ["_static"]
+if not os.path.isdir(os.path.join(DOCS_DIR, "_static")):
+    html_static_path = []
