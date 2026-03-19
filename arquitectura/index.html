@@ -21,7 +21,7 @@
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
     <link rel="next" title="Visión general de la arquitectura" href="vision_general.html" />
-    <link rel="prev" title="Pestaña «Dashboard»" href="../manual/dashboard.html" /> 
+    <link rel="prev" title="Pestaña «Predicciones»" href="../manual/predicciones.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,7 +50,7 @@
 <li class="toctree-l2"><a class="reference internal" href="vision_general.html">Visión general de la arquitectura</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backend.html">Arquitectura del backend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="frontend.html">Arquitectura del frontend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html">Pipeline de modelos (BM, RBM, DBM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html">Pipeline de modelos</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
@@ -89,27 +89,96 @@
 backend, frontend y el pipeline de modelos de Máquinas de Boltzmann.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="vision_general.html">Visión general de la arquitectura</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vision_general.html">Visión general de la arquitectura</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#proposito">Propósito</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#vista-global-del-sistema">Vista global del sistema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#frontend">Frontend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#backend-api">Backend API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#flujo-funcional-del-sistema">Flujo funcional del sistema</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#datos">1. Datos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#modelos">2. Modelos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#predicciones">3. Predicciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#dashboard">4. Dashboard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#capa-de-datos">Capa de datos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#capa-de-modelos">Capa de modelos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#jobs-y-procesos-batch">Jobs y procesos batch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#observabilidad-y-logging">Observabilidad y logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#persistencia-y-artefactos">Persistencia y artefactos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#tests-y-calidad">Tests y calidad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#documentacion-y-publicacion">Documentación y publicación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#material-legacy">Material legacy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#principios-arquitectonicos-observables-en-la-version-actual">Principios arquitectónicos observables en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vision_general.html#resumen">Resumen</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="backend.html">Arquitectura del backend</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="backend.html#estructura-de-directorios">Estructura de directorios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#vision-general">Visión general</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#ubicacion-en-el-repositorio">Ubicación en el repositorio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#punto-de-entrada-app-main-py">Punto de entrada: <code class="docutils literal notranslate"><span class="pre">app/main.py</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#routers-registrados">Routers registrados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#router-datos">Router <code class="docutils literal notranslate"><span class="pre">datos</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#router-jobs">Router <code class="docutils literal notranslate"><span class="pre">jobs</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#router-modelos">Router <code class="docutils literal notranslate"><span class="pre">modelos</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#router-prediccion">Router <code class="docutils literal notranslate"><span class="pre">prediccion</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#router-predicciones">Router <code class="docutils literal notranslate"><span class="pre">predicciones</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#router-dashboard">Router <code class="docutils literal notranslate"><span class="pre">dashboard</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#router-admin-cleanup">Router <code class="docutils literal notranslate"><span class="pre">admin_cleanup</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#esquemas-pydantic">Esquemas Pydantic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#jobs-ejecutables-y-comandos">Jobs ejecutables y comandos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#capas-de-dominio-del-backend">Capas de dominio del backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#relacion-con-el-frontend">Relación con el frontend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#persistencia-y-artefactos">Persistencia y artefactos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#fortalezas-de-la-arquitectura-actual">Fortalezas de la arquitectura actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#limitaciones-o-rasgos-a-tener-en-cuenta">Limitaciones o rasgos a tener en cuenta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html#resumen-arquitectonico">Resumen arquitectónico</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="frontend.html">Arquitectura del frontend</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="frontend.html#estructura-de-directorios">Estructura de directorios</a></li>
-<li class="toctree-l2"><a class="reference internal" href="frontend.html#paginas-principales">Páginas principales</a></li>
-<li class="toctree-l2"><a class="reference internal" href="frontend.html#componentes-reutilizables">Componentes reutilizables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="frontend.html#servicios-de-acceso-a-la-api">Servicios de acceso a la API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="frontend.html#estilos-y-graficos">Estilos y gráficos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#vision-general">Visión general</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#stack-y-herramientas">Stack y herramientas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#estructura-actual-de-directorios">Estructura actual de directorios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#entrada-de-la-aplicacion">1. Entrada de la aplicación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#ruteo-y-navegacion">2. Ruteo y navegación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#layout-compartido">3. Layout compartido</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#sidebar">4. Sidebar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#capa-de-paginas">5. Capa de páginas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#componentes-funcionales-principales">6. Componentes funcionales principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#dashboardtab-tsx">6.1 <code class="docutils literal notranslate"><span class="pre">DashboardTab.tsx</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#datatab-tsx">6.2 <code class="docutils literal notranslate"><span class="pre">DataTab.tsx</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#modelstab-tsx">6.3 <code class="docutils literal notranslate"><span class="pre">ModelsTab.tsx</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#predictionstab-tsx">6.4 <code class="docutils literal notranslate"><span class="pre">PredictionsTab.tsx</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#componentes-auxiliares-especializados">6.5 Componentes auxiliares especializados</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#estado-compartido-entre-pestanas">7. Estado compartido entre pestañas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#capa-de-servicios">8. Capa de servicios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#cliente-base">8.1 Cliente base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#src-services-api-ts">8.2 <code class="docutils literal notranslate"><span class="pre">src/services/api.ts</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#src-services-endpoints-ts">8.3 <code class="docutils literal notranslate"><span class="pre">src/services/endpoints.ts</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#servicios-por-dominio">8.4 Servicios por dominio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#tipos-de-dominio">9. Tipos de dominio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#estilos">10. Estilos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#estrategia-de-pruebas">11. Estrategia de pruebas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#flujo-arquitectonico-general">12. Flujo arquitectónico general</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#decisiones-arquitectonicas-visibles-en-la-version-actual">13. Decisiones arquitectónicas visibles en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend.html#alcance-real-de-la-arquitectura-frontend-actual">14. Alcance real de la arquitectura frontend actual</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="pipeline_modelos.html">Pipeline de modelos (BM, RBM, DBM)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#vision-general-del-pipeline">Visión general del pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#ingesta-y-validacion">1. Ingesta y validación</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#preprocesamiento-y-enriquecimiento-incluyendo-beto">2. Preprocesamiento y enriquecimiento (incluyendo BETO)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#entrenamiento-de-modelos-bm-rbm-dbm">3. Entrenamiento de modelos BM/RBM/DBM</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#evaluacion-y-seleccion-del-modelo-campeon">4. Evaluación y selección del modelo campeón</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#prediccion-y-scoring">5. Predicción y scoring</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#integracion-con-predicciones-y-dashboard">6. Integración con Predicciones y Dashboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline_modelos.html">Pipeline de modelos</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#objetivo">Objetivo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#vista-general">Vista general</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#entrada-al-pipeline-datos-listos-para-modelado">1. Entrada al pipeline: datos listos para modelado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#contexto-de-trabajo-del-pipeline">2. Contexto de trabajo del pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#preparacion-del-feature-pack">3. Preparación del feature-pack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#entrenamiento-de-runs-individuales">4. Entrenamiento de runs individuales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#warm-start-y-reutilizacion-de-estado-previo">5. Warm start y reutilización de estado previo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#sweep-de-candidatos">6. Sweep de candidatos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#registro-y-consulta-de-runs">7. Registro y consulta de runs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#seleccion-y-promocion-del-champion">8. Selección y promoción del champion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#bundle-y-artefactos-del-pipeline">9. Bundle y artefactos del pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#diagnostico-del-estado-del-pipeline">10. Diagnóstico del estado del pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#integracion-con-predicciones">11. Integración con Predicciones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#integracion-con-dashboard">12. Integración con Dashboard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#lectura-correcta-del-pipeline-en-la-version-actual">13. Lectura correcta del pipeline en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html#resumen">Resumen</a></li>
 </ul>
 </li>
 </ul>
@@ -120,7 +189,7 @@ backend, frontend y el pipeline de modelos de Máquinas de Boltzmann.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
-        <a href="../manual/dashboard.html" class="btn btn-neutral float-left" title="Pestaña «Dashboard»" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="../manual/predicciones.html" class="btn btn-neutral float-left" title="Pestaña «Predicciones»" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
         <a href="vision_general.html" class="btn btn-neutral float-right" title="Visión general de la arquitectura" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

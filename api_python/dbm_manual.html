@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Modelos BM / RBM / DBM &mdash; documentación de NeuroCampus - 0.1.0</title>
+  <title>neurocampus.models.dbm_manual &mdash; documentación de NeuroCampus - 0.1.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
@@ -20,8 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="neurocampus.models.bm_manual" href="bm_manual.html" />
-    <link rel="prev" title="API Python (backend)" href="index.html" /> 
+    <link rel="next" title="neurocampus.models.hparam_search" href="hparam_search.html" />
+    <link rel="prev" title="neurocampus.models.rbm_manual" href="rbm_manual.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,10 +50,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../api_backend/index.html">API del backend</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Python (backend)</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Modelos BM / RBM / DBM</a><ul>
+<li class="toctree-l2 current"><a class="reference internal" href="modelos.html">Modelos BM / RBM / DBM</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="bm_manual.html"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.bm_manual</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="rbm_manual.html"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.rbm_manual</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dbm_manual.html"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.dbm_manual</span></code></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.dbm_manual</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elemento-principal">Elemento principal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#uso-esperado">Uso esperado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#relacion-con-otras-secciones">Relación con otras secciones</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="hparam_search.html"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.hparam_search</span></code></a></li>
 </ul>
 </li>
@@ -78,9 +83,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">API Python (backend)</a></li>
-      <li class="breadcrumb-item active">Modelos BM / RBM / DBM</li>
+          <li class="breadcrumb-item"><a href="modelos.html">Modelos BM / RBM / DBM</a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.dbm_manual</span></code></li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api_python/modelos.rst.txt" rel="nofollow"> Ver código fuente de la página</a>
+            <a href="../_sources/api_python/dbm_manual.md.txt" rel="nofollow"> Ver código fuente de la página</a>
       </li>
   </ul>
   <hr/>
@@ -88,24 +94,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="modelos-bm-rbm-dbm">
-<h1>Modelos BM / RBM / DBM<a class="headerlink" href="#modelos-bm-rbm-dbm" title="Link to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="bm_manual.html"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.bm_manual</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="rbm_manual.html"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.rbm_manual</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="dbm_manual.html"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.dbm_manual</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="hparam_search.html"><code class="docutils literal notranslate"><span class="pre">neurocampus.models.hparam_search</span></code></a></li>
+  <section id="neurocampus-models-dbm-manual">
+<h1><code class="docutils literal notranslate"><span class="pre">neurocampus.models.dbm_manual</span></code><a class="headerlink" href="#neurocampus-models-dbm-manual" title="Link to this heading"></a></h1>
+<p>Módulo dedicado a la implementación manual de Deep Boltzmann Machines para
+experimentos y pruebas dentro del proyecto.</p>
+<section id="elemento-principal">
+<h2>Elemento principal<a class="headerlink" href="#elemento-principal" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DBMManual</span></code>: implementación de referencia para entrenamientos DBM manuales.</p></li>
 </ul>
-</div>
+</section>
+<section id="uso-esperado">
+<h2>Uso esperado<a class="headerlink" href="#uso-esperado" title="Link to this heading"></a></h2>
+<p>Se emplea desde jobs de entrenamiento y desde flujos de experimentación donde
+se necesita controlar directamente la configuración del modelo.</p>
+</section>
+<section id="relacion-con-otras-secciones">
+<h2>Relación con otras secciones<a class="headerlink" href="#relacion-con-otras-secciones" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>La justificación teórica se describe en <a class="reference internal" href="../teoria/deep_bm.html"><span class="doc std std-doc">Deep BM</span></a>.</p></li>
+<li><p>La integración del pipeline se resume en <a class="reference internal" href="../arquitectura/pipeline_modelos.html"><span class="doc std std-doc">Pipeline de modelos</span></a>.</p></li>
+</ul>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
-        <a href="index.html" class="btn btn-neutral float-left" title="API Python (backend)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
-        <a href="bm_manual.html" class="btn btn-neutral float-right" title="neurocampus.models.bm_manual" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rbm_manual.html" class="btn btn-neutral float-left" title="neurocampus.models.rbm_manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="hparam_search.html" class="btn btn-neutral float-right" title="neurocampus.models.hparam_search" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

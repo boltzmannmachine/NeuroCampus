@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pipeline de modelos (BM, RBM, DBM) &mdash; documentación de NeuroCampus - 0.1.0</title>
+  <title>Pipeline de modelos &mdash; documentación de NeuroCampus - 0.1.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
@@ -50,22 +50,94 @@
 <li class="toctree-l2"><a class="reference internal" href="vision_general.html">Visión general de la arquitectura</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backend.html">Arquitectura del backend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="frontend.html">Arquitectura del frontend</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Pipeline de modelos (BM, RBM, DBM)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#vision-general-del-pipeline">Visión general del pipeline</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ingesta-y-validacion">1. Ingesta y validación</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#preprocesamiento-y-enriquecimiento-incluyendo-beto">2. Preprocesamiento y enriquecimiento (incluyendo BETO)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#beto-analisis-de-sentimientos">BETO (análisis de sentimientos)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Pipeline de modelos</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#objetivo">Objetivo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vista-general">Vista general</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#entrada-al-pipeline-datos-listos-para-modelado">1. Entrada al pipeline: datos listos para modelado</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#insumos-que-el-pipeline-espera-encontrar">Insumos que el pipeline espera encontrar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#observacion-importante">Observación importante</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#entrenamiento-de-modelos-bm-rbm-dbm">3. Entrenamiento de modelos BM/RBM/DBM</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#modelos-manuales">3.1 Modelos manuales</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#estrategias-de-entrenamiento">3.2 Estrategias de entrenamiento</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#orquestacion-por-jobs">3.3 Orquestación por jobs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contexto-de-trabajo-del-pipeline">2. Contexto de trabajo del pipeline</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#variables-de-contexto-principales">Variables de contexto principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#familias-visibles-en-la-implementacion-actual">Familias visibles en la implementación actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#funcion-del-contexto">Función del contexto</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#evaluacion-y-seleccion-del-modelo-campeon">4. Evaluación y selección del modelo campeón</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#prediccion-y-scoring">5. Predicción y scoring</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#integracion-con-predicciones-y-dashboard">6. Integración con Predicciones y Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#preparacion-del-feature-pack">3. Preparación del feature-pack</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#endpoint-principal">Endpoint principal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-hace">Qué hace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#salida-esperada">Salida esperada</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#como-se-usa-en-la-ui">Cómo se usa en la UI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rol-dentro-del-pipeline">Rol dentro del pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#entrenamiento-de-runs-individuales">4. Entrenamiento de runs individuales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#punto-de-entrada-en-frontend">Punto de entrada en frontend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Endpoint principal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-recibe-el-backend">Qué recibe el backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#modelos-visibles-en-la-implementacion-actual">Modelos visibles en la implementación actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#comportamiento-del-entrenamiento">Comportamiento del entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#consulta-de-estado">Consulta de estado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resultado-funcional">Resultado funcional</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#warm-start-y-reutilizacion-de-estado-previo">5. Warm start y reutilización de estado previo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#modos-de-warm-start-visibles">Modos de warm start visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interpretacion">Interpretación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rol-en-el-pipeline">Rol en el pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#sweep-de-candidatos">6. Sweep de candidatos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Punto de entrada en frontend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#endpoints-asociados">Endpoints asociados</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-hace-el-sweep">Qué hace el sweep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#en-la-implementacion-actual">En la implementación actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resultado-del-sweep">Resultado del sweep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Rol dentro del pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#registro-y-consulta-de-runs">7. Registro y consulta de runs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#endpoints-principales">Endpoints principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-representa-un-run">Qué representa un run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#uso-en-la-ui">Uso en la UI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#importante">Importante</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#seleccion-y-promocion-del-champion">8. Selección y promoción del champion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#endpoint-para-consultar-el-champion">Endpoint para consultar el champion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#endpoint-para-promover-un-run">Endpoint para promover un run</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-significa-champion">Qué significa champion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#como-encaja-en-el-pipeline">Cómo encaja en el pipeline</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#subpestana-asociada">Subpestaña asociada</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#bundle-y-artefactos-del-pipeline">9. Bundle y artefactos del pipeline</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Subpestaña asociada</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-se-consulta-aqui">Qué se consulta aquí</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-papel-cumplen-estos-artefactos">Qué papel cumplen estos artefactos</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#diagnostico-del-estado-del-pipeline">10. Diagnóstico del estado del pipeline</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Subpestaña asociada</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estrategia-de-construccion">Estrategia de construcción</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-valida-el-diagnostico">Qué valida el diagnóstico</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resultado-visible">Resultado visible</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#integracion-con-predicciones">11. Integración con Predicciones</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#como-ocurre-esa-integracion">Cómo ocurre esa integración</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#limitacion-intencional">Limitación intencional</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interpretacion-correcta">Interpretación correcta</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#integracion-con-dashboard">12. Integración con Dashboard</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#relacion-principal">Relación principal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">Interpretación</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#lectura-correcta-del-pipeline-en-la-version-actual">13. Lectura correcta del pipeline en la versión actual</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resumen">Resumen</a></li>
 </ul>
 </li>
 </ul>
@@ -91,7 +163,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Arquitectura de NeuroCampus</a></li>
-      <li class="breadcrumb-item active">Pipeline de modelos (BM, RBM, DBM)</li>
+      <li class="breadcrumb-item active">Pipeline de modelos</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/arquitectura/pipeline_modelos.md.txt" rel="nofollow"> Ver código fuente de la página</a>
       </li>
@@ -101,305 +173,547 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pipeline-de-modelos-bm-rbm-dbm">
-<h1>Pipeline de modelos (BM, RBM, DBM)<a class="headerlink" href="#pipeline-de-modelos-bm-rbm-dbm" title="Link to this heading"></a></h1>
-<p>El pipeline de modelos de NeuroCampus describe el camino completo desde que un
-dataset es cargado hasta que se entrena un modelo campeón y se usa para
-predicciones y dashboard.</p>
+  <section id="pipeline-de-modelos">
+<h1>Pipeline de modelos<a class="headerlink" href="#pipeline-de-modelos" title="Link to this heading"></a></h1>
+<section id="objetivo">
+<h2>Objetivo<a class="headerlink" href="#objetivo" title="Link to this heading"></a></h2>
+<p>El pipeline de modelos de NeuroCampus describe el flujo completo que conecta la
+preparación de datos, el entrenamiento de modelos, la selección del campeón,
+la administración de artefactos y la reutilización del resultado en las pestañas
+<strong>Predicciones</strong> y <strong>Dashboard</strong>.</p>
+<p>En la versión actual del sistema, este pipeline no es un proceso único y lineal
+oculto al usuario. Está expuesto de forma operativa en dos lugares:</p>
+<ul class="simple">
+<li><p>la pestaña <strong>Datos</strong>, donde se preparan los insumos;</p></li>
+<li><p>la pestaña <strong>Modelos</strong>, donde se entrenan, comparan, seleccionan y revisan
+los modelos.</p></li>
+</ul>
+<p>Por ello, el pipeline de modelos debe entenderse como una cadena de etapas
+coordinadas entre frontend, backend y artefactos persistidos en disco.</p>
+</section>
 <hr class="docutils" />
-<section id="vision-general-del-pipeline">
-<h2>Visión general del pipeline<a class="headerlink" href="#vision-general-del-pipeline" title="Link to this heading"></a></h2>
+<section id="vista-general">
+<h2>Vista general<a class="headerlink" href="#vista-general" title="Link to this heading"></a></h2>
+<p>La secuencia funcional vigente es la siguiente:</p>
 <ol class="arabic simple">
-<li><p><strong>Ingesta y validación de datos</strong> (pestaña Datos / router <code class="docutils literal notranslate"><span class="pre">datos</span></code>).</p></li>
-<li><p><strong>Preprocesamiento y enriquecimiento</strong> (incluyendo BETO).</p></li>
-<li><p><strong>Entrenamiento de modelos BM/RBM/DBM</strong>.</p></li>
-<li><p><strong>Evaluación y selección del modelo campeón</strong>.</p></li>
-<li><p><strong>Predicción y scoring para docentes/asignaturas</strong>.</p></li>
-<li><p><strong>Exposición de resultados en Predicciones y Dashboard</strong>.</p></li>
+<li><p><strong>Carga y validación del dataset</strong>.</p></li>
+<li><p><strong>Construcción de artefactos base</strong>.</p></li>
+<li><p><strong>Preparación del feature-pack</strong>.</p></li>
+<li><p><strong>Entrenamiento de runs individuales</strong>.</p></li>
+<li><p><strong>Barrido o sweep de múltiples candidatos</strong>.</p></li>
+<li><p><strong>Selección y promoción del champion</strong>.</p></li>
+<li><p><strong>Consulta de runs, bundle y diagnóstico</strong>.</p></li>
+<li><p><strong>Reutilización del champion en predicción y monitoreo</strong>.</p></li>
+</ol>
+<p>Cada una de estas etapas tiene soporte explícito en el frontend y en el router
+<code class="docutils literal notranslate"><span class="pre">/modelos</span></code> del backend.</p>
+</section>
+<hr class="docutils" />
+<section id="entrada-al-pipeline-datos-listos-para-modelado">
+<h2>1. Entrada al pipeline: datos listos para modelado<a class="headerlink" href="#entrada-al-pipeline-datos-listos-para-modelado" title="Link to this heading"></a></h2>
+<p>El pipeline comienza realmente cuando existe un dataset operativo para el
+periodo activo.</p>
+<p>Ese dataset se prepara desde la pestaña <strong>Datos</strong>, donde el usuario puede:</p>
+<ul class="simple">
+<li><p>cargar el archivo fuente;</p></li>
+<li><p>validarlo;</p></li>
+<li><p>persistirlo;</p></li>
+<li><p>ejecutar BETO si aplica;</p></li>
+<li><p>unificar históricos;</p></li>
+<li><p>construir artefactos previos.</p></li>
+</ul>
+<section id="insumos-que-el-pipeline-espera-encontrar">
+<h3>Insumos que el pipeline espera encontrar<a class="headerlink" href="#insumos-que-el-pipeline-espera-encontrar" title="Link to this heading"></a></h3>
+<p>Según la ruta seguida por el usuario, el backend puede resolver como entrada:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">data/processed/&lt;dataset_id&gt;.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/labeled/&lt;dataset_id&gt;_beto.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets/&lt;dataset_id&gt;.parquet</span></code></p></li>
+</ul>
+</section>
+<section id="observacion-importante">
+<h3>Observación importante<a class="headerlink" href="#observacion-importante" title="Link to this heading"></a></h3>
+<p>En la implementación actual, el pipeline favorece artefactos ya preparados y no
+trabaja como un entrenamiento “desde cualquier archivo arbitrario” dentro de la
+pestaña Modelos.</p>
+<p>Por eso, el dataset activo debe entenderse como un <strong>dataset identificado por
+periodo</strong> y ya registrado en la estructura del proyecto.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="contexto-de-trabajo-del-pipeline">
+<h2>2. Contexto de trabajo del pipeline<a class="headerlink" href="#contexto-de-trabajo-del-pipeline" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Modelos</strong> arranca con un encabezado de contexto compartido entre
+Modelos y Predicciones.</p>
+<section id="variables-de-contexto-principales">
+<h3>Variables de contexto principales<a class="headerlink" href="#variables-de-contexto-principales" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>datasetId</strong></p></li>
+<li><p><strong>family</strong></p></li>
+</ul>
+</section>
+<section id="familias-visibles-en-la-implementacion-actual">
+<h3>Familias visibles en la implementación actual<a class="headerlink" href="#familias-visibles-en-la-implementacion-actual" title="Link to this heading"></a></h3>
+<p>El frontend opera con al menos estas familias:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sentiment_desempeno</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">score_docente</span></code></p></li>
+</ul>
+</section>
+<section id="funcion-del-contexto">
+<h3>Función del contexto<a class="headerlink" href="#funcion-del-contexto" title="Link to this heading"></a></h3>
+<p>Ese contexto determina:</p>
+<ul class="simple">
+<li><p>qué runs se listan;</p></li>
+<li><p>qué champion se resuelve;</p></li>
+<li><p>qué sweep se lanza;</p></li>
+<li><p>qué bundle se consulta;</p></li>
+<li><p>qué diagnóstico se arma;</p></li>
+<li><p>qué información puede reaprovechar luego la pestaña Predicciones.</p></li>
+</ul>
+<p>En otras palabras, el pipeline no es global y abstracto: siempre corre dentro de
+la combinación <strong>dataset + familia</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="preparacion-del-feature-pack">
+<h2>3. Preparación del feature-pack<a class="headerlink" href="#preparacion-del-feature-pack" title="Link to this heading"></a></h2>
+<p>Antes de entrenar, el backend puede necesitar construir el <strong>feature-pack</strong> del
+contexto activo.</p>
+<section id="endpoint-principal">
+<h3>Endpoint principal<a class="headerlink" href="#endpoint-principal" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/feature-pack/prepare</span></code></p></li>
+</ul>
+</section>
+<section id="que-hace">
+<h3>Qué hace<a class="headerlink" href="#que-hace" title="Link to this heading"></a></h3>
+<p>Construye o reconstruye el conjunto de artefactos derivados necesarios para
+entrenamiento, especialmente la matriz de entrada del modelo.</p>
+</section>
+<section id="salida-esperada">
+<h3>Salida esperada<a class="headerlink" href="#salida-esperada" title="Link to this heading"></a></h3>
+<p>La salida principal queda en una ruta de este tipo:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>artifacts/features/&lt;dataset_id&gt;/train_matrix.parquet
+</pre></div>
+</div>
+</section>
+<section id="como-se-usa-en-la-ui">
+<h3>Cómo se usa en la UI<a class="headerlink" href="#como-se-usa-en-la-ui" title="Link to this heading"></a></h3>
+<p>En la subpestaña <strong>Entrenamiento</strong>, el usuario puede preparar el feature-pack
+antes de lanzar un run.</p>
+<p>Además, el backend soporta la lógica <code class="docutils literal notranslate"><span class="pre">auto_prepare</span></code>, por lo que el entrenamiento
+puede intentar preparar automáticamente los artefactos faltantes cuando el flujo
+lo permite.</p>
+</section>
+<section id="rol-dentro-del-pipeline">
+<h3>Rol dentro del pipeline<a class="headerlink" href="#rol-dentro-del-pipeline" title="Link to this heading"></a></h3>
+<p>Esta etapa separa con claridad dos niveles:</p>
+<ul class="simple">
+<li><p>el dataset operativo preparado en <strong>Datos</strong>;</p></li>
+<li><p>el insumo estructurado de modelado preparado en <strong>Modelos</strong>.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="entrenamiento-de-runs-individuales">
+<h2>4. Entrenamiento de runs individuales<a class="headerlink" href="#entrenamiento-de-runs-individuales" title="Link to this heading"></a></h2>
+<p>La etapa central del pipeline es el entrenamiento de un run individual.</p>
+<section id="punto-de-entrada-en-frontend">
+<h3>Punto de entrada en frontend<a class="headerlink" href="#punto-de-entrada-en-frontend" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>subpestaña <strong>Entrenamiento</strong> de <code class="docutils literal notranslate"><span class="pre">ModelsTab</span></code></p></li>
+</ul>
+</section>
+<section id="id1">
+<h3>Endpoint principal<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/entrenar</span></code></p></li>
+</ul>
+</section>
+<section id="que-recibe-el-backend">
+<h3>Qué recibe el backend<a class="headerlink" href="#que-recibe-el-backend" title="Link to this heading"></a></h3>
+<p>El entrenamiento se lanza con un request que incluye, entre otros campos:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">modelo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">epochs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hparams</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metodologia</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warm_start_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warm_start_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">auto_prepare</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">split_mode</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">val_ratio</span></code></p></li>
+</ul>
+</section>
+<section id="modelos-visibles-en-la-implementacion-actual">
+<h3>Modelos visibles en la implementación actual<a class="headerlink" href="#modelos-visibles-en-la-implementacion-actual" title="Link to this heading"></a></h3>
+<p>La UI trabaja explícitamente con estas estrategias:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rbm_general</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rbm_restringida</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dbm_manual</span></code></p></li>
+</ul>
+</section>
+<section id="comportamiento-del-entrenamiento">
+<h3>Comportamiento del entrenamiento<a class="headerlink" href="#comportamiento-del-entrenamiento" title="Link to this heading"></a></h3>
+<p>Cuando se lanza un entrenamiento:</p>
+<ol class="arabic simple">
+<li><p>el frontend construye el request usando el dataset y familia activos;</p></li>
+<li><p>el backend crea un <code class="docutils literal notranslate"><span class="pre">job_id</span></code>;</p></li>
+<li><p>el entrenamiento se ejecuta en background;</p></li>
+<li><p>la UI consulta el estado del job;</p></li>
+<li><p>al finalizar, se produce un <code class="docutils literal notranslate"><span class="pre">run_id</span></code> y se registran métricas y artefactos.</p></li>
 </ol>
 </section>
-<hr class="docutils" />
-<section id="ingesta-y-validacion">
-<h2>1. Ingesta y validación<a class="headerlink" href="#ingesta-y-validacion" title="Link to this heading"></a></h2>
+<section id="consulta-de-estado">
+<h3>Consulta de estado<a class="headerlink" href="#consulta-de-estado" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Iniciada desde la pestaña <strong>Datos</strong>:</p>
-<ul>
-<li><p>Botones:</p>
-<ul>
-<li><p>“Validar sin guardar”</p></li>
-<li><p>“Cargar y procesar”</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>Endpoints:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/datos/validar</span></code>:</p>
-<ul>
-<li><p>Recibe el archivo (CSV/XLSX/Parquet).</p></li>
-<li><p>Usa <code class="docutils literal notranslate"><span class="pre">neurocampus.data.validation_wrapper.run_validations</span></code> para validar
-el contenido.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/datos/upload</span></code>:</p>
-<ul>
-<li><p>Persiste el dataset preprocesado en la estructura de <code class="docutils literal notranslate"><span class="pre">data/</span></code>.</p></li>
-<li><p>Actualiza el resumen del dataset (<code class="docutils literal notranslate"><span class="pre">datos_dashboard.build_dataset_resumen</span></code>).</p></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>El resultado de esta etapa es un dataset consistente y listo para usar en
-modelos.</p>
-</section>
-<hr class="docutils" />
-<section id="preprocesamiento-y-enriquecimiento-incluyendo-beto">
-<h2>2. Preprocesamiento y enriquecimiento (incluyendo BETO)<a class="headerlink" href="#preprocesamiento-y-enriquecimiento-incluyendo-beto" title="Link to this heading"></a></h2>
-<p>Alcance típico:</p>
-<ul class="simple">
-<li><p>Limpieza de columnas.</p></li>
-<li><p>Codificación de variables categóricas.</p></li>
-<li><p>Normalización o escalado (según el modelo).</p></li>
-<li><p>Procesamiento del texto de comentarios mediante BETO.</p></li>
-</ul>
-<section id="beto-analisis-de-sentimientos">
-<h3>BETO (análisis de sentimientos)<a class="headerlink" href="#beto-analisis-de-sentimientos" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p>Job principal: <code class="docutils literal notranslate"><span class="pre">neurocampus/app/jobs/cmd_preprocesar_beto.py</span></code>.</p></li>
-<li><p>Responsabilidades:</p>
-<ul>
-<li><p>Leer el dataset etiquetado con comentarios.</p></li>
-<li><p>Pasar los textos por el modelo BETO (offline, CPU/GPU) para:</p>
-<ul>
-<li><p>obtener scores de polaridad (pos/neu/neg),</p></li>
-<li><p>generar labels o características adicionales.</p></li>
-</ul>
-</li>
-<li><p>Guardar un dataset enriquecido (ej. <code class="docutils literal notranslate"><span class="pre">*_beto.parquet</span></code>).</p></li>
-</ul>
-</li>
-<li><p>Integración con la API:</p>
-<ul>
-<li><p>Router <code class="docutils literal notranslate"><span class="pre">jobs.py</span></code> expone endpoints para lanzar y consultar el job de BETO.</p></li>
-<li><p>Router <code class="docutils literal notranslate"><span class="pre">datos.py</span></code> expone:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">/datos/sentimientos</span></code> con agregados para:</p>
-<ul>
-<li><p>distribución global,</p></li>
-<li><p>distribución por docente,</p></li>
-<li><p>métricas de cobertura de texto.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>La pestaña <strong>Datos</strong> utiliza estos resultados para renderizar las gráficas de
-sentimientos.</p>
-</section>
-</section>
-<hr class="docutils" />
-<section id="entrenamiento-de-modelos-bm-rbm-dbm">
-<h2>3. Entrenamiento de modelos BM/RBM/DBM<a class="headerlink" href="#entrenamiento-de-modelos-bm-rbm-dbm" title="Link to this heading"></a></h2>
-<p>Una vez el dataset está preprocesado, el entrenamiento se puede lanzar desde:</p>
-<ul class="simple">
-<li><p>Pestaña <strong>Modelos</strong> (interacción UI).</p></li>
-<li><p>CLI / Makefile (para pipelines automatizados).</p></li>
-</ul>
-<section id="modelos-manuales">
-<h3>3.1 Modelos manuales<a class="headerlink" href="#modelos-manuales" title="Link to this heading"></a></h3>
-<p>Ubicación: <code class="docutils literal notranslate"><span class="pre">neurocampus/models/</span></code>.</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">bm_manual.py</span></code>:</p>
-<ul>
-<li><p>Implementación de Máquinas de Boltzmann completas.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rbm_manual.py</span></code>:</p>
-<ul>
-<li><p>Implementación de RBM con codificación manual (sin dependencias externas
-de redes neuronales).</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dbm_manual.py</span></code>:</p>
-<ul>
-<li><p>Implementación de DBM manual, construida a partir de la lógica de RBM.</p></li>
-</ul>
-</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/estado/{job_id}</span></code></p></li>
 </ul>
 </section>
-<section id="estrategias-de-entrenamiento">
-<h3>3.2 Estrategias de entrenamiento<a class="headerlink" href="#estrategias-de-entrenamiento" title="Link to this heading"></a></h3>
-<p>Ubicación: <code class="docutils literal notranslate"><span class="pre">neurocampus/models/strategies/</span></code>.</p>
+<section id="resultado-funcional">
+<h3>Resultado funcional<a class="headerlink" href="#resultado-funcional" title="Link to this heading"></a></h3>
+<p>El resultado no es solo un modelo entrenado “en memoria”, sino un <strong>run
+persistido y trazable</strong> que después puede:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">bm_manual_strategy.py</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rbm_manual_strategy.py</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dbm_manual_strategy.py</span></code></p></li>
-<li><p>Otros archivos relacionados (por ejemplo, <code class="docutils literal notranslate"><span class="pre">modelo_rbm_general</span></code>,
-<code class="docutils literal notranslate"><span class="pre">modelo_rbm_restringida</span></code>, <code class="docutils literal notranslate"><span class="pre">rbm_pura</span></code>, etc.).</p></li>
-</ul>
-<p>Estas estrategias definen:</p>
-<ul class="simple">
-<li><p>Cómo se inicializa el modelo.</p></li>
-<li><p>Cómo se ejecuta el ciclo de entrenamiento:</p>
-<ul>
-<li><p>epochs,</p></li>
-<li><p>tamaño de batch,</p></li>
-<li><p>tasa de aprendizaje.</p></li>
-</ul>
-</li>
-<li><p>Qué métricas se calculan (loss, accuracy, etc.).</p></li>
-<li><p>Cómo se guarda el artefacto del modelo.</p></li>
-</ul>
-</section>
-<section id="orquestacion-por-jobs">
-<h3>3.3 Orquestación por jobs<a class="headerlink" href="#orquestacion-por-jobs" title="Link to this heading"></a></h3>
-<p>Ubicación: <code class="docutils literal notranslate"><span class="pre">neurocampus/app/jobs/</span></code>.</p>
-<p>Comandos relevantes:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_train_rbm_manual.py</span></code>:</p>
-<ul>
-<li><p>Entrena uno o varios modelos RBM manuales sobre un dataset preprocesado.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_train_dbm_manual.py</span></code>:</p>
-<ul>
-<li><p>Entrena modelos DBM manuales.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_eval_confusion.py</span></code>:</p>
-<ul>
-<li><p>Genera matrices de confusión y métricas de evaluación.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_autoretrain.py</span></code>:</p>
-<ul>
-<li><p>Puede lanzar reentrenamientos periódicos según nuevas evaluaciones.</p></li>
-</ul>
-</li>
-</ul>
-<p>Estos comandos se invocan desde:</p>
-<ul class="simple">
-<li><p>CLI (por ejemplo, vía Makefile).</p></li>
-<li><p>Endpoints expuestos en el router <code class="docutils literal notranslate"><span class="pre">modelos</span></code> o <code class="docutils literal notranslate"><span class="pre">jobs</span></code>.</p></li>
+<li><p>verse en la subpestaña <strong>Ejecuciones</strong>;</p></li>
+<li><p>promoverse a champion;</p></li>
+<li><p>reutilizarse en Predicciones;</p></li>
+<li><p>inspeccionarse desde Artefactos y Diagnóstico.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="evaluacion-y-seleccion-del-modelo-campeon">
-<h2>4. Evaluación y selección del modelo campeón<a class="headerlink" href="#evaluacion-y-seleccion-del-modelo-campeon" title="Link to this heading"></a></h2>
-<p>La evaluación se basa en:</p>
+<section id="warm-start-y-reutilizacion-de-estado-previo">
+<h2>5. Warm start y reutilización de estado previo<a class="headerlink" href="#warm-start-y-reutilizacion-de-estado-previo" title="Link to this heading"></a></h2>
+<p>El pipeline actual soporta continuidad de entrenamiento mediante <strong>warm start</strong>.</p>
+<section id="modos-de-warm-start-visibles">
+<h3>Modos de warm start visibles<a class="headerlink" href="#modos-de-warm-start-visibles" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Métricas calculadas en:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/audit_kfold.py</span></code> (validación cruzada),</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/hparam_search.py</span></code> (búsqueda de hiperparámetros).</p></li>
-</ul>
-</li>
-<li><p>Resultados almacenados:</p>
-<ul>
-<li><p>Rutas de artefactos,</p></li>
-<li><p>ficheros de métricas (JSON/CSV),</p></li>
-<li><p>logs de entrenamiento.</p></li>
-</ul>
-</li>
-</ul>
-<p>La <strong>lógica de selección del modelo campeón</strong> puede incluir:</p>
-<ul class="simple">
-<li><p>Regla básica:</p>
-<ul>
-<li><p>modelo con mejor F1 o accuracy en el conjunto de validación.</p></li>
-</ul>
-</li>
-<li><p>Criterios adicionales:</p>
-<ul>
-<li><p>estabilidad entre folds (en <code class="docutils literal notranslate"><span class="pre">audit_kfold</span></code>),</p></li>
-<li><p>tiempo de entrenamiento (preferir modelos más ligeros si el rendimiento es similar).</p></li>
-</ul>
-</li>
-</ul>
-<p>El modelo seleccionado se registra a través de:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">models/registry.py</span></code>:</p>
-<ul>
-<li><p>Permite resolver un “modelo activo” por dataset o contexto.</p></li>
-</ul>
-</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">none</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">champion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code></p></li>
 </ul>
 </section>
-<hr class="docutils" />
-<section id="prediccion-y-scoring">
-<h2>5. Predicción y scoring<a class="headerlink" href="#prediccion-y-scoring" title="Link to this heading"></a></h2>
-<p>La inferencia se realiza:</p>
+<section id="interpretacion">
+<h3>Interpretación<a class="headerlink" href="#interpretacion" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Desde el router <code class="docutils literal notranslate"><span class="pre">prediccion.py</span></code>:</p>
-<ul>
-<li><p>Para casos individuales (pestaña <strong>Predicciones</strong>, ingreso manual).</p></li>
-<li><p>Para predicciones por lote (fichero de entrada con varios casos).</p></li>
-</ul>
-</li>
-<li><p>Utilizando:</p>
-<ul>
-<li><p>El modelo campeón cargado desde los artefactos,</p></li>
-<li><p>el mismo pipeline de preprocesamiento aplicado al dataset de entrenamiento.</p></li>
-</ul>
-</li>
-</ul>
-<p>La salida típica:</p>
-<ul class="simple">
-<li><p>Probabilidad de alto/bajo rendimiento.</p></li>
-<li><p>Intervalos de confianza (si están implementados).</p></li>
-<li><p>Variables derivadas (por ejemplo, scores de sentimiento agregados).</p></li>
+<li><p><strong>none</strong>: entrenamiento desde cero;</p></li>
+<li><p><strong>champion</strong>: reutiliza el champion activo del contexto;</p></li>
+<li><p><strong>run_id</strong>: reutiliza un run específico.</p></li>
 </ul>
 </section>
+<section id="rol-en-el-pipeline">
+<h3>Rol en el pipeline<a class="headerlink" href="#rol-en-el-pipeline" title="Link to this heading"></a></h3>
+<p>Esto permite que el entrenamiento no siempre parta de una inicialización nueva,
+lo que vuelve al pipeline más incremental y más cercano al trabajo real de
+iteración sobre modelos.</p>
+</section>
+</section>
 <hr class="docutils" />
-<section id="integracion-con-predicciones-y-dashboard">
-<h2>6. Integración con Predicciones y Dashboard<a class="headerlink" href="#integracion-con-predicciones-y-dashboard" title="Link to this heading"></a></h2>
+<section id="sweep-de-candidatos">
+<h2>6. Sweep de candidatos<a class="headerlink" href="#sweep-de-candidatos" title="Link to this heading"></a></h2>
+<p>Además del entrenamiento unitario, la aplicación implementa una etapa de
+<strong>sweep</strong> para comparar varios candidatos de forma coordinada.</p>
+<section id="id2">
+<h3>Punto de entrada en frontend<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>La pestaña <strong>Predicciones</strong>:</p>
-<ul>
-<li><p>Consume los endpoints de <code class="docutils literal notranslate"><span class="pre">prediccion.py</span></code> y muestra:</p>
-<ul>
-<li><p>probabilidad,</p></li>
-<li><p>radar de indicadores,</p></li>
-<li><p>barras comparativas,</p></li>
-<li><p>proyecciones temporales para el caso o lote analizado.</p></li>
+<li><p>subpestaña <strong>Sweep</strong></p></li>
 </ul>
-</li>
+</section>
+<section id="endpoints-asociados">
+<h3>Endpoints asociados<a class="headerlink" href="#endpoints-asociados" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/sweep</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/entrenar/sweep</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/sweeps/{sweep_id}</span></code></p></li>
 </ul>
-</li>
-<li><p>La pestaña <strong>Dashboard</strong>:</p>
-<ul>
-<li><p>Consume datos agregados generados a partir de:</p>
-<ul>
-<li><p>predicciones,</p></li>
-<li><p>métricas del modelo,</p></li>
-<li><p>histórico de evaluaciones reales.</p></li>
+</section>
+<section id="que-hace-el-sweep">
+<h3>Qué hace el sweep<a class="headerlink" href="#que-hace-el-sweep" title="Link to this heading"></a></h3>
+<p>El sweep ejecuta múltiples entrenamientos comparables bajo el mismo contexto de:</p>
+<ul class="simple">
+<li><p>dataset;</p></li>
+<li><p>familia;</p></li>
+<li><p>métrica primaria;</p></li>
+<li><p>reglas de evaluación.</p></li>
 </ul>
-</li>
-<li><p>Muestra:</p>
-<ul>
-<li><p>KPIs globales,</p></li>
-<li><p>históricos por docente/asignatura,</p></li>
-<li><p>ranking de docentes,</p></li>
-<li><p>distribuciones de riesgo,</p></li>
-<li><p>comparaciones real vs predicho.</p></li>
+</section>
+<section id="en-la-implementacion-actual">
+<h3>En la implementación actual<a class="headerlink" href="#en-la-implementacion-actual" title="Link to this heading"></a></h3>
+<p>La UI comunica esta etapa como un proceso para <strong>entrenar tres modelos</strong> y
+comparar candidatos.</p>
+</section>
+<section id="resultado-del-sweep">
+<h3>Resultado del sweep<a class="headerlink" href="#resultado-del-sweep" title="Link to this heading"></a></h3>
+<p>El sistema genera:</p>
+<ul class="simple">
+<li><p>un <code class="docutils literal notranslate"><span class="pre">sweep_id</span></code>;</p></li>
+<li><p>un resumen consolidado;</p></li>
+<li><p>una lista de candidatos;</p></li>
+<li><p>un ganador global;</p></li>
+<li><p>posibles ganadores por tipo de modelo.</p></li>
 </ul>
-</li>
-</ul>
-</li>
-</ul>
+</section>
+<section id="id3">
+<h3>Rol dentro del pipeline<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>El sweep formaliza la parte comparativa del pipeline: no solo entrena modelos,
+sino que ayuda a elegir cuál vale la pena convertir en champion.</p>
+</section>
+</section>
 <hr class="docutils" />
-<p>Este pipeline de modelos asegura que:</p>
+<section id="registro-y-consulta-de-runs">
+<h2>7. Registro y consulta de runs<a class="headerlink" href="#registro-y-consulta-de-runs" title="Link to this heading"></a></h2>
+<p>Una vez que existen entrenamientos ejecutados, el pipeline entra en una fase de
+<strong>gestión de runs</strong>.</p>
+<section id="endpoints-principales">
+<h3>Endpoints principales<a class="headerlink" href="#endpoints-principales" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Los datos pasan por un proceso controlado de validación y preprocesamiento.</p></li>
-<li><p>El entrenamiento de BM/RBM/DBM se realiza de forma reproducible.</p></li>
-<li><p>La selección del modelo campeón está basada en métricas cuantitativas.</p></li>
-<li><p>Las predicciones se integran de forma coherente con las vistas de usuario
-(Predicciones y Dashboard) para la toma de decisiones.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/runs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/runs/{run_id}</span></code></p></li>
 </ul>
+</section>
+<section id="que-representa-un-run">
+<h3>Qué representa un run<a class="headerlink" href="#que-representa-un-run" title="Link to this heading"></a></h3>
+<p>Un run es la unidad persistida de trabajo del pipeline. Un run conserva, como
+mínimo:</p>
+<ul class="simple">
+<li><p>modelo entrenado;</p></li>
+<li><p>dataset asociado;</p></li>
+<li><p>familia;</p></li>
+<li><p>hiperparámetros;</p></li>
+<li><p>métricas;</p></li>
+<li><p>estado;</p></li>
+<li><p>referencias a artefactos.</p></li>
+</ul>
+</section>
+<section id="uso-en-la-ui">
+<h3>Uso en la UI<a class="headerlink" href="#uso-en-la-ui" title="Link to this heading"></a></h3>
+<p>La subpestaña <strong>Ejecuciones</strong> permite:</p>
+<ul class="simple">
+<li><p>listar runs del contexto actual;</p></li>
+<li><p>filtrar o inspeccionar runs;</p></li>
+<li><p>revisar métricas resumidas;</p></li>
+<li><p>abrir el detalle de un run;</p></li>
+<li><p>saltar hacia Predicciones usando el run como trazabilidad de UI.</p></li>
+</ul>
+</section>
+<section id="importante">
+<h3>Importante<a class="headerlink" href="#importante" title="Link to this heading"></a></h3>
+<p>La pestaña Predicciones sigue resolviendo la inferencia desde el champion activo
+soportado por backend. El run seleccionado se usa sobre todo como contexto y
+trazabilidad, no como bypass del contrato principal de inferencia.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="seleccion-y-promocion-del-champion">
+<h2>8. Selección y promoción del champion<a class="headerlink" href="#seleccion-y-promocion-del-champion" title="Link to this heading"></a></h2>
+<p>El pipeline actual separa claramente el concepto de run entrenado del concepto
+<strong>champion</strong>.</p>
+<section id="endpoint-para-consultar-el-champion">
+<h3>Endpoint para consultar el champion<a class="headerlink" href="#endpoint-para-consultar-el-champion" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/champion</span></code></p></li>
+</ul>
+</section>
+<section id="endpoint-para-promover-un-run">
+<h3>Endpoint para promover un run<a class="headerlink" href="#endpoint-para-promover-un-run" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/promote</span></code></p></li>
+</ul>
+</section>
+<section id="que-significa-champion">
+<h3>Qué significa champion<a class="headerlink" href="#que-significa-champion" title="Link to this heading"></a></h3>
+<p>El champion es el modelo activo que el sistema considera referencia principal
+para una combinación de dataset y familia.</p>
+</section>
+<section id="como-encaja-en-el-pipeline">
+<h3>Cómo encaja en el pipeline<a class="headerlink" href="#como-encaja-en-el-pipeline" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>se entrenan uno o varios runs;</p></li>
+<li><p>se revisan métricas y resultados;</p></li>
+<li><p>uno de esos runs se promueve a champion;</p></li>
+<li><p>el champion pasa a ser la base operativa para predicción y parte del
+monitoreo posterior.</p></li>
+</ol>
+</section>
+<section id="subpestana-asociada">
+<h3>Subpestaña asociada<a class="headerlink" href="#subpestana-asociada" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Campeón</strong></p></li>
+</ul>
+<p>Esta subpestaña permite resolver el champion actual y compararlo con otros runs
+candidatos.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="bundle-y-artefactos-del-pipeline">
+<h2>9. Bundle y artefactos del pipeline<a class="headerlink" href="#bundle-y-artefactos-del-pipeline" title="Link to this heading"></a></h2>
+<p>La etapa siguiente del pipeline es la inspección de los artefactos producidos
+por los entrenamientos.</p>
+<section id="id4">
+<h3>Subpestaña asociada<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Artefactos</strong></p></li>
+</ul>
+</section>
+<section id="que-se-consulta-aqui">
+<h3>Qué se consulta aquí<a class="headerlink" href="#que-se-consulta-aqui" title="Link to this heading"></a></h3>
+<p>La aplicación usa el detalle del run para recuperar:</p>
+<ul class="simple">
+<li><p>configuración persistida;</p></li>
+<li><p>métricas serializadas;</p></li>
+<li><p>paths relevantes;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bundle_artifacts</span></code> si están disponibles.</p></li>
+</ul>
+</section>
+<section id="que-papel-cumplen-estos-artefactos">
+<h3>Qué papel cumplen estos artefactos<a class="headerlink" href="#que-papel-cumplen-estos-artefactos" title="Link to this heading"></a></h3>
+<p>Los artefactos permiten:</p>
+<ul class="simple">
+<li><p>trazabilidad técnica;</p></li>
+<li><p>reproducibilidad;</p></li>
+<li><p>auditoría de resultados;</p></li>
+<li><p>soporte a predicción posterior;</p></li>
+<li><p>inspección operativa sin tener que reentrenar.</p></li>
+</ul>
+<p>Dentro del pipeline, esta es la capa que conecta el entrenamiento con la
+persistencia reutilizable.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="diagnostico-del-estado-del-pipeline">
+<h2>10. Diagnóstico del estado del pipeline<a class="headerlink" href="#diagnostico-del-estado-del-pipeline" title="Link to this heading"></a></h2>
+<p>La implementación actual incluye una subpestaña específica para salud y contrato
+operativo del flujo de modelos.</p>
+<section id="id5">
+<h3>Subpestaña asociada<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Diagnóstico</strong></p></li>
+</ul>
+</section>
+<section id="estrategia-de-construccion">
+<h3>Estrategia de construcción<a class="headerlink" href="#estrategia-de-construccion" title="Link to this heading"></a></h3>
+<p>La UI intenta primero obtener datos reales desde backend mediante:</p>
+<ul class="simple">
+<li><p>runs del contexto;</p></li>
+<li><p>champion del contexto.</p></li>
+</ul>
+<p>Si la API no está lista para una parte del flujo, la interfaz mantiene un
+fallback visual basado en prototipos o mocks.</p>
+</section>
+<section id="que-valida-el-diagnostico">
+<h3>Qué valida el diagnóstico<a class="headerlink" href="#que-valida-el-diagnostico" title="Link to this heading"></a></h3>
+<p>El diagnóstico arma un snapshot de checks sobre:</p>
+<ul class="simple">
+<li><p>presencia de runs;</p></li>
+<li><p>existencia de champion;</p></li>
+<li><p>consistencia del contexto;</p></li>
+<li><p>disponibilidad de artefactos esperados;</p></li>
+<li><p>estado general de salud del flujo.</p></li>
+</ul>
+</section>
+<section id="resultado-visible">
+<h3>Resultado visible<a class="headerlink" href="#resultado-visible" title="Link to this heading"></a></h3>
+<p>La UI resume el estado como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Healthy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Degraded</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Unhealthy</span></code></p></li>
+</ul>
+<p>Esto convierte al pipeline de modelos en un flujo observable y no solamente en
+una secuencia de endpoints.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="integracion-con-predicciones">
+<h2>11. Integración con Predicciones<a class="headerlink" href="#integracion-con-predicciones" title="Link to this heading"></a></h2>
+<p>El pipeline de modelos desemboca directamente en la pestaña <strong>Predicciones</strong>.</p>
+<section id="como-ocurre-esa-integracion">
+<h3>Cómo ocurre esa integración<a class="headerlink" href="#como-ocurre-esa-integracion" title="Link to this heading"></a></h3>
+<p>Desde varias subpestañas de Modelos, la UI puede navegar hacia Predicciones
+conservando contexto como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">activeDatasetId</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">selectedModelFamily</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">requestedPredictionRunId</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictionSource</span></code></p></li>
+</ul>
+</section>
+<section id="limitacion-intencional">
+<h3>Limitación intencional<a class="headerlink" href="#limitacion-intencional" title="Link to this heading"></a></h3>
+<p>Aunque el frontend preserve el <code class="docutils literal notranslate"><span class="pre">run_id</span></code> como traza de navegación, la resolución
+real de inferencia sigue dependiendo del champion activo y de los contratos del
+backend.</p>
+</section>
+<section id="interpretacion-correcta">
+<h3>Interpretación correcta<a class="headerlink" href="#interpretacion-correcta" title="Link to this heading"></a></h3>
+<p>Por tanto, el pipeline no debe leerse como “entrenar un run y predecir con ese
+run directamente sin más”, sino como:</p>
+<ul class="simple">
+<li><p>entrenar;</p></li>
+<li><p>comparar;</p></li>
+<li><p>seleccionar champion;</p></li>
+<li><p>usar el contexto vigente de inferencia.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="integracion-con-dashboard">
+<h2>12. Integración con Dashboard<a class="headerlink" href="#integracion-con-dashboard" title="Link to this heading"></a></h2>
+<p>El Dashboard no entrena modelos ni consulta runs individuales, pero sí depende
+indirectamente del pipeline de modelos.</p>
+<section id="relacion-principal">
+<h3>Relación principal<a class="headerlink" href="#relacion-principal" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>el champion influye en métricas de rendimiento mostradas en dashboard;</p></li>
+<li><p>las predicciones persistidas se agregan después en indicadores globales;</p></li>
+<li><p>el pipeline completo contribuye al estado analítico final del sistema.</p></li>
+</ul>
+</section>
+<section id="id6">
+<h3>Interpretación<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>Dentro de la arquitectura general, el pipeline de modelos es la capa intermedia
+que transforma datos preparados en resultados predictivos reutilizables.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="lectura-correcta-del-pipeline-en-la-version-actual">
+<h2>13. Lectura correcta del pipeline en la versión actual<a class="headerlink" href="#lectura-correcta-del-pipeline-en-la-version-actual" title="Link to this heading"></a></h2>
+<p>En la implementación vigente, el pipeline de modelos debe entenderse como una
+cadena de trabajo con estas propiedades:</p>
+<ul class="simple">
+<li><p><strong>contextual</strong>: depende de dataset y familia;</p></li>
+<li><p><strong>persistente</strong>: genera runs, champion y artefactos en disco;</p></li>
+<li><p><strong>asíncrona</strong>: usa jobs y polling de estado;</p></li>
+<li><p><strong>trazable</strong>: cada resultado relevante queda asociado a IDs y rutas;</p></li>
+<li><p><strong>observable</strong>: puede revisarse desde resumen, ejecuciones, campeón,
+artefactos y diagnóstico;</p></li>
+<li><p><strong>integrada</strong>: alimenta directamente Predicciones y, de forma indirecta,
+Dashboard.</p></li>
+</ul>
+<p>No es simplemente un script de entrenamiento aislado, sino una pieza central de
+la operación de NeuroCampus.</p>
+</section>
+<hr class="docutils" />
+<section id="resumen">
+<h2>Resumen<a class="headerlink" href="#resumen" title="Link to this heading"></a></h2>
+<p>El pipeline vigente de modelos en NeuroCampus sigue esta lógica práctica:</p>
+<ol class="arabic simple">
+<li><p><strong>Datos</strong> deja listo el dataset operativo.</p></li>
+<li><p><strong>Modelos</strong> prepara el feature-pack.</p></li>
+<li><p>Se entrenan runs individuales o por sweep.</p></li>
+<li><p>Los runs se comparan y se promueve un champion.</p></li>
+<li><p>Los artefactos quedan disponibles para consulta y auditoría.</p></li>
+<li><p>El champion y el contexto activo alimentan la inferencia.</p></li>
+<li><p>Los resultados terminan impactando Predicciones y Dashboard.</p></li>
+</ol>
+<p>Esta es la forma más fiel de describir el sistema actual desde su
+implementación real.</p>
 </section>
 </section>
 

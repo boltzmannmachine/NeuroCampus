@@ -78,23 +78,37 @@
              
   <section id="neurocampus">
 <h1>NeuroCampus<a class="headerlink" href="#neurocampus" title="Link to this heading"></a></h1>
-<p>Plataforma para análisis de evaluaciones docentes con modelos de Máquinas de Boltzmann
-(BM, RBM, DBM), análisis de sentimientos y visualización de resultados.</p>
+<p>NeuroCampus es una plataforma para el análisis de evaluaciones docentes mediante
+modelos de Máquinas de Boltzmann (BM, RBM, DBM), análisis de sentimientos y
+visualización de resultados.</p>
+<p>Esta documentación centraliza el manual de uso, la arquitectura del sistema,
+los fundamentos teóricos, la referencia de API y la guía operativa del proyecto.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="manual/index.html">Manual de usuario</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="manual/datos.html">Pestaña «Datos» – Ingesta y análisis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html">Pestaña «Modelos»</a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual/predicciones.html">Pestaña «Predicciones»</a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual/dashboard.html">Pestaña «Dashboard»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/datos.html">Pestaña «Datos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html">Pestaña «Modelos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#subpestana-resumen">Subpestaña «Resumen»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#subpestana-entrenamiento">Subpestaña «Entrenamiento»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#subpestana-ejecuciones">Subpestaña «Ejecuciones»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#subpestana-campeon">Subpestaña «Campeón»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#subpestana-sweep">Subpestaña «Sweep»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#subpestana-artefactos">Subpestaña «Artefactos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#subpestana-diagnostico">Subpestaña «Diagnóstico»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#comportamiento-transversal-de-la-pestana">Comportamiento transversal de la pestaña</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/modelos.html#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual/predicciones.html">Pestaña «Predicciones»</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="arquitectura/index.html">Arquitectura de NeuroCampus</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="arquitectura/vision_general.html">Visión general de la arquitectura</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arquitectura/backend.html">Arquitectura del backend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arquitectura/frontend.html">Arquitectura del frontend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arquitectura/pipeline_modelos.html">Pipeline de modelos (BM, RBM, DBM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arquitectura/pipeline_modelos.html">Pipeline de modelos</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="teoria/index.html">Teoría de modelos</a><ul>
@@ -105,9 +119,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api_backend/index.html">API del backend</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api_backend/datos.html">Endpoints de datos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_backend/jobs.html">Endpoints de jobs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_backend/admin.html">Endpoints de administración</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_backend/index.html#cobertura-documental-actual">Cobertura documental actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_backend/index.html#resumen-de-dominios-expuestos">Resumen de dominios expuestos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_backend/index.html#navegacion-de-esta-seccion">Navegación de esta sección</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api_python/index.html">API Python (backend)</a><ul>

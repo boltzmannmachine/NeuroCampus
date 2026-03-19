@@ -1,10 +1,9 @@
 Jobs y orquestación
 ===================
 
-.. autosummary::
-   :toctree: generated
-   :recursive:
+.. toctree::
+   :maxdepth: 1
 
-   neurocampus.app.jobs.cmd_train_rbm_manual
-   neurocampus.app.jobs.cmd_preprocesar_beto
-   neurocampus.app.jobs.cmd_train_dbm_manual
+   cmd_preprocesar_beto
+   cmd_train_rbm_manual
+   cmd_train_dbm_manual

@@ -1,0 +1,697 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endpoints del Dashboard &mdash; documentación de NeuroCampus - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Endpoints de predicción directa" href="prediccion.html" />
+    <link rel="prev" title="Endpoints de modelos" href="modelos.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            NeuroCampus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">Manual de usuario</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API del backend</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#cobertura-documental-actual">Cobertura documental actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#resumen-de-dominios-expuestos">Resumen de dominios expuestos</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#navegacion-de-esta-seccion">Navegación de esta sección</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="datos.html">Endpoints de datos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html">Endpoints de jobs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preprocesamiento-beto">Jobs de preprocesamiento BETO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-unificacion-historica">Jobs de unificación histórica</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preparacion-de-feature-pack">Jobs de preparación de feature-pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-busqueda-de-hiperparametros-rbm">Jobs de búsqueda de hiperparámetros RBM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modelos.html">Endpoints de modelos</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Endpoints del Dashboard</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fuente-de-datos">Fuente de datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filtros-comunes">Filtros comunes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resumen-de-endpoints-principales">Resumen de endpoints principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-status"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-periodos"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/periodos</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-catalogos"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/catalogos</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-kpis"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/kpis</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-series"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/series</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-radar"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/radar</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-wordcloud"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/wordcloud</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-sentimiento"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/sentimiento</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-dashboard-rankings"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/rankings</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#consideraciones-funcionales">Consideraciones funcionales</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="prediccion.html">Endpoints de predicción directa</a></li>
+<li class="toctree-l3"><a class="reference internal" href="predicciones.html">Endpoints de predicciones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="admin.html">Endpoints de administración</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_python/index.html">API Python (backend)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devops/index.html">Guía de desarrollo y operación</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">NeuroCampus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API del backend</a></li>
+      <li class="breadcrumb-item active">Endpoints del Dashboard</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_backend/dashboard.md.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="endpoints-del-dashboard">
+<h1>Endpoints del Dashboard<a class="headerlink" href="#endpoints-del-dashboard" title="Link to this heading"></a></h1>
+<p>La API del <strong>Dashboard</strong> expone endpoints de consulta agregada construidos sobre el
+histórico institucional de NeuroCampus. Su función es alimentar la pestaña
+<strong>Dashboard</strong> del frontend con KPIs, filtros, rankings, series temporales,
+indicadores radar y contexto cualitativo.</p>
+<p>Todos los endpoints aquí descritos cuelgan del prefijo base:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/dashboard</span></code></p></li>
+</ul>
+<section id="fuente-de-datos">
+<h2>Fuente de datos<a class="headerlink" href="#fuente-de-datos" title="Link to this heading"></a></h2>
+<p>La implementación actual trabaja con dos artefactos principales:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">historico/unificado.parquet</span></code></p>
+<ul>
+<li><p>histórico procesado, usado para KPIs, series, radar y rankings.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">historico/unificado_labeled.parquet</span></code></p>
+<ul>
+<li><p>histórico etiquetado, usado para sentimiento y nube de palabras.</p></li>
+</ul>
+</li>
+</ul>
+<p>También consulta el manifiesto institucional para determinar periodos
+existentes y estado del histórico.</p>
+</section>
+<section id="filtros-comunes">
+<h2>Filtros comunes<a class="headerlink" href="#filtros-comunes" title="Link to this heading"></a></h2>
+<p>La mayoría de endpoints del dashboard aceptan los mismos filtros de consulta:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p>
+<ul>
+<li><p>periodo exacto; tiene prioridad sobre el rango.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_from</span></code></p>
+<ul>
+<li><p>inicio de rango, inclusivo.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_to</span></code></p>
+<ul>
+<li><p>fin de rango, inclusivo.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p>
+<ul>
+<li><p>filtro por docente.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p>
+<ul>
+<li><p>filtro por asignatura.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p>
+<ul>
+<li><p>filtro por programa.</p></li>
+</ul>
+</li>
+</ul>
+<p>En la UI actual el control de <code class="docutils literal notranslate"><span class="pre">programa</span></code> no está expuesto de forma visible en la
+barra principal del Dashboard, pero el backend sí lo soporta.</p>
+</section>
+<hr class="docutils" />
+<section id="resumen-de-endpoints-principales">
+<h2>Resumen de endpoints principales<a class="headerlink" href="#resumen-de-endpoints-principales" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Método</p></th>
+<th class="head"><p>Ruta</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/status</span></code></p></td>
+<td><p>Estado del histórico, manifiesto y disponibilidad de archivos base</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/periodos</span></code></p></td>
+<td><p>Lista de periodos disponibles para filtros</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/catalogos</span></code></p></td>
+<td><p>Catálogos de docentes, asignaturas y programas según filtros</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/kpis</span></code></p></td>
+<td><p>KPIs agregados del dashboard</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/series</span></code></p></td>
+<td><p>Serie temporal agregada por periodo</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/radar</span></code></p></td>
+<td><p>Perfil radar de indicadores promedio</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/wordcloud</span></code></p></td>
+<td><p>Términos frecuentes desde histórico etiquetado</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/sentimiento</span></code></p></td>
+<td><p>Distribución global de sentimiento</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/dashboard/rankings</span></code></p></td>
+<td><p>Rankings por docente o asignatura</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-status">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/status</span></code><a class="headerlink" href="#get-dashboard-status" title="Link to this heading"></a></h2>
+<section id="descripcion">
+<h3>Descripción<a class="headerlink" href="#descripcion" title="Link to this heading"></a></h3>
+<p>Devuelve el estado del histórico usado por el Dashboard.</p>
+<p>Es un endpoint ligero: no carga parquets completos, sino que inspecciona
+manifiestos y existencia de archivos relevantes.</p>
+</section>
+<section id="respuesta">
+<h3>Respuesta<a class="headerlink" href="#respuesta" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">manifest_exists</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">manifest_updated_at</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">manifest_corrupt</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodos_disponibles</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">processed</span></code></p>
+<ul>
+<li><p>ruta, existencia y fecha de modificación de <code class="docutils literal notranslate"><span class="pre">historico/unificado.parquet</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">labeled</span></code></p>
+<ul>
+<li><p>ruta, existencia y fecha de modificación de <code class="docutils literal notranslate"><span class="pre">historico/unificado_labeled.parquet</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ready_processed</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">true</span></code> si existe histórico procesado y hay periodos válidos en el manifiesto</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ready_labeled</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">true</span></code> si existe el histórico etiquetado</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="uso-en-frontend">
+<h3>Uso en frontend<a class="headerlink" href="#uso-en-frontend" title="Link to this heading"></a></h3>
+<p>Este endpoint se usa para:</p>
+<ul class="simple">
+<li><p>determinar si el Dashboard puede cargarse normalmente;</p></li>
+<li><p>mostrar mensajes como “histórico en actualización”;</p></li>
+<li><p>decidir si las visualizaciones cualitativas están disponibles.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-periodos">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/periodos</span></code><a class="headerlink" href="#get-dashboard-periodos" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>Descripción<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Lista los periodos disponibles para poblar el filtro de periodo del Dashboard.</p>
+</section>
+<section id="id2">
+<h3>Respuesta<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>Devuelve un objeto con un arreglo <code class="docutils literal notranslate"><span class="pre">items</span></code>, por ejemplo:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;items&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;2023-2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;2024-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;2024-2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;2025-1&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-catalogos">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/catalogos</span></code><a class="headerlink" href="#get-dashboard-catalogos" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>Descripción<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Devuelve los catálogos dinámicos de:</p>
+<ul class="simple">
+<li><p>docentes</p></li>
+<li><p>asignaturas</p></li>
+<li><p>programas</p></li>
+</ul>
+<p>según el contexto filtrado.</p>
+</section>
+<section id="parametros-de-query">
+<h3>Parámetros de query<a class="headerlink" href="#parametros-de-query" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_to</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p></li>
+</ul>
+</section>
+<section id="comportamiento">
+<h3>Comportamiento<a class="headerlink" href="#comportamiento" title="Link to this heading"></a></h3>
+<p>El backend:</p>
+<ol class="arabic simple">
+<li><p>carga el histórico procesado;</p></li>
+<li><p>aplica los filtros recibidos;</p></li>
+<li><p>calcula los catálogos válidos para ese subconjunto.</p></li>
+</ol>
+</section>
+<section id="id4">
+<h3>Respuesta<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>Devuelve tres listas:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">docentes</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignaturas</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programas</span></code></p></li>
+</ul>
+<p>Este endpoint permite que el frontend recalcule dropdowns dependientes al cambiar
+el periodo o el rango histórico.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-kpis">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/kpis</span></code><a class="headerlink" href="#get-dashboard-kpis" title="Link to this heading"></a></h2>
+<section id="id5">
+<h3>Descripción<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>Calcula los KPIs agregados del Dashboard sobre el histórico procesado y agrega un
+KPI adicional basado en predicciones persistidas.</p>
+</section>
+<section id="id6">
+<h3>Parámetros de query<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_to</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>Comportamiento<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>El endpoint:</p>
+<ol class="arabic simple">
+<li><p>carga <code class="docutils literal notranslate"><span class="pre">historico/unificado.parquet</span></code>;</p></li>
+<li><p>aplica filtros;</p></li>
+<li><p>calcula KPIs base con <code class="docutils literal notranslate"><span class="pre">compute_kpis(df_f)</span></code>;</p></li>
+<li><p>cuenta predicciones persistidas en <code class="docutils literal notranslate"><span class="pre">artifacts/predictions/</span></code> para los
+<code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> compatibles con el periodo o rango solicitado.</p></li>
+</ol>
+</section>
+<section id="id8">
+<h3>Respuesta<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<p>Incluye, al menos, el KPI de:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predicciones</span></code></p></li>
+</ul>
+<p>junto con el resto de KPIs agregados calculados desde el histórico.</p>
+</section>
+<section id="observacion">
+<h3>Observación<a class="headerlink" href="#observacion" title="Link to this heading"></a></h3>
+<p>Este endpoint conecta el Dashboard con el subsistema de predicciones, por eso el
+número de predicciones no sale del histórico procesado sino del directorio de
+artefactos de salida de predicción.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-series">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/series</span></code><a class="headerlink" href="#get-dashboard-series" title="Link to this heading"></a></h2>
+<section id="id9">
+<h3>Descripción<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>Devuelve una serie agregada por periodo para construir gráficos temporales.</p>
+</section>
+<section id="id10">
+<h3>Parámetros de query<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">metric</span></code></p>
+<ul>
+<li><p>por defecto: <code class="docutils literal notranslate"><span class="pre">evaluaciones</span></code></p></li>
+<li><p>ejemplos soportados: <code class="docutils literal notranslate"><span class="pre">evaluaciones</span></code>, <code class="docutils literal notranslate"><span class="pre">score_promedio</span></code>, <code class="docutils literal notranslate"><span class="pre">docentes</span></code>, <code class="docutils literal notranslate"><span class="pre">asignaturas</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_to</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p></li>
+</ul>
+</section>
+<section id="id11">
+<h3>Respuesta<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<p>Devuelve un objeto con:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">metric</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">points</span></code></p>
+<ul>
+<li><p>lista de puntos con <code class="docutils literal notranslate"><span class="pre">periodo</span></code> y <code class="docutils literal notranslate"><span class="pre">value</span></code></p></li>
+</ul>
+</li>
+</ul>
+<p>Ejemplo simplificado:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;metric&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;evaluaciones&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;points&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;periodo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1200</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;periodo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1335</span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="errores-relevantes">
+<h3>Errores relevantes<a class="headerlink" href="#errores-relevantes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si no existe el histórico procesado.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span></code> si la métrica solicitada no es válida o los filtros son inconsistentes.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-radar">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/radar</span></code><a class="headerlink" href="#get-dashboard-radar" title="Link to this heading"></a></h2>
+<section id="id12">
+<h3>Descripción<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>Devuelve el perfil radar del histórico filtrado, calculado a partir del promedio
+agregado de las preguntas 1 a 10.</p>
+</section>
+<section id="id13">
+<h3>Parámetros de query<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_to</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>Respuesta<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<p>Devuelve un objeto con <code class="docutils literal notranslate"><span class="pre">items</span></code>, donde cada elemento contiene:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">key</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">value</span></code></p></li>
+</ul>
+</section>
+<section id="notas-de-implementacion">
+<h3>Notas de implementación<a class="headerlink" href="#notas-de-implementacion" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>El backend trabaja sobre la escala original del histórico, típicamente <code class="docutils literal notranslate"><span class="pre">0–50</span></code>.</p></li>
+<li><p>Si el frontend requiere escala <code class="docutils literal notranslate"><span class="pre">0–5</span></code>, debe transformar los valores.</p></li>
+</ul>
+</section>
+<section id="id15">
+<h3>Errores relevantes<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si no existe histórico procesado.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span></code> si los filtros o el cálculo no son válidos.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-wordcloud">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/wordcloud</span></code><a class="headerlink" href="#get-dashboard-wordcloud" title="Link to this heading"></a></h2>
+<section id="id16">
+<h3>Descripción<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<p>Devuelve los términos más frecuentes del histórico etiquetado, junto con su
+frecuencia y polaridad asociada.</p>
+</section>
+<section id="id17">
+<h3>Parámetros de query<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code></p>
+<ul>
+<li><p>máximo de términos; por defecto <code class="docutils literal notranslate"><span class="pre">80</span></code>, mínimo <code class="docutils literal notranslate"><span class="pre">1</span></code>, máximo <code class="docutils literal notranslate"><span class="pre">500</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_to</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Respuesta<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<p>Devuelve un objeto con <code class="docutils literal notranslate"><span class="pre">items</span></code>, donde cada elemento contiene:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">text</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">value</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sentiment</span></code></p></li>
+</ul>
+</section>
+<section id="id19">
+<h3>Errores relevantes<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si no existe <code class="docutils literal notranslate"><span class="pre">historico/unificado_labeled.parquet</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span></code> si el cálculo no puede realizarse con los filtros dados.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-sentimiento">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/sentimiento</span></code><a class="headerlink" href="#get-dashboard-sentimiento" title="Link to this heading"></a></h2>
+<section id="id20">
+<h3>Descripción<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<p>Devuelve la distribución agregada de sentimiento sobre el histórico etiquetado.</p>
+</section>
+<section id="id21">
+<h3>Parámetros de query<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_to</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p></li>
+</ul>
+</section>
+<section id="id22">
+<h3>Respuesta<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<p>Devuelve un objeto con <code class="docutils literal notranslate"><span class="pre">buckets</span></code>, por ejemplo:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">neg</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">neu</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pos</span></code></p></li>
+</ul>
+<p>Cada bucket contiene:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">value</span></code></p></li>
+</ul>
+<p>El valor se entrega como proporción en el rango <code class="docutils literal notranslate"><span class="pre">0..1</span></code>.</p>
+</section>
+<section id="id23">
+<h3>Errores relevantes<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si no existe histórico etiquetado.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span></code> si el archivo existe, pero no tiene columnas compatibles de sentimiento.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-dashboard-rankings">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/dashboard/rankings</span></code><a class="headerlink" href="#get-dashboard-rankings" title="Link to this heading"></a></h2>
+<section id="id24">
+<h3>Descripción<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>Genera rankings agregados a partir del histórico procesado.</p>
+</section>
+<section id="id25">
+<h3>Parámetros de query<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">by</span></code></p>
+<ul>
+<li><p>obligatorio; dimensión del ranking, por ejemplo <code class="docutils literal notranslate"><span class="pre">docente</span></code> o <code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metric</span></code></p>
+<ul>
+<li><p>por defecto <code class="docutils literal notranslate"><span class="pre">score_promedio</span></code></p></li>
+<li><p>también puede usarse <code class="docutils literal notranslate"><span class="pre">evaluaciones</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">order</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">asc</span></code> o <code class="docutils literal notranslate"><span class="pre">desc</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code></p>
+<ul>
+<li><p>por defecto <code class="docutils literal notranslate"><span class="pre">8</span></code>, mínimo <code class="docutils literal notranslate"><span class="pre">1</span></code>, máximo <code class="docutils literal notranslate"><span class="pre">200</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo_to</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p></li>
+</ul>
+</section>
+<section id="uso-tipico">
+<h3>Uso típico<a class="headerlink" href="#uso-tipico" title="Link to this heading"></a></h3>
+<p>Este endpoint alimenta bloques como:</p>
+<ul class="simple">
+<li><p>ranking de docentes;</p></li>
+<li><p>ranking de asignaturas;</p></li>
+<li><p>tablas de mejores o casos a intervenir.</p></li>
+</ul>
+</section>
+<section id="id26">
+<h3>Errores relevantes<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si no existe el histórico procesado.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span></code> si <code class="docutils literal notranslate"><span class="pre">by</span></code>, <code class="docutils literal notranslate"><span class="pre">metric</span></code> u <code class="docutils literal notranslate"><span class="pre">order</span></code> no son válidos.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="consideraciones-funcionales">
+<h2>Consideraciones funcionales<a class="headerlink" href="#consideraciones-funcionales" title="Link to this heading"></a></h2>
+<section id="dependencia-del-historico">
+<h3>Dependencia del histórico<a class="headerlink" href="#dependencia-del-historico" title="Link to this heading"></a></h3>
+<p>La mayor parte del Dashboard depende de la existencia y consistencia de:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">historico/unificado.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">historico/unificado_labeled.parquet</span></code></p></li>
+<li><p>manifiesto institucional de periodos</p></li>
+</ul>
+<p>Si estos artefactos no están listos, algunos endpoints devolverán <code class="docutils literal notranslate"><span class="pre">404</span></code> o un
+estado de no disponibilidad.</p>
+</section>
+<section id="separacion-entre-datos-procesados-y-etiquetados">
+<h3>Separación entre datos procesados y etiquetados<a class="headerlink" href="#separacion-entre-datos-procesados-y-etiquetados" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Los endpoints <code class="docutils literal notranslate"><span class="pre">status</span></code>, <code class="docutils literal notranslate"><span class="pre">periodos</span></code>, <code class="docutils literal notranslate"><span class="pre">catalogos</span></code>, <code class="docutils literal notranslate"><span class="pre">kpis</span></code>, <code class="docutils literal notranslate"><span class="pre">series</span></code>, <code class="docutils literal notranslate"><span class="pre">radar</span></code> y
+<code class="docutils literal notranslate"><span class="pre">rankings</span></code> se apoyan principalmente en el histórico procesado.</p></li>
+<li><p>Los endpoints <code class="docutils literal notranslate"><span class="pre">wordcloud</span></code> y <code class="docutils literal notranslate"><span class="pre">sentimiento</span></code> requieren histórico etiquetado.</p></li>
+</ul>
+</section>
+<section id="relacion-con-otras-areas-del-sistema">
+<h3>Relación con otras áreas del sistema<a class="headerlink" href="#relacion-con-otras-areas-del-sistema" title="Link to this heading"></a></h3>
+<p>La API del Dashboard depende indirectamente de procesos ejecutados desde:</p>
+<ul class="simple">
+<li><p><strong>Datos</strong></p>
+<ul>
+<li><p>para unificación de histórico y procesamiento base;</p></li>
+</ul>
+</li>
+<li><p><strong>Predicciones</strong></p>
+<ul>
+<li><p>para el conteo de resultados persistidos;</p></li>
+</ul>
+</li>
+<li><p><strong>Modelos</strong></p>
+<ul>
+<li><p>de forma indirecta, cuando el frontend cruza KPIs del dashboard con estado
+del modelo campeón.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="modelos.html" class="btn btn-neutral float-left" title="Endpoints de modelos" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="prediccion.html" class="btn btn-neutral float-right" title="Endpoints de predicción directa" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Daniel Felipe Ramirez Cabrera &amp; Santiago Criollo Bermudez.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

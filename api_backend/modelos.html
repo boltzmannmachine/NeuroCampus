@@ -1,0 +1,899 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endpoints de modelos &mdash; documentación de NeuroCampus - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Endpoints del Dashboard" href="dashboard.html" />
+    <link rel="prev" title="Endpoints de jobs" href="jobs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            NeuroCampus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">Manual de usuario</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API del backend</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#cobertura-documental-actual">Cobertura documental actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#resumen-de-dominios-expuestos">Resumen de dominios expuestos</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#navegacion-de-esta-seccion">Navegación de esta sección</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="datos.html">Endpoints de datos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html">Endpoints de jobs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preprocesamiento-beto">Jobs de preprocesamiento BETO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-unificacion-historica">Jobs de unificación histórica</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preparacion-de-feature-pack">Jobs de preparación de feature-pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-busqueda-de-hiperparametros-rbm">Jobs de búsqueda de hiperparámetros RBM</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Endpoints de modelos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#resumen-de-endpoints-principales">Resumen de endpoints principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-modelos-datasets"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/datasets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-modelos-readiness"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/readiness</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-modelos-feature-pack-prepare"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/feature-pack/prepare</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-modelos-entrenar"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/entrenar</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-modelos-sweep"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/sweep</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-modelos-entrenar-sweep"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/entrenar/sweep</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-modelos-estado-job-id"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/estado/{job_id}</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-modelos-champion-promote"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/champion/promote</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-modelos-runs"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/runs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-modelos-runs-run-id"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/runs/{run_id}</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-modelos-sweeps-sweep-id"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/sweeps/{sweep_id}</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-modelos-champion"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/champion</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#relacion-con-la-pestana-modelos">Relación con la pestaña «Modelos»</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dashboard.html">Endpoints del Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="prediccion.html">Endpoints de predicción directa</a></li>
+<li class="toctree-l3"><a class="reference internal" href="predicciones.html">Endpoints de predicciones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="admin.html">Endpoints de administración</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_python/index.html">API Python (backend)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devops/index.html">Guía de desarrollo y operación</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">NeuroCampus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API del backend</a></li>
+      <li class="breadcrumb-item active">Endpoints de modelos</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_backend/modelos.md.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="endpoints-de-modelos">
+<h1>Endpoints de modelos<a class="headerlink" href="#endpoints-de-modelos" title="Link to this heading"></a></h1>
+<p>La API de <strong>modelos</strong> agrupa los endpoints que soportan la pestaña <strong>Modelos</strong>
+de NeuroCampus. Este router cubre el ciclo completo de trabajo sobre un
+<code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>:</p>
+<ul class="simple">
+<li><p>detección de datasets disponibles;</p></li>
+<li><p>verificación de insumos mínimos para entrenar;</p></li>
+<li><p>preparación del <strong>feature-pack</strong>;</p></li>
+<li><p>entrenamiento de runs individuales;</p></li>
+<li><p>ejecución de sweeps;</p></li>
+<li><p>consulta de estado de jobs;</p></li>
+<li><p>inspección de runs persistidos;</p></li>
+<li><p>consulta y promoción del <strong>champion</strong>.</p></li>
+</ul>
+<p>Todos los endpoints aquí descritos cuelgan del prefijo base:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/modelos</span></code></p></li>
+</ul>
+<hr class="docutils" />
+<section id="resumen-de-endpoints-principales">
+<h2>Resumen de endpoints principales<a class="headerlink" href="#resumen-de-endpoints-principales" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Método</p></th>
+<th class="head"><p>Ruta</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/datasets</span></code></p></td>
+<td><p>Lista datasets detectados para la pestaña Modelos</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/readiness</span></code></p></td>
+<td><p>Verifica si existen los insumos mínimos para entrenar</p></td>
+</tr>
+<tr class="row-even"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/feature-pack/prepare</span></code></p></td>
+<td><p>Construye o reconstruye el feature-pack de un dataset</p></td>
+</tr>
+<tr class="row-odd"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/entrenar</span></code></p></td>
+<td><p>Lanza un entrenamiento individual en background</p></td>
+</tr>
+<tr class="row-even"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/sweep</span></code></p></td>
+<td><p>Ejecuta un sweep determinístico y devuelve el resultado al terminar</p></td>
+</tr>
+<tr class="row-odd"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/entrenar/sweep</span></code></p></td>
+<td><p>Lanza un sweep asíncrono en background</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/estado/{job_id}</span></code></p></td>
+<td><p>Consulta el estado de un job de entrenamiento o sweep</p></td>
+</tr>
+<tr class="row-odd"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/champion/promote</span></code></p></td>
+<td><p>Promueve manualmente un run a champion</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/runs</span></code></p></td>
+<td><p>Lista runs persistidos de entrenamiento/auditoría</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/runs/{run_id}</span></code></p></td>
+<td><p>Devuelve el detalle completo de un run</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/sweeps/{sweep_id}</span></code></p></td>
+<td><p>Devuelve el resumen persistido de un sweep</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/modelos/champion</span></code></p></td>
+<td><p>Devuelve la información del champion actual</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="get-modelos-datasets">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/datasets</span></code><a class="headerlink" href="#get-modelos-datasets" title="Link to this heading"></a></h2>
+<section id="descripcion">
+<h3>Descripción<a class="headerlink" href="#descripcion" title="Link to this heading"></a></h3>
+<p>Retorna los datasets detectados por la pestaña <strong>Modelos</strong> a partir del estado
+actual del filesystem.</p>
+<p>La detección se hace revisando varias ubicaciones del proyecto, entre ellas:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/labeled/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/processed/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets/</span></code></p></li>
+</ul>
+<p>Este endpoint <strong>no crea artefactos</strong>. Solo inspecciona qué datasets están
+presentes y qué piezas del pipeline existen para cada uno.</p>
+</section>
+<section id="respuesta">
+<h3>Respuesta<a class="headerlink" href="#respuesta" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
+<li><p>Cuerpo JSON: lista de objetos <code class="docutils literal notranslate"><span class="pre">DatasetInfo</span></code>.</p></li>
+</ul>
+<p>Campos observables en la respuesta:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_train_matrix</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_pair_matrix</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_labeled</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_processed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_raw_dataset</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_rows</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_pairs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">created_at</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_champion_sentiment</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_champion_score</span></code></p></li>
+</ul>
+</section>
+<section id="utilidad-en-frontend">
+<h3>Utilidad en frontend<a class="headerlink" href="#utilidad-en-frontend" title="Link to this heading"></a></h3>
+<p>Este endpoint sirve para poblar el selector principal de dataset en la pestaña
+<strong>Modelos</strong> y para mostrar rápidamente si un dataset ya tiene:</p>
+<ul class="simple">
+<li><p>feature-pack de entrenamiento,</p></li>
+<li><p>pair-matrix,</p></li>
+<li><p>labeled BETO,</p></li>
+<li><p>dataset procesado,</p></li>
+<li><p>champion por familia.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-modelos-readiness">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/readiness</span></code><a class="headerlink" href="#get-modelos-readiness" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>Descripción<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Verifica si existen los insumos mínimos necesarios para entrenar un dataset.</p>
+<p>Según el código actual, este endpoint reporta el estado de:</p>
+<ul class="simple">
+<li><p>dataset etiquetado (<code class="docutils literal notranslate"><span class="pre">labeled</span></code>),</p></li>
+<li><p>histórico etiquetado unificado,</p></li>
+<li><p>feature-pack,</p></li>
+<li><p>pair-matrix,</p></li>
+<li><p>metadatos de score/target.</p></li>
+</ul>
+</section>
+<section id="entrada">
+<h3>Entrada<a class="headerlink" href="#entrada" title="Link to this heading"></a></h3>
+<p>Parámetros de query:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>: identificador del dataset a inspeccionar.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Respuesta<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
+<li><p>Cuerpo JSON tipo <code class="docutils literal notranslate"><span class="pre">ReadinessResponse</span></code>.</p></li>
+</ul>
+<p>Campos relevantes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">labeled_exists</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unified_labeled_exists</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feature_pack_exists</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pair_matrix_exists</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">score_col</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pair_meta</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">labeled_score_meta</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">paths</span></code></p></li>
+</ul>
+</section>
+<section id="observaciones">
+<h3>Observaciones<a class="headerlink" href="#observaciones" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>El endpoint intenta resolver primero el labeled con los helpers del dominio.</p></li>
+<li><p>También expone rutas lógicas a los artefactos clave para que la UI pueda
+mostrar qué parte del pipeline está lista y qué falta construir.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-modelos-feature-pack-prepare">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/feature-pack/prepare</span></code><a class="headerlink" href="#post-modelos-feature-pack-prepare" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>Descripción<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Construye o reconstruye el <strong>feature-pack</strong> de un dataset.</p>
+<p>Este endpoint habilita el modo automático desde la pestaña <strong>Datos</strong> y también
+sirve como herramienta operativa/manual para dejar listo el conjunto de
+artefactos de entrenamiento bajo:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/</span></code></p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Entrada<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>Parámetros esperados:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>: identificador del dataset.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_uri</span></code> (opcional): ruta o URI del dataset fuente.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">force</span></code> (opcional): si es <code class="docutils literal notranslate"><span class="pre">true</span></code>, recalcula aunque el feature-pack exista.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">text_feats_mode</span></code> (opcional): <code class="docutils literal notranslate"><span class="pre">none</span></code> o <code class="docutils literal notranslate"><span class="pre">tfidf_lsa</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">text_col</span></code> (opcional): columna de texto a utilizar.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">text_n_components</span></code> (opcional): dimensión máxima de LSA.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">text_min_df</span></code> (opcional): frecuencia mínima de documento en TF-IDF.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">text_max_features</span></code> (opcional): tamaño máximo del vocabulario TF-IDF.</p></li>
+</ul>
+</section>
+<section id="resolucion-automatica-de-origen">
+<h3>Resolución automática de origen<a class="headerlink" href="#resolucion-automatica-de-origen" title="Link to this heading"></a></h3>
+<p>Si <code class="docutils literal notranslate"><span class="pre">input_uri</span></code> no se envía, el endpoint intenta resolver la fuente en este orden:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">data/labeled/&lt;dataset_id&gt;_beto.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/processed/&lt;dataset_id&gt;.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets/&lt;dataset_id&gt;.parquet</span></code></p></li>
+</ol>
+<p>Si no encuentra una fuente válida, responde con conflicto porque no puede
+construir el pack.</p>
+</section>
+<section id="id5">
+<h3>Respuesta<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> si el feature-pack se construye correctamente.</p></li>
+<li><p>En caso de errores:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span></code> si falta <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si se especifica <code class="docutils literal notranslate"><span class="pre">input_uri</span></code> pero no existe.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">409</span></code> si no se encuentra ninguna fuente válida para construir el pack.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="artefactos-esperados">
+<h3>Artefactos esperados<a class="headerlink" href="#artefactos-esperados" title="Link to this heading"></a></h3>
+<p>Este flujo deja listos, entre otros, artefactos como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/train_matrix.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/meta.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/pair_matrix.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/pair_meta.json</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-modelos-entrenar">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/entrenar</span></code><a class="headerlink" href="#post-modelos-entrenar" title="Link to this heading"></a></h2>
+<section id="id6">
+<h3>Descripción<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>Lanza un entrenamiento individual en background y retorna un <code class="docutils literal notranslate"><span class="pre">job_id</span></code> para
+consulta posterior.</p>
+<p>La ejecución real:</p>
+<ul class="simple">
+<li><p>construye el plan de entrenamiento,</p></li>
+<li><p>prepara la selección de datos,</p></li>
+<li><p>crea la estrategia de modelo,</p></li>
+<li><p>ejecuta <code class="docutils literal notranslate"><span class="pre">PlantillaEntrenamiento</span></code>,</p></li>
+<li><p>persiste un run en <code class="docutils literal notranslate"><span class="pre">artifacts/runs/&lt;run_id&gt;</span></code>,</p></li>
+<li><p>intenta exportar el predictor bundle,</p></li>
+<li><p>evalúa si corresponde promover champion.</p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>Entrada<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>El endpoint recibe un cuerpo <code class="docutils literal notranslate"><span class="pre">EntrenarRequest</span></code>. Según el código visible, el
+payload puede incluir campos como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">modelo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">task_type</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_level</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_source</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">epochs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_plan</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">window_k</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">replay_size</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">replay_strategy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warm_start_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warm_start_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hparams</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">auto_prepare</span></code></p></li>
+<li><p>parámetros opcionales de texto para auto-prepare del feature-pack</p></li>
+</ul>
+</section>
+<section id="id8">
+<h3>Respuesta<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
+<li><p>Respuesta tipo <code class="docutils literal notranslate"><span class="pre">EntrenarResponse</span></code> con:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">job_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">message</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="persistencia-y-trazabilidad">
+<h3>Persistencia y trazabilidad<a class="headerlink" href="#persistencia-y-trazabilidad" title="Link to this heading"></a></h3>
+<p>Durante el flujo se reserva y luego persiste un run bajo:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/runs/&lt;run_id&gt;</span></code></p></li>
+</ul>
+<p>El estado interno del job registra, entre otros:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifact_path</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">history</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">champion_promoted</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time_total_ms</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warm_start_trace</span></code></p></li>
+</ul>
+</section>
+<section id="errores">
+<h3>Errores<a class="headerlink" href="#errores" title="Link to this heading"></a></h3>
+<p>Si el entrenamiento falla, el job queda en estado <code class="docutils literal notranslate"><span class="pre">failed</span></code> y la consulta de
+estado posterior expone el detalle mediante <code class="docutils literal notranslate"><span class="pre">/modelos/estado/{job_id}</span></code>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-modelos-sweep">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/sweep</span></code><a class="headerlink" href="#post-modelos-sweep" title="Link to this heading"></a></h2>
+<section id="id9">
+<h3>Descripción<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>Ejecuta un <strong>sweep determinístico</strong> de modelos y devuelve el resultado cuando
+termina.</p>
+<p>Este endpoint:</p>
+<ul class="simple">
+<li><p>valida la lista de modelos solicitados,</p></li>
+<li><p>construye una selección de datos comparable para todos los candidatos,</p></li>
+<li><p>entrena cada candidato en las mismas condiciones,</p></li>
+<li><p>calcula la métrica primaria por familia,</p></li>
+<li><p>elige el mejor de forma determinística,</p></li>
+<li><p>opcionalmente promueve champion,</p></li>
+<li><p>persiste un <code class="docutils literal notranslate"><span class="pre">summary.json</span></code> del sweep.</p></li>
+</ul>
+</section>
+<section id="id10">
+<h3>Entrada<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>El cuerpo es <code class="docutils literal notranslate"><span class="pre">ModelSweepRequest</span></code>. Según el código visible, incluye al menos:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">models</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">base_hparams</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hparams_overrides</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_candidates</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">auto_promote_champion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed</span></code></p></li>
+<li><p>y otros parámetros compartidos con el entrenamiento individual.</p></li>
+</ul>
+</section>
+<section id="id11">
+<h3>Respuesta<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
+<li><p>Respuesta <code class="docutils literal notranslate"><span class="pre">ModelSweepResponse</span></code> con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sweep_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">primary_metric</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">primary_metric_mode</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">candidates</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">best</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">champion_promoted</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">champion_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_completed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_failed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">summary_path</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">elapsed_s</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="validaciones-y-errores">
+<h3>Validaciones y errores<a class="headerlink" href="#validaciones-y-errores" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span></code> si se solicita un modelo no soportado.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span></code> si falta <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span></code> si falta <code class="docutils literal notranslate"><span class="pre">family</span></code>.</p></li>
+</ul>
+</section>
+<section id="persistencia">
+<h3>Persistencia<a class="headerlink" href="#persistencia" title="Link to this heading"></a></h3>
+<p>El resultado del sweep se persiste en un <code class="docutils literal notranslate"><span class="pre">summary.json</span></code> bajo el directorio de
+sweeps para su consulta posterior.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-modelos-entrenar-sweep">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/entrenar/sweep</span></code><a class="headerlink" href="#post-modelos-entrenar-sweep" title="Link to this heading"></a></h2>
+<section id="id12">
+<h3>Descripción<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>Lanza un <strong>sweep asíncrono</strong> en background.</p>
+<p>A diferencia de <code class="docutils literal notranslate"><span class="pre">/modelos/sweep</span></code>, este endpoint no espera a que terminen todos
+los candidatos, sino que responde de inmediato con un <code class="docutils literal notranslate"><span class="pre">sweep_id</span></code>.</p>
+</section>
+<section id="id13">
+<h3>Entrada<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<p>Recibe un <code class="docutils literal notranslate"><span class="pre">SweepEntrenarRequest</span></code> con el contexto compartido del sweep.</p>
+</section>
+<section id="id14">
+<h3>Respuesta<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
+<li><p>Respuesta tipo <code class="docutils literal notranslate"><span class="pre">SweepEntrenarResponse</span></code> con:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sweep_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">message</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="consulta-posterior">
+<h3>Consulta posterior<a class="headerlink" href="#consulta-posterior" title="Link to this heading"></a></h3>
+<p>El estado y resultado del sweep se consultan mediante:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/estado/{job_id}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/sweeps/{sweep_id}</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-modelos-estado-job-id">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/estado/{job_id}</span></code><a class="headerlink" href="#get-modelos-estado-job-id" title="Link to this heading"></a></h2>
+<section id="id15">
+<h3>Descripción<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<p>Devuelve el estado de un job de entrenamiento o sweep.</p>
+<p>Este endpoint consulta primero el estado en memoria. Si no lo encuentra y existe
+un <code class="docutils literal notranslate"><span class="pre">summary.json</span></code> persistido para el sweep, usa ese archivo como fuente de
+verdad.</p>
+</section>
+<section id="id16">
+<h3>Entrada<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">job_id</span></code> en la ruta.</p></li>
+</ul>
+</section>
+<section id="id17">
+<h3>Respuesta<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> si el job existe o si puede reconstruirse desde el summary.</p></li>
+<li><p>Cuerpo tipo <code class="docutils literal notranslate"><span class="pre">EstadoResponse</span></code>.</p></li>
+</ul>
+<p>Campos visibles en el código:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">job_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">progress</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">params</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">history</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifact_path</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">champion_promoted</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">job_type</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sweep_summary_path</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sweep_best_overall</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sweep_best_by_model</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warm_start_trace</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time_total_ms</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">error</span></code></p></li>
+</ul>
+</section>
+<section id="estados-posibles">
+<h3>Estados posibles<a class="headerlink" href="#estados-posibles" title="Link to this heading"></a></h3>
+<p>Según el flujo actual, pueden aparecer estados como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">running</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">completed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">failed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unknown</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-modelos-champion-promote">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/modelos/champion/promote</span></code><a class="headerlink" href="#post-modelos-champion-promote" title="Link to this heading"></a></h2>
+<section id="id18">
+<h3>Descripción<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<p>Promueve manualmente un run existente a <strong>champion</strong>.</p>
+<p>El endpoint implementa validaciones defensivas para preservar una semántica
+estable de errores y también intenta inferir información faltante desde el run
+si el payload es mínimo.</p>
+</section>
+<section id="id19">
+<h3>Entrada<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<p>Recibe <code class="docutils literal notranslate"><span class="pre">PromoteChampionRequest</span></code>.</p>
+<p>Campos relevantes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (opcional si puede inferirse)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code> (opcional)</p></li>
+</ul>
+</section>
+<section id="comportamiento-relevante">
+<h3>Comportamiento relevante<a class="headerlink" href="#comportamiento-relevante" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Si falta <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>, intenta inferirlo desde <code class="docutils literal notranslate"><span class="pre">metrics.json</span></code> o desde el
+formato del <code class="docutils literal notranslate"><span class="pre">run_id</span></code>.</p></li>
+<li><p>Si falta <code class="docutils literal notranslate"><span class="pre">model_name</span></code>, delega la inferencia al flujo de promoción.</p></li>
+<li><p>Si el run no tiene <code class="docutils literal notranslate"><span class="pre">metrics.json</span></code>, responde con error explícito.</p></li>
+</ul>
+</section>
+<section id="id20">
+<h3>Respuesta<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con <code class="docutils literal notranslate"><span class="pre">ChampionInfo</span></code> si la promoción fue exitosa.</p></li>
+</ul>
+</section>
+<section id="errores-esperados">
+<h3>Errores esperados<a class="headerlink" href="#errores-esperados" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span></code> si <code class="docutils literal notranslate"><span class="pre">run_id</span></code> es inválido.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si no existe el run o falta <code class="docutils literal notranslate"><span class="pre">metrics.json</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">409</span></code> si no se pudo promover champion por conflicto operativo.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-modelos-runs">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/runs</span></code><a class="headerlink" href="#get-modelos-runs" title="Link to this heading"></a></h2>
+<section id="id21">
+<h3>Descripción<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<p>Lista runs persistidos de entrenamiento o auditoría encontrados en
+<code class="docutils literal notranslate"><span class="pre">artifacts/runs</span></code>.</p>
+<p>La implementación actual soporta filtros y además hace <strong>backfill</strong> de contexto a
+partir de <code class="docutils literal notranslate"><span class="pre">metrics.json</span></code> y <code class="docutils literal notranslate"><span class="pre">predictor.json</span></code> para que la respuesta sea más útil a
+la UI.</p>
+</section>
+<section id="id22">
+<h3>Entrada<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<p>Parámetros de query soportados:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code> (opcional)</p></li>
+</ul>
+</section>
+<section id="id23">
+<h3>Respuesta<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
+<li><p>Lista de objetos <code class="docutils literal notranslate"><span class="pre">RunSummary</span></code>.</p></li>
+</ul>
+</section>
+<section id="campos-relevantes">
+<h3>Campos relevantes<a class="headerlink" href="#campos-relevantes" title="Link to this heading"></a></h3>
+<p>Aunque el shape exacto depende del schema, el código visible rellena o expone:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifact_path</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">task_type</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_level</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">target_col</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_plan</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_source</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">context</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics</span></code></p></li>
+</ul>
+<p>También intenta completar métricas resumidas como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">primary_metric</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">primary_metric_mode</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">primary_metric_value</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">val_accuracy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">val_f1_macro</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accuracy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">f1_macro</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_train</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_val</span></code></p></li>
+</ul>
+</section>
+<section id="utilidad">
+<h3>Utilidad<a class="headerlink" href="#utilidad" title="Link to this heading"></a></h3>
+<p>Este endpoint alimenta listados como el historial de runs y tablas de resumen en
+la pestaña <strong>Modelos</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-modelos-runs-run-id">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/runs/{run_id}</span></code><a class="headerlink" href="#get-modelos-runs-run-id" title="Link to this heading"></a></h2>
+<section id="id24">
+<h3>Descripción<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>Devuelve los detalles completos de un run leyendo sus artefactos del filesystem.</p>
+<p>Además del detalle bruto, el endpoint enriquece la respuesta con contexto
+reconstruido para que la UI pueda renderizar metadatos y estado del bundle de
+inferencia sin depender de mocks.</p>
+</section>
+<section id="id25">
+<h3>Entrada<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code> en la ruta.</p></li>
+</ul>
+</section>
+<section id="id26">
+<h3>Respuesta<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con <code class="docutils literal notranslate"><span class="pre">RunDetails</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si el run no existe.</p></li>
+</ul>
+</section>
+<section id="campos-enriquecidos">
+<h3>Campos enriquecidos<a class="headerlink" href="#campos-enriquecidos" title="Link to this heading"></a></h3>
+<p>Según el código, el endpoint intenta completar o normalizar:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">context</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">task_type</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_level</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">target_col</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_plan</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_source</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-modelos-sweeps-sweep-id">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/sweeps/{sweep_id}</span></code><a class="headerlink" href="#get-modelos-sweeps-sweep-id" title="Link to this heading"></a></h2>
+<section id="id27">
+<h3>Descripción<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<p>Devuelve el resumen persistido de un sweep.</p>
+<p>Si el <code class="docutils literal notranslate"><span class="pre">summary.json</span></code> todavía no existe, intenta responder con la información en
+memoria del sweep en ejecución.</p>
+<p>Cuando el summary existe, el endpoint además normaliza y completa varios campos
+para que la UI pueda consumir sweeps nuevos y legados con el mismo contrato.</p>
+</section>
+<section id="id28">
+<h3>Entrada<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sweep_id</span></code> en la ruta.</p></li>
+</ul>
+</section>
+<section id="id29">
+<h3>Respuesta<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con <code class="docutils literal notranslate"><span class="pre">SweepSummary</span></code>.</p></li>
+<li><p>Si el summary aún no existe, puede devolver una versión parcial con:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sweep_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">summary_path</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="normalizaciones-observables">
+<h3>Normalizaciones observables<a class="headerlink" href="#normalizaciones-observables" title="Link to this heading"></a></h3>
+<p>El código visible hace, entre otras cosas:</p>
+<ul class="simple">
+<li><p>asegurar <code class="docutils literal notranslate"><span class="pre">primary_metric</span></code> y <code class="docutils literal notranslate"><span class="pre">primary_metric_mode</span></code>;</p></li>
+<li><p>compatibilizar <code class="docutils literal notranslate"><span class="pre">best_overall</span></code> y <code class="docutils literal notranslate"><span class="pre">best_by_model</span></code> con llaves legacy;</p></li>
+<li><p>hidratar candidatos desde métricas persistidas;</p></li>
+<li><p>recalcular <code class="docutils literal notranslate"><span class="pre">best_overall</span></code> si falta o viene incompleto.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-modelos-champion">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/modelos/champion</span></code><a class="headerlink" href="#get-modelos-champion" title="Link to this heading"></a></h2>
+<section id="id30">
+<h3>Descripción<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<p>Devuelve la información del <strong>modelo campeón actual</strong> para un dataset.</p>
+<p>El endpoint soporta tanto la carga del champion actual como ciertos fallbacks
+legados por dataset, y realiza backfill de contexto para evitar respuestas
+incompletas.</p>
+</section>
+<section id="id31">
+<h3>Entrada<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<p>Parámetros de query soportados:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code> (opcional)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code> (opcional)</p></li>
+</ul>
+</section>
+<section id="reglas-importantes">
+<h3>Reglas importantes<a class="headerlink" href="#reglas-importantes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Debe existir al menos uno entre <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>, <code class="docutils literal notranslate"><span class="pre">dataset</span></code> o <code class="docutils literal notranslate"><span class="pre">periodo</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code> solo se usa como filtro cuando el usuario lo pasa explícitamente.</p></li>
+<li><p>Si no se pasa <code class="docutils literal notranslate"><span class="pre">model_name</span></code>, se devuelve el champion global del dataset para la
+familia solicitada o detectada.</p></li>
+</ul>
+</section>
+<section id="id32">
+<h3>Respuesta<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con <code class="docutils literal notranslate"><span class="pre">ChampionInfo</span></code>.</p></li>
+</ul>
+<p>Campos relevantes reforzados por el código:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">task_type</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_level</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">target_col</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_plan</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data_source</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics</span></code></p></li>
+</ul>
+</section>
+<section id="id33">
+<h3>Errores esperados<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span></code> si no se envía <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>, <code class="docutils literal notranslate"><span class="pre">dataset</span></code> ni <code class="docutils literal notranslate"><span class="pre">periodo</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span></code> si no existe champion para el dataset/familia solicitados.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span></code> si el champion cargado es inválido para el schema <code class="docutils literal notranslate"><span class="pre">ChampionInfo</span></code> o si
+falla la resolución del champion.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="relacion-con-la-pestana-modelos">
+<h2>Relación con la pestaña «Modelos»<a class="headerlink" href="#relacion-con-la-pestana-modelos" title="Link to this heading"></a></h2>
+<p>En la implementación actual del proyecto, este router es la base operativa de la
+pestaña <strong>Modelos</strong> y de sus subflujos principales:</p>
+<ul class="simple">
+<li><p><strong>Resumen</strong>: datasets disponibles, readiness y champion.</p></li>
+<li><p><strong>Entrenamiento</strong>: <code class="docutils literal notranslate"><span class="pre">feature-pack/prepare</span></code>, <code class="docutils literal notranslate"><span class="pre">entrenar</span></code>.</p></li>
+<li><p><strong>Ejecuciones</strong>: <code class="docutils literal notranslate"><span class="pre">runs</span></code>, <code class="docutils literal notranslate"><span class="pre">runs/{run_id}</span></code>, <code class="docutils literal notranslate"><span class="pre">estado/{job_id}</span></code>.</p></li>
+<li><p><strong>Campeón</strong>: <code class="docutils literal notranslate"><span class="pre">champion</span></code>, <code class="docutils literal notranslate"><span class="pre">champion/promote</span></code>.</p></li>
+<li><p><strong>Sweep</strong>: <code class="docutils literal notranslate"><span class="pre">sweep</span></code>, <code class="docutils literal notranslate"><span class="pre">entrenar/sweep</span></code>, <code class="docutils literal notranslate"><span class="pre">sweeps/{sweep_id}</span></code>.</p></li>
+<li><p><strong>Artefactos / Diagnóstico</strong>: inspección indirecta de paths, bundles y
+métricas persistidas.</p></li>
+</ul>
+<p>Por ello, esta documentación debe considerarse la referencia principal de la API
+para la operación del ciclo de modelado en NeuroCampus.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="jobs.html" class="btn btn-neutral float-left" title="Endpoints de jobs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="dashboard.html" class="btn btn-neutral float-right" title="Endpoints del Dashboard" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Daniel Felipe Ramirez Cabrera &amp; Santiago Criollo Bermudez.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endpoints de predicción directa &mdash; documentación de NeuroCampus - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Endpoints de predicciones" href="predicciones.html" />
+    <link rel="prev" title="Endpoints del Dashboard" href="dashboard.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            NeuroCampus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">Manual de usuario</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API del backend</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#cobertura-documental-actual">Cobertura documental actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#resumen-de-dominios-expuestos">Resumen de dominios expuestos</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#navegacion-de-esta-seccion">Navegación de esta sección</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="datos.html">Endpoints de datos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html">Endpoints de jobs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preprocesamiento-beto">Jobs de preprocesamiento BETO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-unificacion-historica">Jobs de unificación histórica</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preparacion-de-feature-pack">Jobs de preparación de feature-pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-busqueda-de-hiperparametros-rbm">Jobs de búsqueda de hiperparámetros RBM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modelos.html">Endpoints de modelos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dashboard.html">Endpoints del Dashboard</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Endpoints de predicción directa</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#resumen-de-endpoints">Resumen de endpoints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-prediccion-online"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/prediccion/online</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-prediccion-batch"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/prediccion/batch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#diferencia-entre-prediccion-y-predicciones">Diferencia entre <code class="docutils literal notranslate"><span class="pre">/prediccion</span></code> y <code class="docutils literal notranslate"><span class="pre">/predicciones</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#relacion-con-otros-modulos">Relación con otros módulos</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="predicciones.html">Endpoints de predicciones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="admin.html">Endpoints de administración</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_python/index.html">API Python (backend)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devops/index.html">Guía de desarrollo y operación</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">NeuroCampus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API del backend</a></li>
+      <li class="breadcrumb-item active">Endpoints de predicción directa</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_backend/prediccion.md.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="endpoints-de-prediccion-directa">
+<h1>Endpoints de predicción directa<a class="headerlink" href="#endpoints-de-prediccion-directa" title="Link to this heading"></a></h1>
+<p>La API de <strong>predicción directa</strong> agrupa endpoints de inferencia inmediata bajo el
+prefijo:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/prediccion</span></code></p></li>
+</ul>
+<p>Esta sección documenta el router orientado a predicción <strong>online</strong> y
+predicción <strong>batch</strong> ligera. Su objetivo es resolver inferencia rápida a partir</p>
+<ul class="simple">
+<li><p>de un payload JSON en línea, o</p></li>
+<li><p>de un archivo cargado en la petición.</p></li>
+</ul>
+<p>A diferencia del router <code class="docutils literal notranslate"><span class="pre">predicciones</span></code>, este módulo <strong>no</strong> gestiona listados de
+runs persistidos, feature-packs, champion browsing ni descargas de outputs. Su
+alcance está centrado en ejecutar inferencia directamente mediante el facade de
+predicción.</p>
+<hr class="docutils" />
+<section id="resumen-de-endpoints">
+<h2>Resumen de endpoints<a class="headerlink" href="#resumen-de-endpoints" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Método</p></th>
+<th class="head"><p>Ruta</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/prediccion/online</span></code></p></td>
+<td><p>Ejecuta predicción online con payload JSON</p></td>
+</tr>
+<tr class="row-odd"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/prediccion/batch</span></code></p></td>
+<td><p>Ejecuta predicción batch ligera a partir de un archivo</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="post-prediccion-online">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/prediccion/online</span></code><a class="headerlink" href="#post-prediccion-online" title="Link to this heading"></a></h2>
+<section id="descripcion">
+<h3>Descripción<a class="headerlink" href="#descripcion" title="Link to this heading"></a></h3>
+<p>Ejecuta una predicción online a partir de un cuerpo JSON validado por el schema
+<code class="docutils literal notranslate"><span class="pre">PrediccionOnlineRequest</span></code>.</p>
+<p>Este endpoint está pensado para escenarios donde el cliente ya dispone de los
+atributos de entrada en memoria y necesita una respuesta inmediata sin generar
+artefactos persistidos.</p>
+</section>
+<section id="comportamiento-real-del-endpoint">
+<h3>Comportamiento real del endpoint<a class="headerlink" href="#comportamiento-real-del-endpoint" title="Link to this heading"></a></h3>
+<p>El router:</p>
+<ol class="arabic simple">
+<li><p>recibe un request tipado con <code class="docutils literal notranslate"><span class="pre">PrediccionOnlineRequest</span></code>;</p></li>
+<li><p>serializa el payload con <code class="docutils literal notranslate"><span class="pre">model_dump()</span></code> o <code class="docutils literal notranslate"><span class="pre">dict()</span></code> según compatibilidad;</p></li>
+<li><p>llama al facade <code class="docutils literal notranslate"><span class="pre">predict_online(...)</span></code>;</p></li>
+<li><p>convierte la salida a un formato seguro para JSON;</p></li>
+<li><p>devuelve la respuesta como <code class="docutils literal notranslate"><span class="pre">JSONResponse</span></code>.</p></li>
+</ol>
+<p>También intenta capturar y serializar correctamente tipos no nativos como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">numpy.integer</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">numpy.floating</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">torch.Tensor</span></code> (si <code class="docutils literal notranslate"><span class="pre">torch</span></code> está disponible)</p></li>
+</ul>
+<p>Esto evita errores de serialización frecuentes en respuestas de inferencia.</p>
+</section>
+<section id="entrada">
+<h3>Entrada<a class="headerlink" href="#entrada" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Método: <code class="docutils literal notranslate"><span class="pre">POST</span></code></p></li>
+<li><p>Content-Type: <code class="docutils literal notranslate"><span class="pre">application/json</span></code></p></li>
+<li><p>Cuerpo: <code class="docutils literal notranslate"><span class="pre">PrediccionOnlineRequest</span></code></p></li>
+</ul>
+<p>El detalle exacto del schema depende de <code class="docutils literal notranslate"><span class="pre">neurocampus.app.schemas.prediccion</span></code>,
+pero conceptualmente el payload representa una observación individual para la
+que se desea inferencia inmediata.</p>
+</section>
+<section id="reglas-de-decision-internas">
+<h3>Reglas de decisión internas<a class="headerlink" href="#reglas-de-decision-internas" title="Link to this heading"></a></h3>
+<p>El módulo define una lógica auxiliar de decisión costo-sensible sobre
+probabilidades de clase:</p>
+<ul class="simple">
+<li><p>prioriza <strong>pos</strong> si <code class="docutils literal notranslate"><span class="pre">p_pos</span> <span class="pre">&gt;=</span> <span class="pre">0.55</span></code>;</p></li>
+<li><p>favorece <strong>neg</strong> si <code class="docutils literal notranslate"><span class="pre">p_neg</span> <span class="pre">&gt;=</span> <span class="pre">0.35</span></code>;</p></li>
+<li><p>o si <code class="docutils literal notranslate"><span class="pre">p_neg</span> <span class="pre">-</span> <span class="pre">p_neu</span> <span class="pre">&gt;=</span> <span class="pre">0.05</span></code>;</p></li>
+<li><p>en otro caso, cae en <strong>neu</strong>.</p></li>
+</ul>
+<p>Actualmente esa lógica está implementada como helper interno, pero el endpoint
+<code class="docutils literal notranslate"><span class="pre">/online</span></code> delega la inferencia principal al facade <code class="docutils literal notranslate"><span class="pre">predict_online(...)</span></code>.</p>
+</section>
+<section id="respuesta">
+<h3>Respuesta<a class="headerlink" href="#respuesta" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> en caso de éxito.</p></li>
+<li><p>Cuerpo JSON compatible con <code class="docutils literal notranslate"><span class="pre">PrediccionOnlineResponse</span></code>.</p></li>
+</ul>
+<p>El contrato exacto depende del facade, pero la respuesta se devuelve ya
+normalizada para evitar problemas de codificación de tipos numéricos.</p>
+</section>
+<section id="errores-esperados">
+<h3>Errores esperados<a class="headerlink" href="#errores-esperados" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code></p>
+<ul>
+<li><p>si el facade de predicción falla;</p></li>
+<li><p>si ocurre una excepción durante la inferencia.</p></li>
+</ul>
+</li>
+</ul>
+<p>A diferencia de un 500 genérico opaco, este endpoint construye un <code class="docutils literal notranslate"><span class="pre">detail</span></code>
+JSON con forma similar a:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;detail&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prediction_failed&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mensaje del error&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Si la variable de entorno <code class="docutils literal notranslate"><span class="pre">NEUROCAMPUS_DEBUG=1</span></code> está habilitada, puede incluir
+además un traceback en la respuesta de error.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-prediccion-batch">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/prediccion/batch</span></code><a class="headerlink" href="#post-prediccion-batch" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>Descripción<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Ejecuta una predicción batch ligera a partir de un archivo subido en la misma
+petición.</p>
+<p>Este endpoint está pensado como una variante mínima de inferencia por lote,
+separada del sistema más completo de runs persistidos del router
+<code class="docutils literal notranslate"><span class="pre">/predicciones</span></code>.</p>
+</section>
+<section id="id2">
+<h3>Entrada<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Método: <code class="docutils literal notranslate"><span class="pre">POST</span></code></p></li>
+<li><p>Content-Type: <code class="docutils literal notranslate"><span class="pre">multipart/form-data</span></code></p></li>
+<li><p>Campo soportado:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">file</span></code> (opcional en la firma, pero esperado en el flujo principal)</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="formato-esperado-del-archivo">
+<h3>Formato esperado del archivo<a class="headerlink" href="#formato-esperado-del-archivo" title="Link to this heading"></a></h3>
+<p>Cuando se envía <code class="docutils literal notranslate"><span class="pre">file</span></code>, el código actual lee el contenido con <code class="docutils literal notranslate"><span class="pre">pandas.read_csv</span></code>
+y espera columnas con esta forma conceptual:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comentario</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pregunta_1</span></code> … <code class="docutils literal notranslate"><span class="pre">pregunta_10</span></code></p></li>
+</ul>
+</section>
+<section id="adaptacion-interna">
+<h3>Adaptación interna<a class="headerlink" href="#adaptacion-interna" title="Link to this heading"></a></h3>
+<p>Por cada fila del CSV, el endpoint construye un item con estructura lógica como:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;comentario&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;calificaciones&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;pregunta_1&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;pregunta_2&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">3.0</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Luego delega la inferencia al facade:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predict_batch(items,</span> <span class="pre">correlation_id=...)</span></code></p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Respuesta<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">201</span> <span class="pre">Created</span></code> en caso de éxito.</p></li>
+<li><p>Cuerpo compatible con <code class="docutils literal notranslate"><span class="pre">PrediccionBatchResponse</span></code>.</p></li>
+</ul>
+<p>El endpoint retorna directamente el <code class="docutils literal notranslate"><span class="pre">summary</span></code> devuelto por <code class="docutils literal notranslate"><span class="pre">predict_batch(...)</span></code>.</p>
+</section>
+<section id="alcance-actual-y-limitaciones">
+<h3>Alcance actual y limitaciones<a class="headerlink" href="#alcance-actual-y-limitaciones" title="Link to this heading"></a></h3>
+<p>El propio código deja explícito que esta implementación es una <strong>variante
+mínima</strong>.</p>
+<p>Hoy no documenta ni implementa completamente:</p>
+<ul class="simple">
+<li><p>resolución de <code class="docutils literal notranslate"><span class="pre">data_ref</span></code> en JSON;</p></li>
+<li><p>persistencia de outputs batch;</p></li>
+<li><p>polling de jobs;</p></li>
+<li><p>reglas costo-sensibles aplicadas a cada ítem de salida.</p></li>
+</ul>
+<p>Existe un comentario <code class="docutils literal notranslate"><span class="pre">TODO</span></code> para extender la entrada a escenarios con JSON y
+adapters más generales.</p>
+</section>
+<section id="errores-probables">
+<h3>Errores probables<a class="headerlink" href="#errores-probables" title="Link to this heading"></a></h3>
+<p>Aunque el endpoint no envuelve todas las excepciones con un manejo tan explícito
+como <code class="docutils literal notranslate"><span class="pre">/prediccion/online</span></code>, pueden aparecer errores por:</p>
+<ul class="simple">
+<li><p>archivo CSV inválido;</p></li>
+<li><p>columnas faltantes;</p></li>
+<li><p>tipos no convertibles a <code class="docutils literal notranslate"><span class="pre">float</span></code> en <code class="docutils literal notranslate"><span class="pre">pregunta_*</span></code>;</p></li>
+<li><p>fallos internos del facade <code class="docutils literal notranslate"><span class="pre">predict_batch(...)</span></code>.</p></li>
+</ul>
+<p>Dependiendo del punto del fallo, FastAPI puede responder con:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="diferencia-entre-prediccion-y-predicciones">
+<h2>Diferencia entre <code class="docutils literal notranslate"><span class="pre">/prediccion</span></code> y <code class="docutils literal notranslate"><span class="pre">/predicciones</span></code><a class="headerlink" href="#diferencia-entre-prediccion-y-predicciones" title="Link to this heading"></a></h2>
+<p>Aunque sus nombres son parecidos, ambos routers cumplen funciones distintas.</p>
+<section id="prediccion">
+<h3><code class="docutils literal notranslate"><span class="pre">/prediccion</span></code><a class="headerlink" href="#prediccion" title="Link to this heading"></a></h3>
+<p>Se usa para:</p>
+<ul class="simple">
+<li><p>inferencia directa online;</p></li>
+<li><p>batch simple cargado en la misma petición;</p></li>
+<li><p>respuestas inmediatas sin pipeline completo de artefactos.</p></li>
+</ul>
+</section>
+<section id="predicciones">
+<h3><code class="docutils literal notranslate"><span class="pre">/predicciones</span></code><a class="headerlink" href="#predicciones" title="Link to this heading"></a></h3>
+<p>Se usa para:</p>
+<ul class="simple">
+<li><p>listar datasets y runs disponibles;</p></li>
+<li><p>resolver docentes y materias desde feature-pack;</p></li>
+<li><p>ejecutar predicción individual sobre pares docente–materia;</p></li>
+<li><p>lanzar jobs batch persistidos;</p></li>
+<li><p>consultar estado de jobs batch;</p></li>
+<li><p>descargar outputs persistidos;</p></li>
+<li><p>inspeccionar bundles de modelo (<code class="docutils literal notranslate"><span class="pre">model-info</span></code>, <code class="docutils literal notranslate"><span class="pre">predict</span></code>).</p></li>
+</ul>
+<p>Por tanto, este archivo documenta únicamente el router <strong>ligero</strong> de
+predicción directa.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="relacion-con-otros-modulos">
+<h2>Relación con otros módulos<a class="headerlink" href="#relacion-con-otros-modulos" title="Link to this heading"></a></h2>
+<p>El router <code class="docutils literal notranslate"><span class="pre">/prediccion</span></code> se apoya principalmente en:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus.app.schemas.prediccion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus.prediction.facades.prediccion_facade</span></code></p></li>
+</ul>
+<p>Esto implica que el contrato funcional real depende del facade y de los schemas
+Pydantic asociados. Si esos contratos cambian, esta página debe actualizarse.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="dashboard.html" class="btn btn-neutral float-left" title="Endpoints del Dashboard" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="predicciones.html" class="btn btn-neutral float-right" title="Endpoints de predicciones" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Daniel Felipe Ramirez Cabrera &amp; Santiago Criollo Bermudez.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

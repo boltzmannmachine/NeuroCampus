@@ -21,7 +21,7 @@
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
     <link rel="next" title="API Python (backend)" href="../api_python/index.html" />
-    <link rel="prev" title="Endpoints de jobs" href="jobs.html" /> 
+    <link rel="prev" title="Endpoints de predicciones" href="predicciones.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -49,34 +49,29 @@
 <li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API del backend</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="datos.html">Endpoints de datos</a></li>
-<li class="toctree-l2"><a class="reference internal" href="jobs.html">Endpoints de jobs</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Endpoints de administración</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#resumen-de-endpoints-principales">Resumen de endpoints principales</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#get-admin-cleanup-preview"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/admin/cleanup/preview</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#descripcion">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#respuesta">Respuesta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cobertura-documental-actual">Cobertura documental actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#resumen-de-dominios-expuestos">Resumen de dominios expuestos</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#navegacion-de-esta-seccion">Navegación de esta sección</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="datos.html">Endpoints de datos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html">Endpoints de jobs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preprocesamiento-beto">Jobs de preprocesamiento BETO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-unificacion-historica">Jobs de unificación histórica</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preparacion-de-feature-pack">Jobs de preparación de feature-pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-busqueda-de-hiperparametros-rbm">Jobs de búsqueda de hiperparámetros RBM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modelos.html">Endpoints de modelos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dashboard.html">Endpoints del Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="prediccion.html">Endpoints de predicción directa</a></li>
+<li class="toctree-l3"><a class="reference internal" href="predicciones.html">Endpoints de predicciones</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Endpoints de administración</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#consideraciones-de-autenticacion">Consideraciones de autenticación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resumen-de-endpoints">Resumen de endpoints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-admin-cleanup-inventory"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/admin/cleanup/inventory</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-admin-cleanup"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/admin/cleanup</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-admin-cleanup-logs"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/admin/cleanup/logs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#consideraciones-operativas">Consideraciones operativas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#relacion-con-otras-areas-del-sistema">Relación con otras áreas del sistema</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#post-admin-cleanup-datasets"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/admin/cleanup/datasets</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id1">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#entrada">Entrada</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id2">Respuesta</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#post-admin-cleanup-jobs"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/admin/cleanup/jobs</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id3">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id4">Entrada</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id5">Respuesta</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#post-admin-cleanup-artifacts"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/admin/cleanup/artifacts</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id6">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id7">Entrada</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id8">Respuesta</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#consideraciones-de-seguridad">Consideraciones de seguridad</a></li>
 </ul>
 </li>
 </ul>
@@ -112,17 +107,47 @@
              
   <section id="endpoints-de-administracion">
 <h1>Endpoints de administración<a class="headerlink" href="#endpoints-de-administracion" title="Link to this heading"></a></h1>
-<p>La API de administración agrupa endpoints pensados para tareas de <strong>mantenimiento</strong>
-y <strong>limpieza</strong> de artefactos relacionados con datos y modelos. Estos endpoints
-suelen estar protegidos o restringidos a usuarios con permisos elevados.</p>
-<p>Todos los endpoints aquí descritos cuelgan del prefijo base:</p>
+<p>La API de administración agrupa operaciones de <strong>inventario</strong>, <strong>limpieza</strong> y
+<strong>consulta de logs</strong> relacionadas con datasets, jobs y artefactos del sistema.</p>
+<p>En la implementación actual, estos endpoints viven en el router
+<code class="docutils literal notranslate"><span class="pre">admin_cleanup.py</span></code> y exponen rutas absolutas bajo el espacio:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">/admin</span></code> (o <code class="docutils literal notranslate"><span class="pre">/admin/cleanup</span></code>, según la estructura concreta del backend)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup/*</span></code></p></li>
 </ul>
+<p>A diferencia de otros routers, en <code class="docutils literal notranslate"><span class="pre">main.py</span></code> este router se registra <strong>sin
+prefix adicional</strong>, por lo que las rutas documentadas aquí son las rutas finales
+que recibe el cliente.</p>
 <hr class="docutils" />
-<section id="resumen-de-endpoints-principales">
-<h2>Resumen de endpoints principales<a class="headerlink" href="#resumen-de-endpoints-principales" title="Link to this heading"></a></h2>
-<p>Los nombres exactos pueden variar, pero típicamente se exponen operaciones como:</p>
+<section id="consideraciones-de-autenticacion">
+<h2>Consideraciones de autenticación<a class="headerlink" href="#consideraciones-de-autenticacion" title="Link to this heading"></a></h2>
+<p>Los tres endpoints del router dependen de <code class="docutils literal notranslate"><span class="pre">require_admin</span></code>.</p>
+<section id="comportamiento-actual">
+<h3>Comportamiento actual<a class="headerlink" href="#comportamiento-actual" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Si la variable de entorno <code class="docutils literal notranslate"><span class="pre">NC_DISABLE_ADMIN_AUTH=1</span></code> está activa,
+la validación de autenticación se desactiva.</p></li>
+<li><p>Si no está activa:</p>
+<ul>
+<li><p>el cliente debe enviar un header <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Bearer</span> <span class="pre">&lt;token&gt;</span></code>;</p></li>
+<li><p>si el header falta o no usa el esquema <code class="docutils literal notranslate"><span class="pre">Bearer</span></code>, el backend responde <code class="docutils literal notranslate"><span class="pre">401</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="importante">
+<h3>Importante<a class="headerlink" href="#importante" title="Link to this heading"></a></h3>
+<p>En la implementación actual, el backend <strong>no valida el valor exacto del token</strong>
+una vez que el header <code class="docutils literal notranslate"><span class="pre">Bearer</span></code> está presente. Es decir, hoy el control efectivo
+comprueba la presencia del esquema <code class="docutils literal notranslate"><span class="pre">Bearer</span></code>, no la igualdad contra un token
+específico.</p>
+<p>Esto debe interpretarse como una implementación de control administrativo en
+estado de desarrollo o compatibilidad, no como un esquema de seguridad robusto
+para producción.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="resumen-de-endpoints">
+<h2>Resumen de endpoints<a class="headerlink" href="#resumen-de-endpoints" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Método</p></th>
@@ -132,170 +157,316 @@ suelen estar protegidos o restringidos a usuarios con permisos elevados.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>GET</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup/preview</span></code></p></td>
-<td><p>Muestra un resumen de lo que se puede limpiar</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup/inventory</span></code></p></td>
+<td><p>Calcula inventario y candidatos de limpieza en modo simulación</p></td>
 </tr>
 <tr class="row-odd"><td><p>POST</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup/datasets</span></code></p></td>
-<td><p>Limpia datasets obsoletos o de prueba</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup</span></code></p></td>
+<td><p>Ejecuta o simula la limpieza según el payload recibido</p></td>
 </tr>
-<tr class="row-even"><td><p>POST</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup/jobs</span></code></p></td>
-<td><p>Limpia registros de jobs antiguos</p></td>
-</tr>
-<tr class="row-odd"><td><p>POST</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup/artifacts</span></code></p></td>
-<td><p>Elimina artefactos de modelos no utilizados</p></td>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup/logs</span></code></p></td>
+<td><p>Devuelve las últimas líneas del log de limpieza</p></td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<div><p><strong>Importante</strong>: esta sección describe la intención de la API de administración.
-La implementación real puede agrupar o dividir endpoints de forma ligeramente
-diferente (por ejemplo, <code class="docutils literal notranslate"><span class="pre">/admin/cleanup</span></code> con payload que especifique qué
-limpiar).</p>
-</div></blockquote>
 </section>
 <hr class="docutils" />
-<section id="get-admin-cleanup-preview">
-<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/admin/cleanup/preview</span></code><a class="headerlink" href="#get-admin-cleanup-preview" title="Link to this heading"></a></h2>
+<section id="get-admin-cleanup-inventory">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/admin/cleanup/inventory</span></code><a class="headerlink" href="#get-admin-cleanup-inventory" title="Link to this heading"></a></h2>
 <section id="descripcion">
 <h3>Descripción<a class="headerlink" href="#descripcion" title="Link to this heading"></a></h3>
-<p>Devuelve un resumen de los elementos que podrían eliminarse mediante las
-operaciones de limpieza:</p>
+<p>Devuelve un inventario de artefactos y candidatos de limpieza.</p>
+<p>Este endpoint siempre opera en <strong>modo simulación</strong> (<code class="docutils literal notranslate"><span class="pre">dry_run=True</span></code>), por lo que:</p>
 <ul class="simple">
-<li><p>Datasets antiguos o marcados como de prueba.</p></li>
-<li><p>Registros de jobs que ya no son necesarios.</p></li>
-<li><p>Artefactos de modelos obsoletos o superseded.</p></li>
+<li><p>no borra archivos;</p></li>
+<li><p>no mueve elementos a papelera;</p></li>
+<li><p>no altera el estado persistido del sistema.</p></li>
 </ul>
-<p>Se utiliza en la pestaña de administración para que el usuario pueda ver qué
-impacto tendrá la acción de limpieza antes de ejecutarla.</p>
+<p>Su objetivo es permitir al usuario o a la interfaz administrativa inspeccionar
+el impacto potencial de una limpieza antes de ejecutarla.</p>
+</section>
+<section id="parametros-de-query">
+<h3>Parámetros de query<a class="headerlink" href="#parametros-de-query" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">retention_days</span></code>:</p>
+<ul>
+<li><p>entero mayor o igual a <code class="docutils literal notranslate"><span class="pre">0</span></code>;</p></li>
+<li><p>valor por defecto: <code class="docutils literal notranslate"><span class="pre">90</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keep_last</span></code>:</p>
+<ul>
+<li><p>entero mayor o igual a <code class="docutils literal notranslate"><span class="pre">0</span></code>;</p></li>
+<li><p>valor por defecto: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exclude_globs</span></code>:</p>
+<ul>
+<li><p>string opcional;</p></li>
+<li><p>acepta patrones separados por coma, por ejemplo:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/champions/**,*.keep</span></code></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="ejemplo-conceptual">
+<h3>Ejemplo conceptual<a class="headerlink" href="#ejemplo-conceptual" title="Link to this heading"></a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>GET /admin/cleanup/inventory?retention_days=120&amp;keep_last=5
+Authorization: Bearer dev-admin-token
+</pre></div>
+</div>
 </section>
 <section id="respuesta">
 <h3>Respuesta<a class="headerlink" href="#respuesta" title="Link to this heading"></a></h3>
+<p>Devuelve el resultado de <code class="docutils literal notranslate"><span class="pre">run_cleanup(...)</span></code> en modo simulación.</p>
+<p>La forma exacta del JSON depende de la implementación del script de limpieza,
+pero conceptualmente incluye:</p>
 <ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
-<li><p>Cuerpo JSON típico:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">datasets</span></code>: lista resumida de datasets candidatos a limpieza.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">jobs</span></code>: lista resumida de jobs antiguos.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">artifacts</span></code>: lista de artefactos/módulos candidatos.</p></li>
-<li><p>contadores globales por tipo.</p></li>
+<li><p>inventario inspeccionado;</p></li>
+<li><p>candidatos a limpieza;</p></li>
+<li><p>conteos agregados;</p></li>
+<li><p>criterios usados para calcular el resultado.</p></li>
 </ul>
-</li>
+</section>
+<section id="codigos-relevantes">
+<h3>Códigos relevantes<a class="headerlink" href="#codigos-relevantes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>: inventario calculado correctamente.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">401</span> <span class="pre">Unauthorized</span></code>: falta el header <code class="docutils literal notranslate"><span class="pre">Bearer</span></code> y la autenticación no está desactivada.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="post-admin-cleanup-datasets">
-<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/admin/cleanup/datasets</span></code><a class="headerlink" href="#post-admin-cleanup-datasets" title="Link to this heading"></a></h2>
+<section id="post-admin-cleanup">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/admin/cleanup</span></code><a class="headerlink" href="#post-admin-cleanup" title="Link to this heading"></a></h2>
 <section id="id1">
 <h3>Descripción<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<p>Elimina datasets marcados como candidatos según alguna política de retención
-(configuración, antigüedad, etiquetas, etc.).</p>
-</section>
-<section id="entrada">
-<h3>Entrada<a class="headerlink" href="#entrada" title="Link to this heading"></a></h3>
+<p>Ejecuta el flujo de limpieza administrativa.</p>
+<p>Este endpoint soporta dos comportamientos principales:</p>
 <ul class="simple">
-<li><p>Cuerpo JSON opcional con criterios adicionales, por ejemplo:</p>
+<li><p><strong>simulación</strong> si <code class="docutils literal notranslate"><span class="pre">dry_run=true</span></code>;</p></li>
+<li><p><strong>ejecución efectiva</strong> si <code class="docutils literal notranslate"><span class="pre">dry_run=false</span></code>.</p></li>
+</ul>
+<p>Adicionalmente, el comportamiento de borrado/movimiento depende del valor de
+<code class="docutils literal notranslate"><span class="pre">force</span></code> y de la lógica implementada por <code class="docutils literal notranslate"><span class="pre">run_cleanup(...)</span></code>.</p>
+</section>
+<section id="cuerpo-de-la-peticion">
+<h3>Cuerpo de la petición<a class="headerlink" href="#cuerpo-de-la-peticion" title="Link to this heading"></a></h3>
+<p>El payload corresponde al modelo <code class="docutils literal notranslate"><span class="pre">CleanupRequest</span></code>.</p>
+<section id="campos-soportados">
+<h4>Campos soportados<a class="headerlink" href="#campos-soportados" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">retention_days</span></code>:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">older_than</span></code>: fecha a partir de la cual los datasets se consideran antiguos.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dry_run</span></code>: si es <code class="docutils literal notranslate"><span class="pre">true</span></code>, solo simula la limpieza sin ejecutarla.</p></li>
+<li><p>entero <code class="docutils literal notranslate"><span class="pre">&gt;=</span> <span class="pre">0</span></code>;</p></li>
+<li><p>default: <code class="docutils literal notranslate"><span class="pre">90</span></code>.</p></li>
 </ul>
 </li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keep_last</span></code>:</p>
+<ul>
+<li><p>entero <code class="docutils literal notranslate"><span class="pre">&gt;=</span> <span class="pre">0</span></code>;</p></li>
+<li><p>default: <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exclude_globs</span></code>:</p>
+<ul>
+<li><p>string opcional con globs separados por coma.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dry_run</span></code>:</p>
+<ul>
+<li><p>booleano;</p></li>
+<li><p>default: <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">force</span></code>:</p>
+<ul>
+<li><p>booleano;</p></li>
+<li><p>default: <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trash_dir</span></code>:</p>
+<ul>
+<li><p>string;</p></li>
+<li><p>default: <code class="docutils literal notranslate"><span class="pre">.trash</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trash_retention_days</span></code>:</p>
+<ul>
+<li><p>entero <code class="docutils literal notranslate"><span class="pre">&gt;=</span> <span class="pre">0</span></code>;</p></li>
+<li><p>default: <code class="docutils literal notranslate"><span class="pre">14</span></code>.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="ejemplo-de-payload">
+<h3>Ejemplo de payload<a class="headerlink" href="#ejemplo-de-payload" title="Link to this heading"></a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;retention_days&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">90</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;keep_last&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;exclude_globs&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;artifacts/champions/**,*.keep&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;dry_run&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;force&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;trash_dir&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;.trash&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;trash_retention_days&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="comportamiento">
+<h3>Comportamiento<a class="headerlink" href="#comportamiento" title="Link to this heading"></a></h3>
+<p>El endpoint delega la operación al script <code class="docutils literal notranslate"><span class="pre">scripts/cleanup.py</span></code> mediante la
+función <code class="docutils literal notranslate"><span class="pre">run_cleanup(...)</span></code>.</p>
+<p>Eso significa que la semántica final de la limpieza depende del script de
+soporte, pero desde la API HTTP el contrato funcional actual es:</p>
+<ul class="simple">
+<li><p>calcular candidatos según política de retención;</p></li>
+<li><p>respetar exclusiones por glob;</p></li>
+<li><p>soportar simulación (<code class="docutils literal notranslate"><span class="pre">dry_run</span></code>);</p></li>
+<li><p>soportar ejecución forzada (<code class="docutils literal notranslate"><span class="pre">force</span></code>);</p></li>
+<li><p>usar una carpeta de papelera lógica (<code class="docutils literal notranslate"><span class="pre">trash_dir</span></code>) cuando aplique.</p></li>
 </ul>
 </section>
 <section id="id2">
 <h3>Respuesta<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>Devuelve directamente el resultado de <code class="docutils literal notranslate"><span class="pre">run_cleanup(...)</span></code>.</p>
+<p>En términos funcionales, la respuesta suele incluir:</p>
 <ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
-<li><p>Cuerpo JSON típico:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">deleted_count</span></code>: número de datasets eliminados.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">deleted_ids</span></code>: identificadores de los datasets afectados.</p></li>
+<li><p>criterios usados en la ejecución;</p></li>
+<li><p>recursos afectados o candidatos;</p></li>
+<li><p>conteos de elementos procesados;</p></li>
+<li><p>detalle de elementos eliminados, movidos o preservados, según el modo.</p></li>
 </ul>
-</li>
+</section>
+<section id="id3">
+<h3>Códigos relevantes<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>: operación aceptada y procesada.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">401</span> <span class="pre">Unauthorized</span></code>: falta el header <code class="docutils literal notranslate"><span class="pre">Bearer</span></code> y la autenticación no está desactivada.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code>: payload inválido según el modelo <code class="docutils literal notranslate"><span class="pre">CleanupRequest</span></code>.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="post-admin-cleanup-jobs">
-<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/admin/cleanup/jobs</span></code><a class="headerlink" href="#post-admin-cleanup-jobs" title="Link to this heading"></a></h2>
-<section id="id3">
-<h3>Descripción<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
-<p>Elimina registros de jobs ya finalizados (por ejemplo, más antiguos que cierta
-fecha o en estados terminales). Esto ayuda a mantener liviana la tabla de jobs
-o las estructuras de almacenamiento que se usen.</p>
-</section>
+<section id="get-admin-cleanup-logs">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/admin/cleanup/logs</span></code><a class="headerlink" href="#get-admin-cleanup-logs" title="Link to this heading"></a></h2>
 <section id="id4">
-<h3>Entrada<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p>Cuerpo JSON opcional con filtros:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code>: estados que se quieren limpiar (<code class="docutils literal notranslate"><span class="pre">completed</span></code>, <code class="docutils literal notranslate"><span class="pre">failed</span></code>, etc.).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">older_than</span></code>: fecha de corte.</p></li>
-</ul>
-</li>
-</ul>
+<h3>Descripción<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>Devuelve las últimas líneas del archivo de log de limpieza generado por el
+script administrativo.</p>
+<p>El endpoint lee el archivo apuntado por <code class="docutils literal notranslate"><span class="pre">LOG_FILE</span></code> y devuelve una porción final
+acotada por el parámetro <code class="docutils literal notranslate"><span class="pre">limit</span></code>.</p>
 </section>
 <section id="id5">
-<h3>Respuesta<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<h3>Parámetros de query<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
-<li><p>Cuerpo JSON típico:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code>:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">deleted_count</span></code>: número de jobs borrados.</p></li>
+<li><p>entero entre <code class="docutils literal notranslate"><span class="pre">1</span></code> y <code class="docutils literal notranslate"><span class="pre">5000</span></code>;</p></li>
+<li><p>default: <code class="docutils literal notranslate"><span class="pre">200</span></code>.</p></li>
 </ul>
 </li>
 </ul>
 </section>
-</section>
-<hr class="docutils" />
-<section id="post-admin-cleanup-artifacts">
-<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/admin/cleanup/artifacts</span></code><a class="headerlink" href="#post-admin-cleanup-artifacts" title="Link to this heading"></a></h2>
 <section id="id6">
-<h3>Descripción<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
-<p>Limpia artefactos de modelos ya no utilizados, por ejemplo:</p>
+<h3>Comportamiento<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Modelos antiguos sustituidos por versiones más nuevas.</p></li>
-<li><p>Archivos de entrenamiento intermedio que ya no hacen falta.</p></li>
+<li><p>si el archivo de log no existe, devuelve:</p></li>
+</ul>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;lines&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>si existe, devuelve las últimas <code class="docutils literal notranslate"><span class="pre">N</span></code> líneas del archivo.</p></li>
 </ul>
 </section>
 <section id="id7">
-<h3>Entrada<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p>Cuerpo JSON opcional indicando criterios:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">keep_latest_per_dataset</span></code>: conservar solo el último modelo por dataset.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dry_run</span></code>: simular limpieza.</p></li>
-</ul>
-</li>
-</ul>
+<h3>Respuesta<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>Respuesta JSON con la forma:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;lines&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;...&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </section>
 <section id="id8">
-<h3>Respuesta<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<h3>Códigos relevantes<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
-<li><p>Cuerpo JSON típico:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">deleted_count</span></code>: número de artefactos eliminados.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">paths</span></code>: lista de rutas que se han eliminado (o se eliminarían en modo <code class="docutils literal notranslate"><span class="pre">dry_run</span></code>).</p></li>
-</ul>
-</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>: lectura correcta del log o log inexistente tratado como vacío.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">401</span> <span class="pre">Unauthorized</span></code>: falta el header <code class="docutils literal notranslate"><span class="pre">Bearer</span></code> y la autenticación no está desactivada.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code>: <code class="docutils literal notranslate"><span class="pre">limit</span></code> fuera del rango permitido.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="consideraciones-de-seguridad">
-<h2>Consideraciones de seguridad<a class="headerlink" href="#consideraciones-de-seguridad" title="Link to this heading"></a></h2>
-<p>Dado que estas operaciones pueden borrar información de forma irreversible, es
-recomendable que:</p>
+<section id="consideraciones-operativas">
+<h2>Consideraciones operativas<a class="headerlink" href="#consideraciones-operativas" title="Link to this heading"></a></h2>
+<section id="router-registrado-sin-prefijo-adicional">
+<h3>1. Router registrado sin prefijo adicional<a class="headerlink" href="#router-registrado-sin-prefijo-adicional" title="Link to this heading"></a></h3>
+<p>Aunque en <code class="docutils literal notranslate"><span class="pre">main.py</span></code> el router se registra sin <code class="docutils literal notranslate"><span class="pre">prefix</span></code>, las rutas finales ya
+incluyen <code class="docutils literal notranslate"><span class="pre">/admin/cleanup/...</span></code> porque ese segmento está declarado directamente en
+las anotaciones de ruta del archivo <code class="docutils literal notranslate"><span class="pre">admin_cleanup.py</span></code>.</p>
+</section>
+<section id="dependencia-de-scripts-cleanup-py">
+<h3>2. Dependencia de <code class="docutils literal notranslate"><span class="pre">scripts/cleanup.py</span></code><a class="headerlink" href="#dependencia-de-scripts-cleanup-py" title="Link to this heading"></a></h3>
+<p>El comportamiento real de inventario y limpieza está externalizado en el script:</p>
 <ul class="simple">
-<li><p>Estén protegidas por mecanismos de autenticación/autorización adecuados.</p></li>
-<li><p>Se registren en los logs con suficiente detalle (quién, cuándo, qué).</p></li>
-<li><p>Ofrezcan, en la interfaz de usuario, información clara antes de ejecutar
-acciones de limpieza masiva.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scripts/cleanup.py</span></code></p></li>
 </ul>
+<p>Por ello, esta documentación describe el <strong>contrato HTTP</strong> y la intención
+funcional del router, mientras que la lógica exacta de selección y eliminación
+se define en ese script.</p>
+</section>
+<section id="uso-recomendado">
+<h3>3. Uso recomendado<a class="headerlink" href="#uso-recomendado" title="Link to this heading"></a></h3>
+<p>Este router está pensado para:</p>
+<ul class="simple">
+<li><p>tareas de mantenimiento técnico;</p></li>
+<li><p>limpieza controlada de artefactos;</p></li>
+<li><p>inspección del estado del sistema antes de borrar recursos;</p></li>
+<li><p>revisión de logs administrativos.</p></li>
+</ul>
+<p>No está pensado como parte del flujo funcional normal de un usuario final.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="relacion-con-otras-areas-del-sistema">
+<h2>Relación con otras áreas del sistema<a class="headerlink" href="#relacion-con-otras-areas-del-sistema" title="Link to this heading"></a></h2>
+<p>Los endpoints de administración impactan indirectamente en:</p>
+<ul class="simple">
+<li><p><strong>Datos</strong></p>
+<ul>
+<li><p>si se eliminan datasets o artefactos intermedios.</p></li>
+</ul>
+</li>
+<li><p><strong>Jobs</strong></p>
+<ul>
+<li><p>si se limpian registros o salidas antiguas.</p></li>
+</ul>
+</li>
+<li><p><strong>Modelos</strong></p>
+<ul>
+<li><p>si se eliminan artefactos de entrenamiento, campeones o resultados previos.</p></li>
+</ul>
+</li>
+<li><p><strong>Dashboard</strong> y <strong>Predicciones</strong></p>
+<ul>
+<li><p>si la limpieza afecta históricos, artefactos persistidos o salidas necesarias.</p></li>
+</ul>
+</li>
+</ul>
+<p>Por eso su uso debe considerarse una operación de mantenimiento con impacto
+transversal sobre el proyecto.</p>
 </section>
 </section>
 
@@ -303,7 +474,7 @@ acciones de limpieza masiva.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
-        <a href="jobs.html" class="btn btn-neutral float-left" title="Endpoints de jobs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="predicciones.html" class="btn btn-neutral float-left" title="Endpoints de predicciones" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
         <a href="../api_python/index.html" class="btn btn-neutral float-right" title="API Python (backend)" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

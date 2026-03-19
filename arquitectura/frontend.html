@@ -20,7 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="Pipeline de modelos (BM, RBM, DBM)" href="pipeline_modelos.html" />
+    <link rel="next" title="Pipeline de modelos" href="pipeline_modelos.html" />
     <link rel="prev" title="Arquitectura del backend" href="backend.html" /> 
 </head>
 
@@ -50,17 +50,137 @@
 <li class="toctree-l2"><a class="reference internal" href="vision_general.html">Visión general de la arquitectura</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backend.html">Arquitectura del backend</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Arquitectura del frontend</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#estructura-de-directorios">Estructura de directorios</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#layout-principal-y-navegacion">1. Layout principal y navegación</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vision-general">Visión general</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stack-y-herramientas">Stack y herramientas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estructura-actual-de-directorios">Estructura actual de directorios</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lectura-estructural">Lectura estructural</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#paginas-principales">Páginas principales</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#componentes-reutilizables">Componentes reutilizables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#servicios-de-acceso-a-la-api">Servicios de acceso a la API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#estilos-y-graficos">Estilos y gráficos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#entrada-de-la-aplicacion">1. Entrada de la aplicación</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-main-tsx"><code class="docutils literal notranslate"><span class="pre">src/main.tsx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-app-tsx"><code class="docutils literal notranslate"><span class="pre">src/App.tsx</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html">Pipeline de modelos (BM, RBM, DBM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ruteo-y-navegacion">2. Ruteo y navegación</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-routes-router-tsx"><code class="docutils literal notranslate"><span class="pre">src/routes/Router.tsx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#observacion-importante">Observación importante</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#layout-compartido">3. Layout compartido</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-layouts-appshell-tsx"><code class="docutils literal notranslate"><span class="pre">src/layouts/AppShell.tsx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#responsabilidades">Responsabilidades</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#composicion-visual">Composición visual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#header-superior">Header superior</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#sidebar">4. Sidebar</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-components-sidebar-tsx"><code class="docutils literal notranslate"><span class="pre">src/components/Sidebar.tsx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#items-actuales">Ítems actuales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caracteristicas">Características</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#capa-de-paginas">5. Capa de páginas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#patron-usado">Patrón usado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ventaja-de-este-patron">Ventaja de este patrón</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#componentes-funcionales-principales">6. Componentes funcionales principales</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dashboardtab-tsx">6.1 <code class="docutils literal notranslate"><span class="pre">DashboardTab.tsx</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#responsabilidades-funcionales">Responsabilidades funcionales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#relacion-con-backend">Relación con backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rol-arquitectonico">Rol arquitectónico</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#datatab-tsx">6.2 <code class="docutils literal notranslate"><span class="pre">DataTab.tsx</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Responsabilidades funcionales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Relación con backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Rol arquitectónico</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#modelstab-tsx">6.3 <code class="docutils literal notranslate"><span class="pre">ModelsTab.tsx</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Responsabilidades funcionales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#funciones-principales">Funciones principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Relación con backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#observacion-arquitectonica-importante">Observación arquitectónica importante</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#predictionstab-tsx">6.4 <code class="docutils literal notranslate"><span class="pre">PredictionsTab.tsx</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id6">Responsabilidades funcionales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Relación con backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id8">Rol arquitectónico</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#componentes-auxiliares-especializados">6.5 Componentes auxiliares especializados</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#teachersentimentchart-tsx"><code class="docutils literal notranslate"><span class="pre">TeacherSentimentChart.tsx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-aporta">Qué aporta</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estado-compartido-entre-pestanas">7. Estado compartido entre pestañas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-state-appfilters-store-ts"><code class="docutils literal notranslate"><span class="pre">src/state/appFilters.store.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-guarda">Qué guarda</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#objetivo-arquitectonico">Objetivo arquitectónico</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#casos-de-uso-principales">Casos de uso principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#persistencia">Persistencia</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#capa-de-servicios">8. Capa de servicios</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cliente-base">8.1 Cliente base</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-apiclient-ts"><code class="docutils literal notranslate"><span class="pre">src/services/apiClient.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Responsabilidades</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#variables-de-entorno-soportadas">Variables de entorno soportadas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#src-services-api-ts">8.2 <code class="docutils literal notranslate"><span class="pre">src/services/api.ts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#src-services-endpoints-ts">8.3 <code class="docutils literal notranslate"><span class="pre">src/services/endpoints.ts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dominios-mapeados-actualmente">Dominios mapeados actualmente</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#servicios-por-dominio">8.4 Servicios por dominio</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-datos-ts"><code class="docutils literal notranslate"><span class="pre">src/services/datos.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-cubre">Qué cubre</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-jobs-ts"><code class="docutils literal notranslate"><span class="pre">src/services/jobs.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id10">Qué cubre</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-modelos-ts"><code class="docutils literal notranslate"><span class="pre">src/services/modelos.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id11">Qué cubre</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-prediccion-ts"><code class="docutils literal notranslate"><span class="pre">src/services/prediccion.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id12">Qué cubre</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-predicciones-ts"><code class="docutils literal notranslate"><span class="pre">src/services/predicciones.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id13">Qué cubre</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-dashboard-ts"><code class="docutils literal notranslate"><span class="pre">src/services/dashboard.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id14">Qué cubre</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-admincleanup-ts"><code class="docutils literal notranslate"><span class="pre">src/services/adminCleanup.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-services-http-ts"><code class="docutils literal notranslate"><span class="pre">src/services/http.ts</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tipos-de-dominio">9. Tipos de dominio</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-types-neurocampus-ts"><code class="docutils literal notranslate"><span class="pre">src/types/neurocampus.ts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#proposito">Propósito</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estilos">10. Estilos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#src-styles-index-css"><code class="docutils literal notranslate"><span class="pre">src/styles/index.css</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caracteristicas-visuales-actuales">Características visuales actuales</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estrategia-de-pruebas">11. Estrategia de pruebas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#archivos-relevantes">Archivos relevantes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#herramientas">Herramientas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enfoque-actual">Enfoque actual</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#flujo-arquitectonico-general">12. Flujo arquitectónico general</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#decisiones-arquitectonicas-visibles-en-la-version-actual">13. Decisiones arquitectónicas visibles en la versión actual</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ui-centrada-en-pestanas-grandes">1. UI centrada en pestañas grandes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pages-delgadas-tabs-gruesas">2. Pages delgadas, tabs gruesas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estado-global-minimo">3. Estado global mínimo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id15">4. Servicios por dominio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#integracion-progresiva-con-backend">5. Integración progresiva con backend</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#alcance-real-de-la-arquitectura-frontend-actual">14. Alcance real de la arquitectura frontend actual</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html">Pipeline de modelos</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
@@ -96,262 +216,792 @@
              
   <section id="arquitectura-del-frontend">
 <h1>Arquitectura del frontend<a class="headerlink" href="#arquitectura-del-frontend" title="Link to this heading"></a></h1>
-<p>El frontend de NeuroCampus está desarrollado con <strong>React + TypeScript</strong> y se
-construye con <strong>Vite</strong>. Está organizado en páginas, componentes reutilizables,
-servicios de acceso a la API y un layout común.</p>
+<section id="vision-general">
+<h2>Visión general<a class="headerlink" href="#vision-general" title="Link to this heading"></a></h2>
+<p>El frontend de NeuroCampus está construido con <strong>React 18 + TypeScript</strong> y se
+empaqueta con <strong>Vite</strong>.</p>
+<p>La aplicación sigue una arquitectura ligera orientada a cuatro vistas
+principales del producto:</p>
+<ul class="simple">
+<li><p><strong>Dashboard</strong></p></li>
+<li><p><strong>Datos</strong></p></li>
+<li><p><strong>Modelos</strong></p></li>
+<li><p><strong>Predicciones</strong></p></li>
+</ul>
+<p>A nivel técnico, el frontend se organiza en cinco capas principales:</p>
+<ol class="arabic simple">
+<li><p><strong>Entrada de aplicación</strong></p></li>
+<li><p><strong>Ruteo y layout</strong></p></li>
+<li><p><strong>Páginas</strong></p></li>
+<li><p><strong>Componentes funcionales por pestaña</strong></p></li>
+<li><p><strong>Servicios de acceso a backend y estado compartido</strong></p></li>
+</ol>
+<p>El objetivo de esta arquitectura es mantener separadas:</p>
+<ul class="simple">
+<li><p>la navegación,</p></li>
+<li><p>la composición visual,</p></li>
+<li><p>la lógica de cada pestaña,</p></li>
+<li><p>y la comunicación con la API del backend.</p></li>
+</ul>
+</section>
 <hr class="docutils" />
-<section id="estructura-de-directorios">
-<h2>Estructura de directorios<a class="headerlink" href="#estructura-de-directorios" title="Link to this heading"></a></h2>
+<section id="stack-y-herramientas">
+<h2>Stack y herramientas<a class="headerlink" href="#stack-y-herramientas" title="Link to this heading"></a></h2>
+<p>El <code class="docutils literal notranslate"><span class="pre">package.json</span></code> actual refleja este stack base:</p>
+<ul class="simple">
+<li><p><strong>React</strong> para la interfaz</p></li>
+<li><p><strong>TypeScript</strong> para tipado estático</p></li>
+<li><p><strong>React Router</strong> para navegación</p></li>
+<li><p><strong>Vite</strong> para desarrollo y build</p></li>
+<li><p><strong>Recharts</strong> para visualizaciones</p></li>
+<li><p><strong>Lucide React</strong> para iconografía</p></li>
+<li><p><strong>Vitest + Testing Library</strong> para pruebas del frontend</p></li>
+</ul>
+<p>Además, el proyecto incluye dependencias de interfaz asociadas a componentes de
+estilo moderno, varias de ellas del ecosistema <strong>Radix UI</strong>.</p>
+</section>
+<hr class="docutils" />
+<section id="estructura-actual-de-directorios">
+<h2>Estructura actual de directorios<a class="headerlink" href="#estructura-actual-de-directorios" title="Link to this heading"></a></h2>
 <p>Ubicación base del frontend:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>frontend/
   index.html
   package.json
   vite.config.ts
+  tsconfig.json
   src/
     App.tsx
-    layout/
-    pages/
+    main.tsx
     components/
-    services/
+      DashboardTab.tsx
+      DataTab.tsx
+      ModelsTab.tsx
+      PredictionsTab.tsx
+      Sidebar.tsx
+      TeacherSentimentChart.tsx
+    layouts/
+      AppShell.tsx
+    pages/
+      DashboardPage.tsx
+      DatosPage.tsx
+      ModelosPage.tsx
+      PrediccionesPage.tsx
     routes/
+      Router.tsx
+    services/
+      api.ts
+      apiClient.ts
+      dashboard.ts
+      datos.ts
+      jobs.ts
+      modelos.ts
+      prediccion.ts
+      predicciones.ts
+      adminCleanup.ts
+      endpoints.ts
+      http.ts
+    state/
+      appFilters.store.ts
     styles/
+      index.css
+    types/
+      neurocampus.ts
+    setupTests.ts
 </pre></div>
 </div>
-<section id="layout-principal-y-navegacion">
-<h3>1. Layout principal y navegación<a class="headerlink" href="#layout-principal-y-navegacion" title="Link to this heading"></a></h3>
+<section id="lectura-estructural">
+<h3>Lectura estructural<a class="headerlink" href="#lectura-estructural" title="Link to this heading"></a></h3>
+<p>La estructura actual no está basada en muchas páginas complejas independientes,
+sino en una composición sencilla:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">src/layout/MainLayout.tsx</span></code>:</p>
-<ul>
-<li><p>Define el layout de la aplicación:</p>
-<ul>
-<li><p>Sidebar a la izquierda (<code class="docutils literal notranslate"><span class="pre">Sidebar.tsx</span></code>).</p></li>
-<li><p>Barra superior (<code class="docutils literal notranslate"><span class="pre">Topbar.tsx</span></code>).</p></li>
-<li><p>Área principal de contenido (<code class="docutils literal notranslate"><span class="pre">&lt;Outlet</span> <span class="pre">/&gt;</span></code>).</p></li>
+<li><p>una <strong>ruta por pestaña</strong>;</p></li>
+<li><p>una <strong>page wrapper</strong> por ruta;</p></li>
+<li><p>un <strong>tab component</strong> que concentra la lógica real de la vista.</p></li>
 </ul>
-</li>
+<p>Es decir, la mayor parte de la lógica funcional vive hoy en:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DashboardTab.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DataTab.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ModelsTab.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PredictionsTab.tsx</span></code></p></li>
 </ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/layout/Sidebar.tsx</span></code>:</p>
-<ul>
-<li><p>Contiene el menú de navegación:</p>
-<ul>
-<li><p>Inicio,</p></li>
-<li><p>Dashboard,</p></li>
-<li><p>Prediction,</p></li>
-<li><p>Models,</p></li>
-<li><p>Jobs,</p></li>
-<li><p>Datos.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/routes/Router.tsx</span></code>:</p>
-<ul>
-<li><p>Define las rutas de React Router:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">/</span></code> → <code class="docutils literal notranslate"><span class="pre">Home</span></code> / <code class="docutils literal notranslate"><span class="pre">App</span></code> (según configuración),</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/dashboard</span></code> → <code class="docutils literal notranslate"><span class="pre">Dashboard.tsx</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/models</span></code> → <code class="docutils literal notranslate"><span class="pre">Models.tsx</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/prediction</span></code> → <code class="docutils literal notranslate"><span class="pre">Prediction.tsx</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/jobs</span></code> → <code class="docutils literal notranslate"><span class="pre">Jobs.tsx</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/datos</span></code> → <code class="docutils literal notranslate"><span class="pre">DataUpload.tsx</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">/datos/diagnostico</span></code> → <code class="docutils literal notranslate"><span class="pre">DatosDiagnostico.tsx</span></code>.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>La aplicación se renderiza dentro de <code class="docutils literal notranslate"><span class="pre">MainLayout</span></code>, que aporta una experiencia
-consistente en todas las pestañas.</p>
+<p>mientras que <code class="docutils literal notranslate"><span class="pre">pages/*.tsx</span></code> actúan como envolturas mínimas.</p>
 </section>
 </section>
 <hr class="docutils" />
-<section id="paginas-principales">
-<h2>Páginas principales<a class="headerlink" href="#paginas-principales" title="Link to this heading"></a></h2>
+<section id="entrada-de-la-aplicacion">
+<h2>1. Entrada de la aplicación<a class="headerlink" href="#entrada-de-la-aplicacion" title="Link to this heading"></a></h2>
+<section id="src-main-tsx">
+<h3><code class="docutils literal notranslate"><span class="pre">src/main.tsx</span></code><a class="headerlink" href="#src-main-tsx" title="Link to this heading"></a></h3>
+<p>Es el punto de montaje de la aplicación React sobre el DOM.</p>
+<p>Su responsabilidad principal es:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">src/pages/DataUpload.tsx</span></code>:</p>
-<ul>
-<li><p>Implementa la pestaña <strong>Datos</strong>:</p>
-<ul>
-<li><p>Carga y validación de datasets.</p></li>
-<li><p>Resumen estructural del dataset.</p></li>
-<li><p>Lanzamiento y visualización de BETO (análisis de sentimientos).</p></li>
-<li><p>Vista previa de filas.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/pages/Models.tsx</span></code>:</p>
-<ul>
-<li><p>Implementa la pestaña <strong>Modelos</strong>:</p>
-<ul>
-<li><p>Configuración y lanzamiento de entrenamientos.</p></li>
-<li><p>Comparación de métricas entre BM, RBM, DBM, etc.</p></li>
-<li><p>Visualización de curvas de pérdida/accuracy y matrices de confusión.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/pages/Prediction.tsx</span></code>:</p>
-<ul>
-<li><p>Implementa la pestaña <strong>Predicciones</strong>:</p>
-<ul>
-<li><p>Ingreso manual de nuevas evaluaciones.</p></li>
-<li><p>Predicción por lote.</p></li>
-<li><p>Visualización de probabilidades, radar de indicadores, barras comparativas y proyecciones temporales.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/pages/Dashboard.tsx</span></code>:</p>
-<ul>
-<li><p>Implementa la pestaña <strong>Dashboard</strong>:</p>
-<ul>
-<li><p>Filtros por periodo, programa, docente, asignatura.</p></li>
-<li><p>KPIs globales.</p></li>
-<li><p>Gráficos de histórico, ranking de docentes, riesgo y real vs predicho.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/pages/AdminCleanup.tsx</span></code>:</p>
-<ul>
-<li><p>Interfaz de administración para limpiar artefactos y datasets temporales.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/pages/Jobs.tsx</span></code>:</p>
-<ul>
-<li><p>Muestra y gestiona jobs en ejecución/históricos (por ejemplo, jobs de BETO
-o entrenamientos).</p></li>
-</ul>
-</li>
+<li><p>inicializar React;</p></li>
+<li><p>importar estilos globales;</p></li>
+<li><p>montar el componente raíz.</p></li>
 </ul>
 </section>
-<hr class="docutils" />
-<section id="componentes-reutilizables">
-<h2>Componentes reutilizables<a class="headerlink" href="#componentes-reutilizables" title="Link to this heading"></a></h2>
-<p>Ubicación: <code class="docutils literal notranslate"><span class="pre">src/components/</span></code>.</p>
-<p>Ejemplos:</p>
+<section id="src-app-tsx">
+<h3><code class="docutils literal notranslate"><span class="pre">src/App.tsx</span></code><a class="headerlink" href="#src-app-tsx" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">App.tsx</span></code> es deliberadamente pequeño.</p>
+<p>Su única responsabilidad es delegar el render al proveedor de rutas:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">UploadDropzone.tsx</span></code>:</p>
-<ul>
-<li><p>Zona de arrastre/selección de archivos.</p></li>
-<li><p>Usado en pestaña Datos y, potencialmente, en Predicciones por lote.</p></li>
+<li><p>usa <code class="docutils literal notranslate"><span class="pre">RouterProvider</span></code>;</p></li>
+<li><p>consume el <code class="docutils literal notranslate"><span class="pre">router</span></code> definido en <code class="docutils literal notranslate"><span class="pre">src/routes/Router.tsx</span></code>.</p></li>
 </ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ResultsTable.tsx</span></code>:</p>
-<ul>
-<li><p>Tabla genérica para mostrar resultados o muestras de datos.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MetricCard.tsx</span></code>:</p>
-<ul>
-<li><p>Tarjetas de KPI que se utilizan principalmente en el Dashboard.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ValidationReport.tsx</span></code>:</p>
-<ul>
-<li><p>Muestra informes de validación de datasets (errores, advertencias, etc.).</p></li>
-</ul>
-</li>
-</ul>
-<p>Estos componentes encapsulan lógica de presentación y evitan duplicación de
-código entre páginas.</p>
+<p>Esto mantiene el punto de entrada desacoplado de la navegación concreta.</p>
+</section>
 </section>
 <hr class="docutils" />
-<section id="servicios-de-acceso-a-la-api">
-<h2>Servicios de acceso a la API<a class="headerlink" href="#servicios-de-acceso-a-la-api" title="Link to this heading"></a></h2>
-<p>Ubicación: <code class="docutils literal notranslate"><span class="pre">src/services/</span></code>.</p>
+<section id="ruteo-y-navegacion">
+<h2>2. Ruteo y navegación<a class="headerlink" href="#ruteo-y-navegacion" title="Link to this heading"></a></h2>
+<section id="src-routes-router-tsx">
+<h3><code class="docutils literal notranslate"><span class="pre">src/routes/Router.tsx</span></code><a class="headerlink" href="#src-routes-router-tsx" title="Link to this heading"></a></h3>
+<p>La navegación se define con <code class="docutils literal notranslate"><span class="pre">createBrowserRouter</span></code>.</p>
+<p>La estructura actual es:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">apiClient.ts</span></code>:</p>
-<ul>
-<li><p>Cliente base sobre <code class="docutils literal notranslate"><span class="pre">fetch</span></code> o <code class="docutils literal notranslate"><span class="pre">axios</span></code> para acceder a la API del backend.</p></li>
-<li><p>Maneja la URL base y algunas opciones comunes.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">api.ts</span></code>:</p>
-<ul>
-<li><p>Utilidades generales sobre el cliente base (por ejemplo, helpers para
-instanciar el cliente según entorno).</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">datos.ts</span></code>:</p>
-<ul>
-<li><p>Funciones para consumir la API de datos:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">esquema()</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">validar()</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">upload()</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">resumen()</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sentimientos()</span></code>.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">jobs.ts</span></code>:</p>
-<ul>
-<li><p>Funciones para lanzar y consultar jobs:</p>
-<ul>
-<li><p>incluyendo el preprocesamiento BETO (<code class="docutils literal notranslate"><span class="pre">/jobs/preproc/beto/run</span></code>, etc.).</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">modelos.ts</span></code>:</p>
-<ul>
-<li><p>Funciones para interactuar con endpoints de entrenamiento y consulta de
-modelos.</p></li>
-</ul>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">prediccion.ts</span></code>:</p>
-<ul>
-<li><p>Funciones para generar predicciones manuales o por lote desde el frontend.</p></li>
-</ul>
-</li>
-</ul>
-<p>Esta estructura mantiene una separación clara entre:</p>
-<ul class="simple">
-<li><p><strong>Lógica de presentación</strong> (páginas y componentes) y</p></li>
-<li><p><strong>Lógica de comunicación con la API</strong> (servicios).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/</span></code> → redirección a <code class="docutils literal notranslate"><span class="pre">/dashboard</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/dashboard</span></code> → <code class="docutils literal notranslate"><span class="pre">DashboardPage</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/datos</span></code> → <code class="docutils literal notranslate"><span class="pre">DatosPage</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/models</span></code> → <code class="docutils literal notranslate"><span class="pre">ModelosPage</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/prediction</span></code> → <code class="docutils literal notranslate"><span class="pre">PrediccionesPage</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*</span></code> → redirección a <code class="docutils literal notranslate"><span class="pre">/dashboard</span></code></p></li>
 </ul>
 </section>
-<hr class="docutils" />
-<section id="estilos-y-graficos">
-<h2>Estilos y gráficos<a class="headerlink" href="#estilos-y-graficos" title="Link to this heading"></a></h2>
+<section id="observacion-importante">
+<h3>Observación importante<a class="headerlink" href="#observacion-importante" title="Link to this heading"></a></h3>
+<p>A nivel de interfaz, las pestañas visibles al usuario son:</p>
 <ul class="simple">
-<li><p>Estilos globales en <code class="docutils literal notranslate"><span class="pre">src/styles/index.css</span></code>:</p>
-<ul>
-<li><p>Define tipografía, colores base, disposición general.</p></li>
+<li><p><strong>Dashboard</strong></p></li>
+<li><p><strong>Datos</strong></p></li>
+<li><p><strong>Modelos</strong></p></li>
+<li><p><strong>Predicciones</strong></p></li>
 </ul>
-</li>
-<li><p>Gráficos:</p>
-<ul>
-<li><p>Principalmente con <strong>Recharts</strong>:</p>
-<ul>
-<li><p>Gráficos de barras,</p></li>
-<li><p>líneas,</p></li>
-<li><p>radar,</p></li>
-<li><p>gráficos apilados, etc.</p></li>
-</ul>
-</li>
-<li><p>Usados en:</p>
-<ul>
-<li><p>Pestaña Datos (sentimientos),</p></li>
-<li><p>Modelos (curvas de entrenamiento, matrices de confusión),</p></li>
-<li><p>Dashboard (históricos, rankings, distribuciones de riesgo).</p></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<hr class="docutils" />
-<p>Esta arquitectura del frontend permite:</p>
+<p>pero a nivel de rutas internas los paths actuales son:</p>
 <ul class="simple">
-<li><p>Crecer en número de páginas y componentes sin perder orden.</p></li>
-<li><p>Probar cada pieza de forma aislada (tests en <code class="docutils literal notranslate"><span class="pre">src/pages/__tests__</span></code> y
-<code class="docutils literal notranslate"><span class="pre">src/services/*.test.ts</span></code>).</p></li>
-<li><p>Reutilizar componentes visuales y servicios API en todas las pestañas.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/dashboard</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/datos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/models</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/prediction</span></code></p></li>
 </ul>
+<p>Esto significa que el etiquetado de navegación está en español, mientras que dos
+rutas internas permanecen con nombres heredados en inglés.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="layout-compartido">
+<h2>3. Layout compartido<a class="headerlink" href="#layout-compartido" title="Link to this heading"></a></h2>
+<section id="src-layouts-appshell-tsx">
+<h3><code class="docutils literal notranslate"><span class="pre">src/layouts/AppShell.tsx</span></code><a class="headerlink" href="#src-layouts-appshell-tsx" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">AppShell</span></code> define la estructura visual común de toda la aplicación.</p>
+</section>
+<section id="responsabilidades">
+<h3>Responsabilidades<a class="headerlink" href="#responsabilidades" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Renderiza la <strong>barra lateral</strong> de navegación.</p></li>
+<li><p>Renderiza un <strong>header superior</strong> común.</p></li>
+<li><p>Expone un <code class="docutils literal notranslate"><span class="pre">&lt;Outlet</span> <span class="pre">/&gt;</span></code> para el contenido de cada ruta.</p></li>
+</ul>
+</section>
+<section id="composicion-visual">
+<h3>Composición visual<a class="headerlink" href="#composicion-visual" title="Link to this heading"></a></h3>
+<p>La disposición actual es:</p>
+<ul class="simple">
+<li><p><strong>Sidebar</strong> a la izquierda;</p></li>
+<li><p><strong>header</strong> superior en la zona principal;</p></li>
+<li><p><strong>contenido scrollable</strong> en el área central.</p></li>
+</ul>
+</section>
+<section id="header-superior">
+<h3>Header superior<a class="headerlink" href="#header-superior" title="Link to this heading"></a></h3>
+<p>El header incluye:</p>
+<ul class="simple">
+<li><p>identidad visual de NeuroCampus;</p></li>
+<li><p>botón de notificaciones;</p></li>
+<li><p>avatar o acceso visual de usuario.</p></li>
+</ul>
+<p>En esta versión, estos elementos son principalmente de presentación y no
+constituyen todavía un módulo funcional completo de autenticación o centro de
+notificaciones.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="sidebar">
+<h2>4. Sidebar<a class="headerlink" href="#sidebar" title="Link to this heading"></a></h2>
+<section id="src-components-sidebar-tsx">
+<h3><code class="docutils literal notranslate"><span class="pre">src/components/Sidebar.tsx</span></code><a class="headerlink" href="#src-components-sidebar-tsx" title="Link to this heading"></a></h3>
+<p>El <code class="docutils literal notranslate"><span class="pre">Sidebar</span></code> contiene los enlaces de navegación principales del sistema.</p>
+</section>
+<section id="items-actuales">
+<h3>Ítems actuales<a class="headerlink" href="#items-actuales" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Dashboard</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Datos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Modelos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Predicciones</span></code></p></li>
+</ul>
+</section>
+<section id="caracteristicas">
+<h3>Características<a class="headerlink" href="#caracteristicas" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>usa <code class="docutils literal notranslate"><span class="pre">NavLink</span></code> para detectar estado activo;</p></li>
+<li><p>cambia estilo visual según la ruta actual;</p></li>
+<li><p>concentra la navegación de primer nivel;</p></li>
+<li><p>evita navegación anidada compleja.</p></li>
+</ul>
+<p>Esta decisión es coherente con la arquitectura de producto actual, que prioriza
+cuatro flujos grandes y diferenciados.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="capa-de-paginas">
+<h2>5. Capa de páginas<a class="headerlink" href="#capa-de-paginas" title="Link to this heading"></a></h2>
+<p>La carpeta <code class="docutils literal notranslate"><span class="pre">src/pages/</span></code> contiene cuatro componentes mínimos:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DashboardPage.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DatosPage.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ModelosPage.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PrediccionesPage.tsx</span></code></p></li>
+</ul>
+<section id="patron-usado">
+<h3>Patrón usado<a class="headerlink" href="#patron-usado" title="Link to this heading"></a></h3>
+<p>Cada página simplemente delega en el componente de pestaña correspondiente.</p>
+<p>Ejemplo conceptual:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DashboardPage</span></code> renderiza <code class="docutils literal notranslate"><span class="pre">DashboardTab</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DatosPage</span></code> renderiza <code class="docutils literal notranslate"><span class="pre">DataTab</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ModelosPage</span></code> renderiza <code class="docutils literal notranslate"><span class="pre">ModelsTab</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PrediccionesPage</span></code> renderiza <code class="docutils literal notranslate"><span class="pre">PredictionsTab</span></code></p></li>
+</ul>
+</section>
+<section id="ventaja-de-este-patron">
+<h3>Ventaja de este patrón<a class="headerlink" href="#ventaja-de-este-patron" title="Link to this heading"></a></h3>
+<p>Permite mantener separadas:</p>
+<ul class="simple">
+<li><p>la responsabilidad de enrutamiento,</p></li>
+<li><p>y la lógica funcional real de cada vista.</p></li>
+</ul>
+<p>Así, si en el futuro se requiere cambiar el router, lazy loading o guards de
+ruta, la lógica de negocio de cada pestaña no tiene que reescribirse.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="componentes-funcionales-principales">
+<h2>6. Componentes funcionales principales<a class="headerlink" href="#componentes-funcionales-principales" title="Link to this heading"></a></h2>
+<p>La carpeta <code class="docutils literal notranslate"><span class="pre">src/components/</span></code> concentra los componentes que implementan las
+pantallas principales.</p>
+</section>
+<section id="dashboardtab-tsx">
+<h2>6.1 <code class="docutils literal notranslate"><span class="pre">DashboardTab.tsx</span></code><a class="headerlink" href="#dashboardtab-tsx" title="Link to this heading"></a></h2>
+<p>Implementa la pestaña <strong>Dashboard</strong>.</p>
+<section id="responsabilidades-funcionales">
+<h3>Responsabilidades funcionales<a class="headerlink" href="#responsabilidades-funcionales" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>consultar el estado del histórico;</p></li>
+<li><p>cargar periodos y catálogos del dashboard;</p></li>
+<li><p>aplicar filtros globales;</p></li>
+<li><p>mostrar KPIs institucionales;</p></li>
+<li><p>renderizar gráficos de ranking, series históricas, radar y sentimiento;</p></li>
+<li><p>presentar una vista agregada del sistema.</p></li>
+</ul>
+</section>
+<section id="relacion-con-backend">
+<h3>Relación con backend<a class="headerlink" href="#relacion-con-backend" title="Link to this heading"></a></h3>
+<p>Consume principalmente endpoints bajo <code class="docutils literal notranslate"><span class="pre">/dashboard/*</span></code> mediante
+<code class="docutils literal notranslate"><span class="pre">src/services/dashboard.ts</span></code>.</p>
+</section>
+<section id="rol-arquitectonico">
+<h3>Rol arquitectónico<a class="headerlink" href="#rol-arquitectonico" title="Link to this heading"></a></h3>
+<p>Es una vista de <strong>consulta y análisis agregado</strong>.
+No carga archivos, no entrena modelos y no ejecuta predicción operativa.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="datatab-tsx">
+<h2>6.2 <code class="docutils literal notranslate"><span class="pre">DataTab.tsx</span></code><a class="headerlink" href="#datatab-tsx" title="Link to this heading"></a></h2>
+<p>Implementa la pestaña <strong>Datos</strong>.</p>
+<section id="id1">
+<h3>Responsabilidades funcionales<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>seleccionar un archivo;</p></li>
+<li><p>validar dataset;</p></li>
+<li><p>subir y registrar dataset;</p></li>
+<li><p>consultar resumen del dataset activo;</p></li>
+<li><p>lanzar y monitorear análisis de sentimientos BETO;</p></li>
+<li><p>ejecutar unificación histórica;</p></li>
+<li><p>preparar el paquete de características.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Relación con backend<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>Utiliza sobre todo:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/services/datos.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/services/jobs.ts</span></code></p></li>
+</ul>
+<p>para consumir endpoints de:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/datos/*</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/jobs/*</span></code></p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Rol arquitectónico<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Es la puerta de entrada operativa del pipeline de datos.
+Conecta la ingesta con el resto del sistema.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="modelstab-tsx">
+<h2>6.3 <code class="docutils literal notranslate"><span class="pre">ModelsTab.tsx</span></code><a class="headerlink" href="#modelstab-tsx" title="Link to this heading"></a></h2>
+<p>Implementa la pestaña <strong>Modelos</strong>.</p>
+<section id="id4">
+<h3>Responsabilidades funcionales<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>La UI actual está organizada en varias subpestañas internas, entre ellas:</p>
+<ul class="simple">
+<li><p>resumen,</p></li>
+<li><p>entrenamiento,</p></li>
+<li><p>ejecuciones,</p></li>
+<li><p>campeón,</p></li>
+<li><p>sweep,</p></li>
+<li><p>artefactos,</p></li>
+<li><p>diagnóstico.</p></li>
+</ul>
+</section>
+<section id="funciones-principales">
+<h3>Funciones principales<a class="headerlink" href="#funciones-principales" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>configurar y lanzar entrenamientos;</p></li>
+<li><p>consultar runs y métricas;</p></li>
+<li><p>revisar el campeón activo;</p></li>
+<li><p>explorar resultados de búsqueda o sweep;</p></li>
+<li><p>inspeccionar artefactos y señales de diagnóstico.</p></li>
+</ul>
+</section>
+<section id="id5">
+<h3>Relación con backend<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>Consume principalmente <code class="docutils literal notranslate"><span class="pre">src/services/modelos.ts</span></code> y se apoya en endpoints de
+<code class="docutils literal notranslate"><span class="pre">/modelos/*</span></code>.</p>
+</section>
+<section id="observacion-arquitectonica-importante">
+<h3>Observación arquitectónica importante<a class="headerlink" href="#observacion-arquitectonica-importante" title="Link to this heading"></a></h3>
+<p>La implementación actual mezcla:</p>
+<ul class="simple">
+<li><p>datos reales del backend cuando los endpoints están disponibles;</p></li>
+<li><p>y ciertos fallbacks de interfaz o defaults visuales cuando una parte del
+backend aún no responde con la estructura esperada.</p></li>
+</ul>
+<p>Por eso esta pestaña debe entenderse como una UI en consolidación, pero ya
+alineada con el flujo operativo del sistema.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="predictionstab-tsx">
+<h2>6.4 <code class="docutils literal notranslate"><span class="pre">PredictionsTab.tsx</span></code><a class="headerlink" href="#predictionstab-tsx" title="Link to this heading"></a></h2>
+<p>Implementa la pestaña <strong>Predicciones</strong>.</p>
+<section id="id6">
+<h3>Responsabilidades funcionales<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>seleccionar dataset o contexto de predicción;</p></li>
+<li><p>resolver docente y asignatura cuando aplica;</p></li>
+<li><p>ejecutar predicción batch;</p></li>
+<li><p>mostrar resultados, trazabilidad y artefactos asociados;</p></li>
+<li><p>reutilizar contexto compartido desde Modelos cuando existe un run
+seleccionado.</p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>Relación con backend<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>La pestaña consume principalmente:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/services/prediccion.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/services/predicciones.ts</span></code></p></li>
+</ul>
+<p>según el tipo de flujo solicitado.</p>
+</section>
+<section id="id8">
+<h3>Rol arquitectónico<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<p>Es la capa de inferencia del frontend.
+Conecta la selección de contexto con el champion activo o el run solicitado por
+el usuario.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="componentes-auxiliares-especializados">
+<h2>6.5 Componentes auxiliares especializados<a class="headerlink" href="#componentes-auxiliares-especializados" title="Link to this heading"></a></h2>
+<section id="teachersentimentchart-tsx">
+<h3><code class="docutils literal notranslate"><span class="pre">TeacherSentimentChart.tsx</span></code><a class="headerlink" href="#teachersentimentchart-tsx" title="Link to this heading"></a></h3>
+<p>Es un componente especializado para visualizar distribución de sentimientos por
+docente.</p>
+</section>
+<section id="que-aporta">
+<h3>Qué aporta<a class="headerlink" href="#que-aporta" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>comparación entre docentes;</p></li>
+<li><p>ordenamiento por volumen o polaridad;</p></li>
+<li><p>búsqueda por nombre;</p></li>
+<li><p>selección comparativa de varios docentes;</p></li>
+<li><p>render con <code class="docutils literal notranslate"><span class="pre">Recharts</span></code>.</p></li>
+</ul>
+<p>Este componente encapsula una lógica visual más rica que la de una gráfica
+simple y evita sobrecargar la pestaña Datos o Dashboard con detalles de
+interacción.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="estado-compartido-entre-pestanas">
+<h2>7. Estado compartido entre pestañas<a class="headerlink" href="#estado-compartido-entre-pestanas" title="Link to this heading"></a></h2>
+<section id="src-state-appfilters-store-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/state/appFilters.store.ts</span></code><a class="headerlink" href="#src-state-appfilters-store-ts" title="Link to this heading"></a></h3>
+<p>El frontend utiliza un store ligero basado en <code class="docutils literal notranslate"><span class="pre">useSyncExternalStore</span></code>.</p>
+</section>
+<section id="que-guarda">
+<h3>Qué guarda<a class="headerlink" href="#que-guarda" title="Link to this heading"></a></h3>
+<p>El estado global actual incluye:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">activeDatasetId</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">activePeriodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodoFrom</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodoTo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">programa</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">asignatura</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">selectedModelFamily</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">selectedModelName</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">requestedPredictionRunId</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictionSource</span></code></p></li>
+</ul>
+</section>
+<section id="objetivo-arquitectonico">
+<h3>Objetivo arquitectónico<a class="headerlink" href="#objetivo-arquitectonico" title="Link to this heading"></a></h3>
+<p>Este store permite compartir contexto entre pestañas sin introducir una capa más
+pesada como Redux.</p>
+</section>
+<section id="casos-de-uso-principales">
+<h3>Casos de uso principales<a class="headerlink" href="#casos-de-uso-principales" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>mantener dataset y periodo activos;</p></li>
+<li><p>transportar filtros globales entre vistas;</p></li>
+<li><p>llevar contexto desde <strong>Modelos</strong> hacia <strong>Predicciones</strong>;</p></li>
+<li><p>persistir intención de navegación y trazabilidad.</p></li>
+</ul>
+</section>
+<section id="persistencia">
+<h3>Persistencia<a class="headerlink" href="#persistencia" title="Link to this heading"></a></h3>
+<p>El store guarda su contenido en <code class="docutils literal notranslate"><span class="pre">localStorage</span></code> mediante la clave:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>NC_APP_FILTERS_V1
+</pre></div>
+</div>
+<p>Esto permite conservar estado básico al recargar la aplicación.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="capa-de-servicios">
+<h2>8. Capa de servicios<a class="headerlink" href="#capa-de-servicios" title="Link to this heading"></a></h2>
+<p>La carpeta <code class="docutils literal notranslate"><span class="pre">src/services/</span></code> concentra la comunicación con el backend.</p>
+<p>La arquitectura actual sigue un patrón claro:</p>
+<ul class="simple">
+<li><p>un <strong>cliente base</strong> de HTTP;</p></li>
+<li><p>módulos especializados por dominio funcional;</p></li>
+<li><p>tipos y helpers para query params, errores y endpoints.</p></li>
+</ul>
+</section>
+<section id="cliente-base">
+<h2>8.1 Cliente base<a class="headerlink" href="#cliente-base" title="Link to this heading"></a></h2>
+<section id="src-services-apiclient-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/apiClient.ts</span></code><a class="headerlink" href="#src-services-apiclient-ts" title="Link to this heading"></a></h3>
+<p>Es el wrapper principal sobre <code class="docutils literal notranslate"><span class="pre">fetch</span></code>.</p>
+</section>
+<section id="id9">
+<h3>Responsabilidades<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>resolver la URL base desde variables de entorno;</p></li>
+<li><p>manejar métodos HTTP comunes;</p></li>
+<li><p>serializar JSON o <code class="docutils literal notranslate"><span class="pre">FormData</span></code>;</p></li>
+<li><p>enriquecer errores HTTP;</p></li>
+<li><p>soportar timeout;</p></li>
+<li><p>adjuntar <code class="docutils literal notranslate"><span class="pre">X-Correlation-Id</span></code> en escenarios definidos;</p></li>
+<li><p>ofrecer una interfaz consistente tipo cliente API.</p></li>
+</ul>
+</section>
+<section id="variables-de-entorno-soportadas">
+<h3>Variables de entorno soportadas<a class="headerlink" href="#variables-de-entorno-soportadas" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">VITE_API_BASE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VITE_API_URL</span></code></p></li>
+</ul>
+<p>Si no existen, usa por defecto:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>http://127.0.0.1:8000
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="src-services-api-ts">
+<h2>8.2 <code class="docutils literal notranslate"><span class="pre">src/services/api.ts</span></code><a class="headerlink" href="#src-services-api-ts" title="Link to this heading"></a></h2>
+<p>Es un cliente mínimo o utilitario de compatibilidad.</p>
+<p>Incluye funciones simples como <code class="docutils literal notranslate"><span class="pre">pingDatos()</span></code> y <code class="docutils literal notranslate"><span class="pre">pingJobs()</span></code> y expone <code class="docutils literal notranslate"><span class="pre">API_BASE</span></code>.</p>
+<p>Su rol es más auxiliar que central frente a <code class="docutils literal notranslate"><span class="pre">apiClient.ts</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="src-services-endpoints-ts">
+<h2>8.3 <code class="docutils literal notranslate"><span class="pre">src/services/endpoints.ts</span></code><a class="headerlink" href="#src-services-endpoints-ts" title="Link to this heading"></a></h2>
+<p>Centraliza varias rutas backend para evitar strings hardcodeados en componentes.</p>
+<section id="dominios-mapeados-actualmente">
+<h3>Dominios mapeados actualmente<a class="headerlink" href="#dominios-mapeados-actualmente" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">datos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">jobs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">modelos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prediccion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">admin</span></code></p></li>
+</ul>
+<p>Esto facilita consistencia entre vistas y reduce errores de rutas repetidas.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="servicios-por-dominio">
+<h2>8.4 Servicios por dominio<a class="headerlink" href="#servicios-por-dominio" title="Link to this heading"></a></h2>
+<section id="src-services-datos-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/datos.ts</span></code><a class="headerlink" href="#src-services-datos-ts" title="Link to this heading"></a></h3>
+<p>Cliente del flujo de datos.</p>
+</section>
+<section id="que-cubre">
+<h3>Qué cubre<a class="headerlink" href="#que-cubre" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>esquema esperado;</p></li>
+<li><p>validación previa;</p></li>
+<li><p>upload de datasets;</p></li>
+<li><p>resumen del dataset;</p></li>
+<li><p>sentimientos del dataset.</p></li>
+</ul>
+<p>Además define tipos ricos para:</p>
+<ul class="simple">
+<li><p>esquema,</p></li>
+<li><p>validación,</p></li>
+<li><p>resumen,</p></li>
+<li><p>sentimientos.</p></li>
+</ul>
+</section>
+<section id="src-services-jobs-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/jobs.ts</span></code><a class="headerlink" href="#src-services-jobs-ts" title="Link to this heading"></a></h3>
+<p>Servicio orientado a jobs del flujo de datos, especialmente BETO.</p>
+</section>
+<section id="id10">
+<h3>Qué cubre<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>lanzar job BETO;</p></li>
+<li><p>consultar estado de job;</p></li>
+<li><p>listar jobs recientes;</p></li>
+<li><p>transportar metadatos asociados al preprocesamiento.</p></li>
+</ul>
+</section>
+<section id="src-services-modelos-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/modelos.ts</span></code><a class="headerlink" href="#src-services-modelos-ts" title="Link to this heading"></a></h3>
+<p>Servicio de la pestaña Modelos.</p>
+</section>
+<section id="id11">
+<h3>Qué cubre<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>entrenamiento;</p></li>
+<li><p>consulta de estado;</p></li>
+<li><p>listado de runs;</p></li>
+<li><p>detalle de run;</p></li>
+<li><p>campeón activo;</p></li>
+<li><p>y otras operaciones asociadas al ciclo de vida del modelado.</p></li>
+</ul>
+</section>
+<section id="src-services-prediccion-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/prediccion.ts</span></code><a class="headerlink" href="#src-services-prediccion-ts" title="Link to this heading"></a></h3>
+<p>Servicio del flujo de inferencia directa.</p>
+</section>
+<section id="id12">
+<h3>Qué cubre<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>predicción online;</p></li>
+<li><p>predicción batch en endpoints del dominio <code class="docutils literal notranslate"><span class="pre">prediccion</span></code>.</p></li>
+</ul>
+</section>
+<section id="src-services-predicciones-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/predicciones.ts</span></code><a class="headerlink" href="#src-services-predicciones-ts" title="Link to this heading"></a></h3>
+<p>Servicio complementario del dominio <code class="docutils literal notranslate"><span class="pre">predicciones</span></code>.</p>
+</section>
+<section id="id13">
+<h3>Qué cubre<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>exploración y gestión de resultados persistidos;</p></li>
+<li><p>catálogos, listados o artefactos relacionados con inferencia según la
+capacidad expuesta por backend.</p></li>
+</ul>
+</section>
+<section id="src-services-dashboard-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/dashboard.ts</span></code><a class="headerlink" href="#src-services-dashboard-ts" title="Link to this heading"></a></h3>
+<p>Servicio especializado del Dashboard.</p>
+</section>
+<section id="id14">
+<h3>Qué cubre<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>estado del histórico;</p></li>
+<li><p>periodos;</p></li>
+<li><p>catálogos;</p></li>
+<li><p>KPIs;</p></li>
+<li><p>series temporales;</p></li>
+<li><p>sentimiento;</p></li>
+<li><p>y otras visualizaciones agregadas del panel institucional.</p></li>
+</ul>
+</section>
+<section id="src-services-admincleanup-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/adminCleanup.ts</span></code><a class="headerlink" href="#src-services-admincleanup-ts" title="Link to this heading"></a></h3>
+<p>Servicio técnico asociado a tareas de limpieza administrativa de artefactos.</p>
+</section>
+<section id="src-services-http-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/services/http.ts</span></code><a class="headerlink" href="#src-services-http-ts" title="Link to this heading"></a></h3>
+<p>Agrupa utilidades HTTP auxiliares empleadas por la capa de servicios.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tipos-de-dominio">
+<h2>9. Tipos de dominio<a class="headerlink" href="#tipos-de-dominio" title="Link to this heading"></a></h2>
+<section id="src-types-neurocampus-ts">
+<h3><code class="docutils literal notranslate"><span class="pre">src/types/neurocampus.ts</span></code><a class="headerlink" href="#src-types-neurocampus-ts" title="Link to this heading"></a></h3>
+<p>Este archivo centraliza tipos compartidos del dominio frontend.</p>
+</section>
+<section id="proposito">
+<h3>Propósito<a class="headerlink" href="#proposito" title="Link to this heading"></a></h3>
+<p>Evitar acoplar la representación del backend directamente a los componentes de
+UI, y proveer contratos reutilizables para:</p>
+<ul class="simple">
+<li><p>datasets;</p></li>
+<li><p>validación;</p></li>
+<li><p>resumen;</p></li>
+<li><p>sentimientos;</p></li>
+<li><p>jobs;</p></li>
+<li><p>runs de modelos;</p></li>
+<li><p>champion;</p></li>
+<li><p>predicción online y batch;</p></li>
+<li><p>placeholders del dashboard.</p></li>
+</ul>
+<p>Esto ayuda a que la capa visual consuma modelos de datos conocidos y reduce la
+duplicidad de interfaces en componentes aislados.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="estilos">
+<h2>10. Estilos<a class="headerlink" href="#estilos" title="Link to this heading"></a></h2>
+<section id="src-styles-index-css">
+<h3><code class="docutils literal notranslate"><span class="pre">src/styles/index.css</span></code><a class="headerlink" href="#src-styles-index-css" title="Link to this heading"></a></h3>
+<p>Define los estilos globales del frontend.</p>
+</section>
+<section id="caracteristicas-visuales-actuales">
+<h3>Características visuales actuales<a class="headerlink" href="#caracteristicas-visuales-actuales" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>paleta oscura como base del sistema;</p></li>
+<li><p>layout full-height;</p></li>
+<li><p>tarjetas y paneles con contraste alto;</p></li>
+<li><p>composición visual orientada a dashboard analítico.</p></li>
+</ul>
+<p>La estética del sistema está alineada con un panel de monitoreo técnico y no
+con una web pública convencional.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="estrategia-de-pruebas">
+<h2>11. Estrategia de pruebas<a class="headerlink" href="#estrategia-de-pruebas" title="Link to this heading"></a></h2>
+<p>El frontend ya incluye base de pruebas automatizadas.</p>
+<section id="archivos-relevantes">
+<h3>Archivos relevantes<a class="headerlink" href="#archivos-relevantes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">src/setupTests.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/services/datos.test.ts</span></code></p></li>
+</ul>
+</section>
+<section id="herramientas">
+<h3>Herramientas<a class="headerlink" href="#herramientas" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Vitest</strong></p></li>
+<li><p><strong>Testing Library</strong></p></li>
+<li><p><strong>jsdom</strong></p></li>
+</ul>
+</section>
+<section id="enfoque-actual">
+<h3>Enfoque actual<a class="headerlink" href="#enfoque-actual" title="Link to this heading"></a></h3>
+<p>La cobertura visible está más orientada a capa de servicios que a una batería
+completa de pruebas de interacción de cada pantalla.</p>
+<p>Esto es coherente con una arquitectura donde buena parte del riesgo funcional
+está en:</p>
+<ul class="simple">
+<li><p>contratos con backend,</p></li>
+<li><p>parsing de payloads,</p></li>
+<li><p>y sincronización de estados.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="flujo-arquitectonico-general">
+<h2>12. Flujo arquitectónico general<a class="headerlink" href="#flujo-arquitectonico-general" title="Link to this heading"></a></h2>
+<p>De forma resumida, el flujo del frontend es el siguiente:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">main.tsx</span></code> monta la aplicación.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">App.tsx</span></code> entrega el control al router.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Router.tsx</span></code> selecciona la página según la URL.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AppShell.tsx</span></code> compone layout y navegación.</p></li>
+<li><p>La página renderiza su componente de pestaña.</p></li>
+<li><p>La pestaña consume servicios del dominio correspondiente.</p></li>
+<li><p>Los servicios usan <code class="docutils literal notranslate"><span class="pre">apiClient.ts</span></code> para hablar con el backend.</p></li>
+<li><p>Parte del contexto compartido se conserva en <code class="docutils literal notranslate"><span class="pre">appFilters.store.ts</span></code>.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="decisiones-arquitectonicas-visibles-en-la-version-actual">
+<h2>13. Decisiones arquitectónicas visibles en la versión actual<a class="headerlink" href="#decisiones-arquitectonicas-visibles-en-la-version-actual" title="Link to this heading"></a></h2>
+<section id="ui-centrada-en-pestanas-grandes">
+<h3>1. UI centrada en pestañas grandes<a class="headerlink" href="#ui-centrada-en-pestanas-grandes" title="Link to this heading"></a></h3>
+<p>El sistema prioriza cuatro áreas funcionales amplias en lugar de muchas rutas
+pequeñas.</p>
+</section>
+<section id="pages-delgadas-tabs-gruesas">
+<h3>2. Pages delgadas, tabs gruesas<a class="headerlink" href="#pages-delgadas-tabs-gruesas" title="Link to this heading"></a></h3>
+<p>La lógica principal vive en los componentes de pestaña y no en wrappers de ruta.</p>
+</section>
+<section id="estado-global-minimo">
+<h3>3. Estado global mínimo<a class="headerlink" href="#estado-global-minimo" title="Link to this heading"></a></h3>
+<p>Se evita una solución de estado más pesada y se usa un store simple para los
+filtros y el contexto compartido.</p>
+</section>
+<section id="id15">
+<h3>4. Servicios por dominio<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<p>Cada área funcional tiene su propia capa de llamadas API, lo que mejora
+mantenibilidad y documentación.</p>
+</section>
+<section id="integracion-progresiva-con-backend">
+<h3>5. Integración progresiva con backend<a class="headerlink" href="#integracion-progresiva-con-backend" title="Link to this heading"></a></h3>
+<p>La UI está diseñada para convivir con endpoints completamente operativos y con
+zonas aún en consolidación, usando estados de carga, fallback o degradación
+controlada cuando hace falta.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="alcance-real-de-la-arquitectura-frontend-actual">
+<h2>14. Alcance real de la arquitectura frontend actual<a class="headerlink" href="#alcance-real-de-la-arquitectura-frontend-actual" title="Link to this heading"></a></h2>
+<p>La arquitectura actual ya soporta de forma coherente:</p>
+<ul class="simple">
+<li><p>navegación principal del producto;</p></li>
+<li><p>operación de datos;</p></li>
+<li><p>monitoreo agregado en dashboard;</p></li>
+<li><p>gestión de modelos;</p></li>
+<li><p>ejecución de predicciones;</p></li>
+<li><p>compartición básica de contexto entre pantallas.</p></li>
+</ul>
+<p>Todavía no refleja una aplicación con:</p>
+<ul class="simple">
+<li><p>autenticación completa en frontend;</p></li>
+<li><p>módulos de usuario avanzados;</p></li>
+<li><p>internacionalización;</p></li>
+<li><p>separación por microfrontends;</p></li>
+<li><p>o una capa de diseño sistematizada formalmente.</p></li>
+</ul>
+<p>Es una arquitectura <strong>compacta, funcional y orientada al dominio</strong>, suficiente
+para el estado actual de NeuroCampus.</p>
 </section>
 </section>
 
@@ -360,7 +1010,7 @@ modelos.</p></li>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
         <a href="backend.html" class="btn btn-neutral float-left" title="Arquitectura del backend" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
-        <a href="pipeline_modelos.html" class="btn btn-neutral float-right" title="Pipeline de modelos (BM, RBM, DBM)" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pipeline_modelos.html" class="btn btn-neutral float-right" title="Pipeline de modelos" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

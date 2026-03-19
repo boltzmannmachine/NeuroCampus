@@ -20,7 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="Pestaña «Dashboard»" href="dashboard.html" />
+    <link rel="next" title="Arquitectura de NeuroCampus" href="../arquitectura/index.html" />
     <link rel="prev" title="Pestaña «Modelos»" href="modelos.html" /> 
 </head>
 
@@ -46,35 +46,153 @@
               <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Manual de usuario</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="datos.html">Pestaña «Datos» – Ingesta y análisis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dashboard.html">Pestaña «Dashboard»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datos.html">Pestaña «Datos»</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modelos.html">Pestaña «Modelos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-resumen">Subpestaña «Resumen»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-entrenamiento">Subpestaña «Entrenamiento»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-ejecuciones">Subpestaña «Ejecuciones»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-campeon">Subpestaña «Campeón»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-sweep">Subpestaña «Sweep»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-artefactos">Subpestaña «Artefactos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-diagnostico">Subpestaña «Diagnóstico»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#comportamiento-transversal-de-la-pestana">Comportamiento transversal de la pestaña</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Pestaña «Predicciones»</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#objetivo">Objetivo</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#organizacion-de-la-pantalla">Organización de la pantalla</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#ingreso-manual">Ingreso manual</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#formulario-columna-izquierda">1. Formulario (columna izquierda)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#generar-prediccion">2. Generar predicción</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dependencias-funcionales">Dependencias funcionales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#requisitos-funcionales">Requisitos funcionales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#consecuencia-practica">Consecuencia práctica</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#resultados-de-la-prediccion-salida-inmediata">Resultados de la predicción (salida inmediata)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#tarjeta-de-resultado-principal">1. Tarjeta de resultado principal</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grafico-tipo-radar-indicadores">2. Gráfico tipo radar (indicadores)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#barras-comparativas">3. Barras comparativas</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#proyeccion-temporal-si-hay-historico">4. Proyección temporal (si hay histórico)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contexto-compartido-con-otras-pestanas">Contexto compartido con otras pestañas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dataset-activo-compartido">Dataset activo compartido</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#contexto-recibido-desde-modelos">Contexto recibido desde «Modelos»</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#limitacion-importante">Limitación importante</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#prediccion-por-lote">Predicción por lote</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#ingesta-de-archivo">1. Ingesta de archivo</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ejecucion-de-predicciones">2. Ejecución de predicciones</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#visualizaciones-agregadas">3. Visualizaciones agregadas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estructura-general-de-la-pestana">Estructura general de la pestaña</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#encabezado-principal">Encabezado principal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modo-1-prediccion-individual">Modo 1: Predicción individual</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seleccion-del-conjunto-de-datos">1.1 Selección del conjunto de datos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#que-muestra-cada-opcion">Qué muestra cada opción</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interpretacion">Interpretación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#origen-de-los-datasets-listados">Origen de los datasets listados</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#recomendaciones-de-uso">Recomendaciones de uso</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#errores-frecuentes">Errores frecuentes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seleccion-de-docente">1.2 Selección de docente</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elementos-visibles">Elementos visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#busqueda">Búsqueda</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resultado-del-selector">Resultado del selector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#seleccion-de-asignatura">1.3 Selección de asignatura</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Elementos visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Búsqueda</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Resultado del selector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#panel-informacion-seleccionada">1.4 Panel «Información seleccionada»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#puntaje-historico-del-par">Puntaje histórico del par</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#boton-generar-prediccion">1.5 Botón «Generar Predicción»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#condiciones-para-habilitarse">Condiciones para habilitarse</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estado-durante-ejecucion">Estado durante ejecución</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-hace-internamente">Qué hace internamente</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#resultado-de-prediccion-individual">1.6 Resultado de predicción individual</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tarjeta-principal-de-resultado">Tarjeta principal de resultado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#puntaje-estimado">Puntaje estimado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#confianza">Confianza</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nivel-de-riesgo">Nivel de riesgo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#convencion-visual">Convención visual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#barra-de-progreso">Barra de progreso</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mensaje-interpretativo">Mensaje interpretativo</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#perfil-de-indicadores-radar">1.7 Perfil de indicadores (Radar)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#series-mostradas">Series mostradas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#escala-visual">Escala visual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utilidad">Utilidad</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#analisis-comparativo-por-dimension">1.8 Análisis comparativo por dimensión</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#series-comparadas">Series comparadas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Escala visual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Utilidad</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#proyeccion-temporal">1.9 Proyección temporal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id6">Series mostradas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Escala visual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#proposito">Propósito</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estado-sin-resultado">1.10 Estado sin resultado</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manejo-de-errores">1.11 Manejo de errores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modo-2-prediccion-por-lote">Modo 2: Predicción por lote</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">2.1 Selección del conjunto de datos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#informacion-adicional-visible">Información adicional visible</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implicacion-funcional">Implicación funcional</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#boton-generar-predicciones-del-lote">2.2 Botón «Generar predicciones del lote»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#que-hace">Qué hace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estado-posterior-al-lanzamiento">Estado posterior al lanzamiento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#progreso-del-job">2.3 Progreso del job</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#naturaleza-del-proceso">Naturaleza del proceso</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#historial-de-ejecuciones">2.4 Historial de ejecuciones</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#que-muestra">Qué muestra</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#acciones-por-ejecucion">Acciones por ejecución</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ver-vista-previa">Ver vista previa</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#descargar">Descargar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Utilidad</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#resumen-de-resultados-batch">2.5 Resumen de resultados batch</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#indicadores-visibles">Indicadores visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-representan">Qué representan</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#distribucion-de-riesgo-por-materia">2.6 Distribución de riesgo por materia</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#que-representa">Qué representa</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#alcance-visible-en-la-ui-actual">Alcance visible en la UI actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id10">Utilidad</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#mapa-de-calor">2.7 Mapa de calor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estructura">Estructura</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#convencion-visual-actual">Convención visual actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#alcance-visible">Alcance visible</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tabla-de-predicciones">2.8 Tabla de predicciones</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columnas-visibles">Columnas visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filtros-rapidos-por-riesgo">Filtros rápidos por riesgo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#descarga-del-artefacto">Descarga del artefacto</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vista-previa-paginada">Vista previa paginada</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#artefactos-de-salida">Artefactos de salida</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estados-de-error-en-batch">Estados de error en batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comportamiento-de-sincronizacion-por-dataset">Comportamiento de sincronización por dataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elementos-que-se-reinician">Elementos que se reinician</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#importancia-de-este-comportamiento">Importancia de este comportamiento</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="dashboard.html">Pestaña «Dashboard»</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
@@ -113,277 +231,833 @@
 <h1>Pestaña «Predicciones»<a class="headerlink" href="#pestana-predicciones" title="Link to this heading"></a></h1>
 <section id="objetivo">
 <h2>Objetivo<a class="headerlink" href="#objetivo" title="Link to this heading"></a></h2>
-<p>La pestaña <strong>Predicciones</strong> permite aplicar el modelo seleccionado (modelo
-campeón) para estimar el rendimiento esperado de docentes/asignaturas a partir
-de nuevas evaluaciones.</p>
-<p>Ofrece dos modos principales:</p>
+<p>La pestaña <strong>Predicciones</strong> permite ejecutar inferencia sobre el desempeño
+esperado de pares <strong>docente–asignatura</strong> a partir de un dataset previamente
+preparado y de un <strong>modelo campeón</strong> disponible para ese dataset.</p>
+<p>Esta pestaña opera sobre la familia de modelos <strong><code class="docutils literal notranslate"><span class="pre">score_docente</span></code></strong>, es decir,
+modelos de regresión cuyo resultado principal es un puntaje estimado en escala
+<strong>0–50</strong>.</p>
+<p>Desde esta pestaña el usuario puede trabajar en dos modos:</p>
 <ol class="arabic simple">
-<li><p><strong>Ingreso manual</strong>: registro de un caso a la vez vía formulario.</p></li>
-<li><p><strong>Predicción por lote</strong>: carga de múltiples casos desde un archivo.</p></li>
+<li><p><strong>Predicción individual</strong></p>
+<ul class="simple">
+<li><p>para estimar el resultado de un par docente–asignatura específico.</p></li>
+</ul>
+</li>
+<li><p><strong>Predicción por lote</strong></p>
+<ul class="simple">
+<li><p>para generar predicciones masivas sobre todos los pares disponibles en el
+dataset activo.</p></li>
+</ul>
+</li>
 </ol>
+<p>Además, la pestaña permite:</p>
+<ul class="simple">
+<li><p>consultar datasets disponibles para inferencia;</p></li>
+<li><p>reutilizar el dataset activo compartido con otras pestañas;</p></li>
+<li><p>abrir historial de ejecuciones batch previas;</p></li>
+<li><p>descargar artefactos de predicciones persistidas.</p></li>
+</ul>
 </section>
 <hr class="docutils" />
-<section id="organizacion-de-la-pantalla">
-<h2>Organización de la pantalla<a class="headerlink" href="#organizacion-de-la-pantalla" title="Link to this heading"></a></h2>
-<p>La pantalla se organiza con:</p>
+<section id="dependencias-funcionales">
+<h2>Dependencias funcionales<a class="headerlink" href="#dependencias-funcionales" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Predicciones</strong> no parte de cero. Para operar correctamente
+necesita que, previamente, exista un flujo de datos y modelado completado.</p>
+<section id="requisitos-funcionales">
+<h3>Requisitos funcionales<a class="headerlink" href="#requisitos-funcionales" title="Link to this heading"></a></h3>
+<p>Para que esta pestaña funcione como se espera, debe existir:</p>
 <ul class="simple">
-<li><p><strong>Layout maestro</strong>:</p>
-<ul>
-<li><p>Columna izquierda: formulario de entrada.</p></li>
-<li><p>Columna derecha: resultado y visualizaciones de la predicción.</p></li>
-</ul>
-</li>
-<li><p><strong>Tabs internos</strong>:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">Ingreso</span> <span class="pre">manual</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Predicción</span> <span class="pre">por</span> <span class="pre">lote</span></code>.</p></li>
-</ul>
-</li>
-</ul>
-<p>Ambas pestañas comparten la misma zona de resultados (tarjetas y gráficos), que
-se actualiza cada vez que se genera una nueva predicción.</p>
-</section>
-<hr class="docutils" />
-<section id="ingreso-manual">
-<h2>Ingreso manual<a class="headerlink" href="#ingreso-manual" title="Link to this heading"></a></h2>
-<section id="formulario-columna-izquierda">
-<h3>1. Formulario (columna izquierda)<a class="headerlink" href="#formulario-columna-izquierda" title="Link to this heading"></a></h3>
-<p>Campos típicos:</p>
-<ul class="simple">
-<li><p><strong>Nombre del docente</strong> (texto).</p></li>
-<li><p><strong>Asignatura</strong> (texto o desplegable).</p></li>
-<li><p><strong>Calificaciones para las 10 preguntas</strong>:</p>
-<ul>
-<li><p>Usualmente 10 sliders o selectores con escala 1–5.</p></li>
-<li><p>Cada pregunta representa un aspecto de la evaluación (claridad, dominio de
-contenido, puntualidad, etc.).</p></li>
-</ul>
-</li>
-<li><p><strong>Comentario</strong> (textarea opcional):</p>
-<ul>
-<li><p>Texto libre que será procesado por el pipeline de PLN si el modelo lo
-utiliza.</p></li>
-</ul>
-</li>
+<li><p>un <strong>dataset</strong> previamente cargado desde la pestaña <strong>Datos</strong>;</p></li>
+<li><p>un <strong>feature-pack</strong> o artefacto de características ya preparado para ese
+dataset;</p></li>
+<li><p>un <strong>modelo campeón</strong> disponible para la familia <code class="docutils literal notranslate"><span class="pre">score_docente</span></code>.</p></li>
 </ul>
 </section>
-<section id="generar-prediccion">
-<h3>2. Generar predicción<a class="headerlink" href="#generar-prediccion" title="Link to this heading"></a></h3>
+<section id="consecuencia-practica">
+<h3>Consecuencia práctica<a class="headerlink" href="#consecuencia-practica" title="Link to this heading"></a></h3>
+<p>Si el dataset existe pero <strong>no</strong> tiene campeón disponible, la pestaña puede:</p>
 <ul class="simple">
-<li><p>Botón principal: <strong>«Generar predicción»</strong>.</p></li>
-<li><p>Al pulsarlo:</p>
-<ul>
-<li><p>El frontend prepara un payload con los campos del formulario.</p></li>
-<li><p>El backend aplica el modelo campeón configurado.</p></li>
-<li><p>Se obtiene una probabilidad de alto/bajo rendimiento y otras métricas
-asociadas.</p></li>
+<li><p>listar el dataset;</p></li>
+<li><p>mostrarlo en los selectores;</p></li>
+<li><p>pero no necesariamente completar la inferencia con éxito.</p></li>
 </ul>
-</li>
-</ul>
+<p>Por eso, esta pestaña debe entenderse como la fase de <strong>consumo de modelos y
+artefactos</strong>, no como la fase donde se entrenan o seleccionan modelos.</p>
 </section>
 </section>
 <hr class="docutils" />
-<section id="resultados-de-la-prediccion-salida-inmediata">
-<h2>Resultados de la predicción (salida inmediata)<a class="headerlink" href="#resultados-de-la-prediccion-salida-inmediata" title="Link to this heading"></a></h2>
-<p>En la columna derecha se muestran una o varias tarjetas y gráficos:</p>
-<section id="tarjeta-de-resultado-principal">
-<h3>1. Tarjeta de resultado principal<a class="headerlink" href="#tarjeta-de-resultado-principal" title="Link to this heading"></a></h3>
-<p>Incluye:</p>
+<section id="contexto-compartido-con-otras-pestanas">
+<h2>Contexto compartido con otras pestañas<a class="headerlink" href="#contexto-compartido-con-otras-pestanas" title="Link to this heading"></a></h2>
+<p>La implementación actual sincroniza parte del contexto global con el resto de la
+aplicación.</p>
+<section id="dataset-activo-compartido">
+<h3>Dataset activo compartido<a class="headerlink" href="#dataset-activo-compartido" title="Link to this heading"></a></h3>
+<p>Cuando existe un dataset activo en el estado global del frontend:</p>
 <ul class="simple">
-<li><p><strong>Probabilidad de alto/bajo rendimiento</strong><br />
-Ejemplo:</p>
-<ul>
-<li><p>Alto: 78% (IC 95% [70–85]),</p></li>
-<li><p>Bajo: 22% (IC 95% [15–30]).</p></li>
-</ul>
-</li>
-<li><p><strong>Clasificación final</strong>:</p>
-<ul>
-<li><p>“Predicción: Alto rendimiento esperado”</p></li>
-<li><p>o “Predicción: Bajo rendimiento esperado”.</p></li>
-</ul>
-</li>
-<li><p><strong>Mensaje explicativo</strong>:</p>
-<ul>
-<li><p>Texto corto que ayuda a interpretar el resultado:</p>
-<ul>
-<li><p>“El modelo sugiere que este docente tiene una alta probabilidad de
-mantener un rendimiento positivo, especialmente por las calificaciones
-en las preguntas X e Y.”</p></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><p>la pestaña <strong>Predicciones</strong> intenta reutilizarlo automáticamente;</p></li>
+<li><p>si ese dataset no existe en el listado disponible, toma como referencia el
+dataset más reciente con artefactos compatibles.</p></li>
 </ul>
 </section>
-<section id="grafico-tipo-radar-indicadores">
-<h3>2. Gráfico tipo radar (indicadores)<a class="headerlink" href="#grafico-tipo-radar-indicadores" title="Link to this heading"></a></h3>
+<section id="contexto-recibido-desde-modelos">
+<h3>Contexto recibido desde «Modelos»<a class="headerlink" href="#contexto-recibido-desde-modelos" title="Link to this heading"></a></h3>
+<p>La UI actual puede mostrar un bloque informativo llamado:</p>
 <ul class="simple">
-<li><p><strong>Gráfico de radar</strong>:</p>
-<ul>
-<li><p>Cada eje representa una pregunta o indicador (P1, P2, …, P10).</p></li>
-<li><p>El área representa el perfil del docente para ese caso concreto.</p></li>
+<li><p><strong>Contexto recibido desde Modelos</strong></p></li>
 </ul>
-</li>
-<li><p>Ayuda a visualizar fortalezas y debilidades relativas.</p></li>
+<p>Este bloque sirve para trazabilidad visual y puede mostrar:</p>
+<ul class="simple">
+<li><p>dataset activo;</p></li>
+<li><p>familia de modelo seleccionada;</p></li>
+<li><p>run seleccionado;</p></li>
+<li><p>origen del contexto.</p></li>
 </ul>
 </section>
-<section id="barras-comparativas">
-<h3>3. Barras comparativas<a class="headerlink" href="#barras-comparativas" title="Link to this heading"></a></h3>
+<section id="limitacion-importante">
+<h3>Limitación importante<a class="headerlink" href="#limitacion-importante" title="Link to this heading"></a></h3>
+<p>Aunque la pestaña <strong>Modelos</strong> puede manejar diferentes familias o contextos,
+la pestaña <strong>Predicciones</strong> opera actualmente sobre el champion de la familia:</p>
 <ul class="simple">
-<li><p><strong>Gráfico de barras</strong>:</p>
-<ul>
-<li><p>Comparación del docente/curso actual vs:</p>
-<ul>
-<li><p>promedio histórico del mismo docente,</p></li>
-<li><p>promedio de la asignatura,</p></li>
-<li><p>promedio global.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">score_docente</span></code></strong></p></li>
 </ul>
-</li>
-</ul>
-</li>
-<li><p>Eje X: indicadores o dimensiones.</p></li>
-<li><p>Eje Y: puntuaciones normalizadas.</p></li>
-</ul>
-</section>
-<section id="proyeccion-temporal-si-hay-historico">
-<h3>4. Proyección temporal (si hay histórico)<a class="headerlink" href="#proyeccion-temporal-si-hay-historico" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><strong>Gráfico de línea o barras en el tiempo</strong>:</p>
-<ul>
-<li><p>Eje X: semestres o periodos.</p></li>
-<li><p>Eje Y: rendimiento predicho o indicador agregado.</p></li>
-</ul>
-</li>
-<li><p>Permite ver si el rendimiento está mejorando, estable o empeorando.</p></li>
-</ul>
+<p>Si desde <strong>Modelos</strong> llega otra familia distinta, la interfaz lo advierte, pero
+mantiene el dataset como referencia compartida y conserva el run recibido solo
+como contexto visual.</p>
 </section>
 </section>
 <hr class="docutils" />
-<section id="prediccion-por-lote">
-<h2>Predicción por lote<a class="headerlink" href="#prediccion-por-lote" title="Link to this heading"></a></h2>
-<section id="ingesta-de-archivo">
-<h3>1. Ingesta de archivo<a class="headerlink" href="#ingesta-de-archivo" title="Link to this heading"></a></h3>
-<p>En la pestaña <strong>Predicción por lote</strong>:</p>
+<section id="estructura-general-de-la-pestana">
+<h2>Estructura general de la pestaña<a class="headerlink" href="#estructura-general-de-la-pestana" title="Link to this heading"></a></h2>
+<p>La interfaz se divide en dos modos mediante tabs:</p>
+<ol class="arabic simple">
+<li><p><strong>Predicción individual</strong></p></li>
+<li><p><strong>Predicción por lote</strong></p></li>
+</ol>
+<p>Antes de esos tabs se muestra:</p>
 <ul class="simple">
-<li><p>Se muestra un componente de subida de archivo similar al de la pestaña
-<strong>Datos</strong>.</p></li>
-<li><p>Formatos aceptados:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code>, <code class="docutils literal notranslate"><span class="pre">.xls</span></code>, etc. (según se defina en el backend).</p></li>
-</ul>
-</li>
-<li><p>El archivo debe seguir una <strong>plantilla de columnas</strong> compatible con el
-modelo:</p>
-<ul>
-<li><p>nombre docente,</p></li>
-<li><p>asignatura,</p></li>
-<li><p>respuestas a las 10 preguntas,</p></li>
-<li><p>comentario (opcional),</p></li>
-<li><p>otros campos que sean necesarios.</p></li>
-</ul>
-</li>
+<li><p>encabezado de la pestaña;</p></li>
+<li><p>descripción breve del propósito;</p></li>
+<li><p>bloque opcional de contexto recibido desde <strong>Modelos</strong>.</p></li>
 </ul>
 </section>
-<section id="ejecucion-de-predicciones">
-<h3>2. Ejecución de predicciones<a class="headerlink" href="#ejecucion-de-predicciones" title="Link to this heading"></a></h3>
+<hr class="docutils" />
+<section id="encabezado-principal">
+<h2>Encabezado principal<a class="headerlink" href="#encabezado-principal" title="Link to this heading"></a></h2>
+<p>La parte superior de la pestaña muestra:</p>
 <ul class="simple">
-<li><p>Botón: <strong>«Generar predicciones (lote)»</strong>.</p></li>
-<li><p>El backend procesa cada fila, aplicando el mismo modelo campeón.</p></li>
-<li><p>Se devuelve:</p>
-<ul>
-<li><p>Una tabla de resultados (probabilidad de alto/bajo rendimiento por fila).</p></li>
-<li><p>Agregados globales (por ejemplo, porcentaje de casos en riesgo alto).</p></li>
+<li><p>el título <strong>Predicciones</strong>;</p></li>
+<li><p>el subtítulo <strong>Sistema de predicción del desempeño docente</strong>.</p></li>
 </ul>
-</li>
+<p>Este encabezado identifica claramente que la pestaña está orientada a
+<strong>inferencia</strong>, no a carga de datos ni entrenamiento.</p>
+</section>
+<hr class="docutils" />
+<section id="modo-1-prediccion-individual">
+<h2>Modo 1: Predicción individual<a class="headerlink" href="#modo-1-prediccion-individual" title="Link to this heading"></a></h2>
+<p>Este modo permite estimar el resultado de un par específico:</p>
+<ul class="simple">
+<li><p>un <strong>docente</strong>;</p></li>
+<li><p>una <strong>asignatura</strong>;</p></li>
+<li><p>dentro de un <strong>dataset</strong> determinado.</p></li>
+</ul>
+<p>La vista está organizada en dos columnas principales:</p>
+<ul class="simple">
+<li><p><strong>columna izquierda</strong>: selección y contexto;</p></li>
+<li><p><strong>columna derecha</strong>: resultados y visualizaciones.</p></li>
 </ul>
 </section>
-<section id="visualizaciones-agregadas">
-<h3>3. Visualizaciones agregadas<a class="headerlink" href="#visualizaciones-agregadas" title="Link to this heading"></a></h3>
-<p>Al trabajar con un lote, es posible mostrar:</p>
+<hr class="docutils" />
+<section id="seleccion-del-conjunto-de-datos">
+<h2>1.1 Selección del conjunto de datos<a class="headerlink" href="#seleccion-del-conjunto-de-datos" title="Link to this heading"></a></h2>
+<p>En el panel izquierdo aparece el selector:</p>
 <ul class="simple">
-<li><p><strong>Distribución de riesgo</strong>:</p>
-<ul>
-<li><p>Gráfico de barras o pastel con categorías:</p>
-<ul>
-<li><p>Bajo riesgo,</p></li>
-<li><p>Riesgo medio,</p></li>
-<li><p>Alto riesgo.</p></li>
+<li><p><strong>Conjunto de datos</strong></p></li>
 </ul>
-</li>
+<section id="que-muestra-cada-opcion">
+<h3>Qué muestra cada opción<a class="headerlink" href="#que-muestra-cada-opcion" title="Link to this heading"></a></h3>
+<p>Cada dataset se presenta con información resumida como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p>número de pares disponibles</p></li>
+<li><p>indicador visual de disponibilidad de campeón</p></li>
 </ul>
-</li>
-<li><p><strong>Ranking de docentes/asignaturas</strong>:</p>
-<ul>
-<li><p>Ordenados por probabilidad de bajo rendimiento.</p></li>
+<p>La forma visual típica es:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span> <span class="pre">—</span> <span class="pre">N</span> <span class="pre">pares</span> <span class="pre">✓</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span> <span class="pre">—</span> <span class="pre">N</span> <span class="pre">pares</span> <span class="pre">⚠</span></code></p></li>
 </ul>
-</li>
-<li><p><strong>Mapa de calor por indicador</strong>:</p>
-<ul>
-<li><p>Eje X: indicadores/preguntas.</p></li>
-<li><p>Eje Y: docentes o asignaturas.</p></li>
-<li><p>Celdas coloreadas según el nivel de riesgo.</p></li>
+</section>
+<section id="interpretacion">
+<h3>Interpretación<a class="headerlink" href="#interpretacion" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>✓</strong> indica que el dataset reporta campeón disponible.</p></li>
+<li><p><strong>⚠</strong> indica que el dataset existe, pero no necesariamente tiene el campeón
+listo para inferencia.</p></li>
 </ul>
-</li>
+</section>
+<section id="origen-de-los-datasets-listados">
+<h3>Origen de los datasets listados<a class="headerlink" href="#origen-de-los-datasets-listados" title="Link to this heading"></a></h3>
+<p>La pestaña consulta datasets desde el backend asociados a artefactos de tipo
+<strong>pair matrix</strong> y contexto de predicción.</p>
+<p>Por ello, no todos los datasets cargados históricamente tienen que aparecer aquí:
+solo aparecen aquellos que tienen el nivel de preparación requerido para la
+pestaña <strong>Predicciones</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="seleccion-de-docente">
+<h2>1.2 Selección de docente<a class="headerlink" href="#seleccion-de-docente" title="Link to this heading"></a></h2>
+<p>Debajo del dataset aparece el bloque <strong>Docente</strong>.</p>
+<section id="elementos-visibles">
+<h3>Elementos visibles<a class="headerlink" href="#elementos-visibles" title="Link to this heading"></a></h3>
+<p>La UI ofrece:</p>
+<ul class="simple">
+<li><p>una caja de búsqueda;</p></li>
+<li><p>un selector desplegable con los docentes disponibles.</p></li>
+</ul>
+</section>
+<section id="busqueda">
+<h3>Búsqueda<a class="headerlink" href="#busqueda" title="Link to this heading"></a></h3>
+<p>La búsqueda permite filtrar por:</p>
+<ul class="simple">
+<li><p>nombre del docente;</p></li>
+<li><p>código o clave del docente.</p></li>
+</ul>
+</section>
+<section id="resultado-del-selector">
+<h3>Resultado del selector<a class="headerlink" href="#resultado-del-selector" title="Link to this heading"></a></h3>
+<p>Cada elemento puede mostrarse como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Nombre</span> <span class="pre">(teacher_key)</span></code></p></li>
+<li><p>o solo el identificador si no hay nombre legible disponible.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="recomendaciones-de-uso">
-<h2>Recomendaciones de uso<a class="headerlink" href="#recomendaciones-de-uso" title="Link to this heading"></a></h2>
+<section id="seleccion-de-asignatura">
+<h2>1.3 Selección de asignatura<a class="headerlink" href="#seleccion-de-asignatura" title="Link to this heading"></a></h2>
+<p>Después del docente aparece el bloque <strong>Asignatura</strong>.</p>
+<section id="id1">
+<h3>Elementos visibles<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>La UI ofrece:</p>
 <ul class="simple">
-<li><p>Antes de utilizar la pestaña <strong>Predicciones</strong>, asegúrate de que:</p>
-<ul>
-<li><p>Hay un <strong>modelo campeón</strong> seleccionado y entrenado en la pestaña <strong>Modelos</strong>.</p></li>
-<li><p>Los datos de entrada siguen el mismo esquema de preprocesamiento que el
-dataset de entrenamiento.</p></li>
+<li><p>una caja de búsqueda;</p></li>
+<li><p>un selector desplegable con las asignaturas disponibles.</p></li>
 </ul>
-</li>
-<li><p>Para casos límite (probabilidades cercanas al 50/50):</p>
-<ul>
-<li><p>Complementar la decisión con información contextual adicional.</p></li>
-<li><p>Utilizar la pestaña <strong>Dashboard</strong> para revisar tendencias históricas.</p></li>
+</section>
+<section id="id2">
+<h3>Búsqueda<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>La búsqueda permite filtrar por:</p>
+<ul class="simple">
+<li><p>nombre de la asignatura;</p></li>
+<li><p>código o clave de la asignatura.</p></li>
 </ul>
-</li>
+</section>
+<section id="id3">
+<h3>Resultado del selector<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Cada elemento puede mostrarse como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Nombre</span> <span class="pre">(materia_key)</span></code></p></li>
+<li><p>o solo el identificador si no hay nombre legible disponible.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="panel-informacion-seleccionada">
+<h2>1.4 Panel «Información seleccionada»<a class="headerlink" href="#panel-informacion-seleccionada" title="Link to this heading"></a></h2>
+<p>Debajo de los selectores, la interfaz muestra una tarjeta de resumen con:</p>
+<ul class="simple">
+<li><p>dataset seleccionado;</p></li>
+<li><p>docente seleccionado;</p></li>
+<li><p>número de encuestas del docente;</p></li>
+<li><p>asignatura seleccionada;</p></li>
+<li><p>número de encuestas de la asignatura;</p></li>
+<li><p>puntaje histórico del par.</p></li>
+</ul>
+<section id="puntaje-historico-del-par">
+<h3>Puntaje histórico del par<a class="headerlink" href="#puntaje-historico-del-par" title="Link to this heading"></a></h3>
+<p>Este valor se muestra como:</p>
+<ul class="simple">
+<li><p><strong>Puntaje histórico (par)</strong></p></li>
+</ul>
+<p>En la implementación actual, este dato solo se actualiza una vez que existe un
+resultado de predicción cargado en pantalla.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="boton-generar-prediccion">
+<h2>1.5 Botón «Generar Predicción»<a class="headerlink" href="#boton-generar-prediccion" title="Link to this heading"></a></h2>
+<p>El botón principal del modo individual es:</p>
+<ul class="simple">
+<li><p><strong>Generar Predicción</strong></p></li>
+</ul>
+<section id="condiciones-para-habilitarse">
+<h3>Condiciones para habilitarse<a class="headerlink" href="#condiciones-para-habilitarse" title="Link to this heading"></a></h3>
+<p>El botón queda deshabilitado si falta seleccionar:</p>
+<ul class="simple">
+<li><p>docente;</p></li>
+<li><p>asignatura.</p></li>
+</ul>
+</section>
+<section id="estado-durante-ejecucion">
+<h3>Estado durante ejecución<a class="headerlink" href="#estado-durante-ejecucion" title="Link to this heading"></a></h3>
+<p>Mientras la solicitud está en curso, el texto cambia a:</p>
+<ul class="simple">
+<li><p><strong>Generando…</strong></p></li>
+</ul>
+</section>
+<section id="que-hace-internamente">
+<h3>Qué hace internamente<a class="headerlink" href="#que-hace-internamente" title="Link to this heading"></a></h3>
+<p>La interfaz envía al backend:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teacher_key</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">materia_key</span></code></p></li>
+</ul>
+<p>usando el endpoint de predicción individual de la pestaña <strong>Predicciones</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="resultado-de-prediccion-individual">
+<h2>1.6 Resultado de predicción individual<a class="headerlink" href="#resultado-de-prediccion-individual" title="Link to this heading"></a></h2>
+<p>Cuando la inferencia responde correctamente, la columna derecha muestra una
+sección de resultados.</p>
+<section id="tarjeta-principal-de-resultado">
+<h3>Tarjeta principal de resultado<a class="headerlink" href="#tarjeta-principal-de-resultado" title="Link to this heading"></a></h3>
+<p>La primera tarjeta muestra:</p>
+<ul class="simple">
+<li><p><strong>Puntaje estimado (0–50)</strong></p></li>
+<li><p><strong>Confianza</strong></p></li>
+<li><p><strong>Nivel de riesgo</strong></p></li>
+</ul>
+</section>
+<section id="puntaje-estimado">
+<h3>Puntaje estimado<a class="headerlink" href="#puntaje-estimado" title="Link to this heading"></a></h3>
+<p>Se presenta como un valor numérico principal en escala de <strong>0 a 50</strong>.</p>
+</section>
+<section id="confianza">
+<h3>Confianza<a class="headerlink" href="#confianza" title="Link to this heading"></a></h3>
+<p>Se presenta como porcentaje derivado de la respuesta del backend.</p>
+</section>
+<section id="nivel-de-riesgo">
+<h3>Nivel de riesgo<a class="headerlink" href="#nivel-de-riesgo" title="Link to this heading"></a></h3>
+<p>Se representa con una etiqueta visual, que puede ser:</p>
+<ul class="simple">
+<li><p><strong>Riesgo bajo</strong></p></li>
+<li><p><strong>Riesgo medio</strong></p></li>
+<li><p><strong>Riesgo alto</strong></p></li>
+</ul>
+</section>
+<section id="convencion-visual">
+<h3>Convención visual<a class="headerlink" href="#convencion-visual" title="Link to this heading"></a></h3>
+<p>La interfaz usa el siguiente criterio de color:</p>
+<ul class="simple">
+<li><p>verde para riesgo bajo;</p></li>
+<li><p>amarillo para riesgo medio;</p></li>
+<li><p>rojo para riesgo alto.</p></li>
+</ul>
+</section>
+<section id="barra-de-progreso">
+<h3>Barra de progreso<a class="headerlink" href="#barra-de-progreso" title="Link to this heading"></a></h3>
+<p>La tarjeta también incluye una barra horizontal que representa el puntaje como
+porcentaje del máximo posible.</p>
+<p>La escala visual marcada en la UI es:</p>
+<ul class="simple">
+<li><p>0</p></li>
+<li><p>25</p></li>
+<li><p>50</p></li>
+</ul>
+</section>
+<section id="mensaje-interpretativo">
+<h3>Mensaje interpretativo<a class="headerlink" href="#mensaje-interpretativo" title="Link to this heading"></a></h3>
+<p>Según el nivel de riesgo, la interfaz acompaña el resultado con una conclusión
+textual de apoyo, orientada a lectura rápida.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="perfil-de-indicadores-radar">
+<h2>1.7 Perfil de indicadores (Radar)<a class="headerlink" href="#perfil-de-indicadores-radar" title="Link to this heading"></a></h2>
+<p>Después de la tarjeta principal, la interfaz muestra un gráfico:</p>
+<ul class="simple">
+<li><p><strong>Perfil de Indicadores (Radar)</strong></p></li>
+</ul>
+<section id="series-mostradas">
+<h3>Series mostradas<a class="headerlink" href="#series-mostradas" title="Link to this heading"></a></h3>
+<p>El radar compara dos perfiles:</p>
+<ul class="simple">
+<li><p><strong>Promedio Actual</strong></p></li>
+<li><p><strong>Predicción</strong></p></li>
+</ul>
+</section>
+<section id="escala-visual">
+<h3>Escala visual<a class="headerlink" href="#escala-visual" title="Link to this heading"></a></h3>
+<p>La escala del radar está normalizada visualmente a rango:</p>
+<ul class="simple">
+<li><p><strong>0 a 5</strong></p></li>
+</ul>
+<p>La implementación actual incorpora una normalización defensiva en frontend para
+mantener el gráfico legible incluso si el backend responde en una escala más
+alta de la esperada.</p>
+</section>
+<section id="utilidad">
+<h3>Utilidad<a class="headerlink" href="#utilidad" title="Link to this heading"></a></h3>
+<p>Este gráfico permite ver, por dimensión o indicador:</p>
+<ul class="simple">
+<li><p>cómo se comporta el par actualmente;</p></li>
+<li><p>cómo se proyecta su comportamiento según la predicción.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="analisis-comparativo-por-dimension">
+<h2>1.8 Análisis comparativo por dimensión<a class="headerlink" href="#analisis-comparativo-por-dimension" title="Link to this heading"></a></h2>
+<p>La siguiente visualización es un gráfico de barras llamado:</p>
+<ul class="simple">
+<li><p><strong>Análisis Comparativo por Dimensión</strong></p></li>
+</ul>
+<section id="series-comparadas">
+<h3>Series comparadas<a class="headerlink" href="#series-comparadas" title="Link to this heading"></a></h3>
+<p>La comparación actual se hace entre:</p>
+<ul class="simple">
+<li><p><strong>Docente Seleccionado</strong></p></li>
+<li><p><strong>Promedio Cohorte</strong></p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Escala visual<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>La gráfica usa una escala visual entre:</p>
+<ul class="simple">
+<li><p><strong>0 y 5</strong></p></li>
+</ul>
+</section>
+<section id="id5">
+<h3>Utilidad<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>Permite responder preguntas como:</p>
+<ul class="simple">
+<li><p>¿en qué dimensiones está por encima o por debajo de la cohorte?</p></li>
+<li><p>¿qué tan distinta es la proyección del docente frente al promedio comparativo?</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="proyeccion-temporal">
+<h2>1.9 Proyección temporal<a class="headerlink" href="#proyeccion-temporal" title="Link to this heading"></a></h2>
+<p>La última visualización del modo individual es:</p>
+<ul class="simple">
+<li><p><strong>Proyección Temporal</strong></p></li>
+</ul>
+<section id="id6">
+<h3>Series mostradas<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>El gráfico de líneas compara:</p>
+<ul class="simple">
+<li><p><strong>Rendimiento Real</strong></p></li>
+<li><p><strong>Predicción</strong></p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>Escala visual<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>La UI usa una escala vertical de:</p>
+<ul class="simple">
+<li><p><strong>0 a 50</strong></p></li>
+</ul>
+</section>
+<section id="proposito">
+<h3>Propósito<a class="headerlink" href="#proposito" title="Link to this heading"></a></h3>
+<p>Esta visualización muestra el comportamiento histórico y la proyección para el
+par o contexto analizado, permitiendo ver continuidad o desviación temporal.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="estado-sin-resultado">
+<h2>1.10 Estado sin resultado<a class="headerlink" href="#estado-sin-resultado" title="Link to this heading"></a></h2>
+<p>Si todavía no se ha ejecutado una predicción individual, la columna derecha
+muestra una tarjeta de estado con el mensaje equivalente a:</p>
+<ul class="simple">
+<li><p>seleccionar docente y asignatura;</p></li>
+<li><p>luego hacer clic en <strong>Generar Predicción</strong>.</p></li>
+</ul>
+<p>Esto actúa como placeholder funcional de la pantalla.</p>
+</section>
+<hr class="docutils" />
+<section id="manejo-de-errores">
+<h2>1.11 Manejo de errores<a class="headerlink" href="#manejo-de-errores" title="Link to this heading"></a></h2>
+<p>Si la predicción individual falla, la UI muestra un bloque de error visible en
+pantalla.</p>
+<p>Las causas pueden incluir:</p>
+<ul class="simple">
+<li><p>falta de campeón disponible;</p></li>
+<li><p>artefactos incompletos;</p></li>
+<li><p>parámetros inválidos;</p></li>
+<li><p>error interno de inferencia.</p></li>
+</ul>
+<p>En estos casos, la pestaña no borra necesariamente el contexto seleccionado,
+por lo que el usuario puede ajustar el dataset o reintentar la operación.</p>
+</section>
+<hr class="docutils" />
+<section id="modo-2-prediccion-por-lote">
+<h2>Modo 2: Predicción por lote<a class="headerlink" href="#modo-2-prediccion-por-lote" title="Link to this heading"></a></h2>
+<p>Este modo permite ejecutar inferencia masiva para todos los pares
+<strong>docente–asignatura</strong> disponibles dentro del dataset seleccionado.</p>
+<p>Se trata de un flujo asíncrono con:</p>
+<ul class="simple">
+<li><p>lanzamiento de job;</p></li>
+<li><p>consulta de estado;</p></li>
+<li><p>carga de vista previa;</p></li>
+<li><p>posibilidad de descarga del artefacto final.</p></li>
 </ul>
 </section>
 <hr class="docutils" />
-<section id="errores-frecuentes">
-<h2>Errores frecuentes<a class="headerlink" href="#errores-frecuentes" title="Link to this heading"></a></h2>
+<section id="id8">
+<h2>2.1 Selección del conjunto de datos<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<p>Al igual que en la predicción individual, el modo batch comienza con la
+selección de un:</p>
 <ul class="simple">
-<li><p><strong>El sistema indica que no hay modelo disponible</strong></p>
-<ul>
-<li><p>Revisa la pestaña <strong>Modelos</strong> y entrena al menos un modelo para el
-dataset de interés.</p></li>
+<li><p><strong>Conjunto de datos</strong></p></li>
 </ul>
-</li>
-<li><p><strong>Formato incorrecto en predicción por lote</strong></p>
-<ul>
-<li><p>Comprueba que las columnas coinciden con la plantilla usada en el
-entrenamiento.</p></li>
-<li><p>Asegúrate de que las escalas de calificación son las mismas (por ejemplo,
-1–5).</p></li>
+<section id="informacion-adicional-visible">
+<h3>Información adicional visible<a class="headerlink" href="#informacion-adicional-visible" title="Link to this heading"></a></h3>
+<p>En esta sección también se muestra:</p>
+<ul class="simple">
+<li><p><strong>Modelo campeón (automático)</strong></p></li>
 </ul>
-</li>
+<p>Ese valor se rellena cuando el backend devuelve el <code class="docutils literal notranslate"><span class="pre">champion_run_id</span></code> del job o
+cuando se abre una ejecución previa.</p>
+</section>
+<section id="implicacion-funcional">
+<h3>Implicación funcional<a class="headerlink" href="#implicacion-funcional" title="Link to this heading"></a></h3>
+<p>El usuario no selecciona manualmente el modelo en esta pestaña.</p>
+<p>La lógica actual es:</p>
+<ul class="simple">
+<li><p>tomar el <strong>champion</strong> disponible para el dataset activo;</p></li>
+<li><p>usarlo como base de inferencia batch.</p></li>
 </ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="boton-generar-predicciones-del-lote">
+<h2>2.2 Botón «Generar predicciones del lote»<a class="headerlink" href="#boton-generar-predicciones-del-lote" title="Link to this heading"></a></h2>
+<p>La acción principal del modo batch es:</p>
+<ul class="simple">
+<li><p><strong>Generar predicciones del lote</strong></p></li>
+</ul>
+<section id="que-hace">
+<h3>Qué hace<a class="headerlink" href="#que-hace" title="Link to this heading"></a></h3>
+<p>Lanza una solicitud al backend para iniciar un job de predicción por lote sobre
+el dataset seleccionado.</p>
+</section>
+<section id="estado-posterior-al-lanzamiento">
+<h3>Estado posterior al lanzamiento<a class="headerlink" href="#estado-posterior-al-lanzamiento" title="Link to this heading"></a></h3>
+<p>Si el backend responde correctamente, la UI:</p>
+<ul class="simple">
+<li><p>guarda el <code class="docutils literal notranslate"><span class="pre">job_id</span></code>;</p></li>
+<li><p>comienza un polling periódico del estado;</p></li>
+<li><p>muestra progreso mientras el job está en ejecución.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="progreso-del-job">
+<h2>2.3 Progreso del job<a class="headerlink" href="#progreso-del-job" title="Link to this heading"></a></h2>
+<p>Mientras el lote está corriendo, la interfaz muestra:</p>
+<ul class="simple">
+<li><p>el mensaje <strong>Procesando lote…</strong>;</p></li>
+<li><p>una barra de progreso;</p></li>
+<li><p>el porcentaje estimado de avance.</p></li>
+</ul>
+<section id="naturaleza-del-proceso">
+<h3>Naturaleza del proceso<a class="headerlink" href="#naturaleza-del-proceso" title="Link to this heading"></a></h3>
+<p>Este comportamiento confirma que la predicción batch se trata como un
+<strong>proceso asíncrono</strong>, no como una respuesta inmediata.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="historial-de-ejecuciones">
+<h2>2.4 Historial de ejecuciones<a class="headerlink" href="#historial-de-ejecuciones" title="Link to this heading"></a></h2>
+<p>Dentro del modo batch existe una tarjeta llamada:</p>
+<ul class="simple">
+<li><p><strong>Historial de ejecuciones</strong></p></li>
+</ul>
+<section id="que-muestra">
+<h3>Qué muestra<a class="headerlink" href="#que-muestra" title="Link to this heading"></a></h3>
+<p>La tabla presenta, para el dataset activo, información como:</p>
+<ul class="simple">
+<li><p>fecha;</p></li>
+<li><p>número de pares procesados;</p></li>
+<li><p>modelo asociado;</p></li>
+<li><p>acciones disponibles.</p></li>
+</ul>
+</section>
+<section id="acciones-por-ejecucion">
+<h3>Acciones por ejecución<a class="headerlink" href="#acciones-por-ejecucion" title="Link to this heading"></a></h3>
+<p>Cada fila puede ofrecer:</p>
+<ul class="simple">
+<li><p><strong>Ver vista previa</strong></p></li>
+<li><p><strong>Descargar</strong></p></li>
+</ul>
+</section>
+<section id="ver-vista-previa">
+<h3>Ver vista previa<a class="headerlink" href="#ver-vista-previa" title="Link to this heading"></a></h3>
+<p>Abre el parquet histórico asociado al run y carga su contenido en la sección de
+resultados del batch actual.</p>
+</section>
+<section id="descargar">
+<h3>Descargar<a class="headerlink" href="#descargar" title="Link to this heading"></a></h3>
+<p>Permite descargar directamente el archivo de predicciones persistido asociado a
+ese run.</p>
+</section>
+<section id="id9">
+<h3>Utilidad<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>Este bloque es importante porque convierte la pestaña en una interfaz no solo de
+<strong>ejecución</strong>, sino también de <strong>consulta histórica de predicciones batch</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="resumen-de-resultados-batch">
+<h2>2.5 Resumen de resultados batch<a class="headerlink" href="#resumen-de-resultados-batch" title="Link to this heading"></a></h2>
+<p>Cuando el batch termina correctamente —o cuando se abre una ejecución previa—
+la UI muestra un conjunto de tarjetas KPI.</p>
+<section id="indicadores-visibles">
+<h3>Indicadores visibles<a class="headerlink" href="#indicadores-visibles" title="Link to this heading"></a></h3>
+<p>La implementación actual presenta:</p>
+<ul class="simple">
+<li><p><strong>Pares procesados</strong></p></li>
+<li><p><strong>Riesgo bajo</strong></p></li>
+<li><p><strong>Riesgo medio</strong></p></li>
+<li><p><strong>Riesgo alto</strong></p></li>
+</ul>
+</section>
+<section id="que-representan">
+<h3>Qué representan<a class="headerlink" href="#que-representan" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Pares procesados</strong>: total de filas o pares inferidos.</p></li>
+<li><p><strong>Riesgo bajo</strong>: cantidad y porcentaje de pares clasificados como bajo riesgo.</p></li>
+<li><p><strong>Riesgo medio</strong>: cantidad y porcentaje de pares clasificados como riesgo medio.</p></li>
+<li><p><strong>Riesgo alto</strong>: cantidad y porcentaje de pares clasificados como alto riesgo.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="distribucion-de-riesgo-por-materia">
+<h2>2.6 Distribución de riesgo por materia<a class="headerlink" href="#distribucion-de-riesgo-por-materia" title="Link to this heading"></a></h2>
+<p>Después del resumen se muestra un gráfico de barras apiladas llamado:</p>
+<ul class="simple">
+<li><p><strong>Distribución de riesgo por materia</strong></p></li>
+</ul>
+<section id="que-representa">
+<h3>Qué representa<a class="headerlink" href="#que-representa" title="Link to this heading"></a></h3>
+<p>Para cada materia visible en la gráfica, se contabilizan tres segmentos:</p>
+<ul class="simple">
+<li><p><strong>Bajo Riesgo</strong></p></li>
+<li><p><strong>Medio Riesgo</strong></p></li>
+<li><p><strong>Alto Riesgo</strong></p></li>
+</ul>
+</section>
+<section id="alcance-visible-en-la-ui-actual">
+<h3>Alcance visible en la UI actual<a class="headerlink" href="#alcance-visible-en-la-ui-actual" title="Link to this heading"></a></h3>
+<p>La implementación actual toma una muestra limitada de materias para mantener la
+legibilidad del gráfico.</p>
+</section>
+<section id="id10">
+<h3>Utilidad<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>Este gráfico permite detectar rápidamente:</p>
+<ul class="simple">
+<li><p>materias con más concentración de riesgo;</p></li>
+<li><p>diferencias de distribución entre asignaturas;</p></li>
+<li><p>focos de atención dentro del lote procesado.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="mapa-de-calor">
+<h2>2.7 Mapa de calor<a class="headerlink" href="#mapa-de-calor" title="Link to this heading"></a></h2>
+<p>La siguiente visualización es una tabla tipo heatmap titulada:</p>
+<ul class="simple">
+<li><p><strong>Mapa de calor: puntaje (% del máximo)</strong></p></li>
+</ul>
+<section id="estructura">
+<h3>Estructura<a class="headerlink" href="#estructura" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>filas: docentes;</p></li>
+<li><p>columnas: materias;</p></li>
+<li><p>celdas: porcentaje del puntaje predicho respecto al máximo.</p></li>
+</ul>
+</section>
+<section id="convencion-visual-actual">
+<h3>Convención visual actual<a class="headerlink" href="#convencion-visual-actual" title="Link to this heading"></a></h3>
+<p>La intensidad y color de cada celda depende del porcentaje calculado:</p>
+<ul class="simple">
+<li><p>verde intenso para valores altos;</p></li>
+<li><p>verde/amarillo intermedio para valores medios;</p></li>
+<li><p>rojo para valores más bajos;</p></li>
+<li><p>gris cuando no hay dato visible.</p></li>
+</ul>
+</section>
+<section id="alcance-visible">
+<h3>Alcance visible<a class="headerlink" href="#alcance-visible" title="Link to this heading"></a></h3>
+<p>La UI actual no muestra toda la matriz completa en el heatmap: utiliza una
+muestra acotada de materias para conservar legibilidad.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tabla-de-predicciones">
+<h2>2.8 Tabla de predicciones<a class="headerlink" href="#tabla-de-predicciones" title="Link to this heading"></a></h2>
+<p>La última sección del modo batch es la:</p>
+<ul class="simple">
+<li><p><strong>Tabla de predicciones</strong></p></li>
+</ul>
+<section id="columnas-visibles">
+<h3>Columnas visibles<a class="headerlink" href="#columnas-visibles" title="Link to this heading"></a></h3>
+<p>La tabla muestra actualmente:</p>
+<ul class="simple">
+<li><p><strong>Docente</strong></p></li>
+<li><p><strong>Materia</strong></p></li>
+<li><p><strong>Puntaje (0–50)</strong></p></li>
+<li><p><strong>Confianza</strong></p></li>
+<li><p><strong>Nivel de Riesgo</strong></p></li>
+</ul>
+</section>
+<section id="filtros-rapidos-por-riesgo">
+<h3>Filtros rápidos por riesgo<a class="headerlink" href="#filtros-rapidos-por-riesgo" title="Link to this heading"></a></h3>
+<p>Encima de la tabla aparecen badges para filtrar por:</p>
+<ul class="simple">
+<li><p><strong>Todos</strong></p></li>
+<li><p><strong>Bajo</strong></p></li>
+<li><p><strong>Medio</strong></p></li>
+<li><p><strong>Alto</strong></p></li>
+</ul>
+</section>
+<section id="descarga-del-artefacto">
+<h3>Descarga del artefacto<a class="headerlink" href="#descarga-del-artefacto" title="Link to this heading"></a></h3>
+<p>Cuando existe una ruta de predicciones persistida, la UI muestra el botón:</p>
+<ul class="simple">
+<li><p><strong>Descargar predicciones</strong></p></li>
+</ul>
+<p>Este botón descarga el artefacto generado por el backend.</p>
+</section>
+<section id="vista-previa-paginada">
+<h3>Vista previa paginada<a class="headerlink" href="#vista-previa-paginada" title="Link to this heading"></a></h3>
+<p>La implementación actual carga una vista previa limitada del archivo de salida.</p>
+<p>Si hay más filas disponibles, aparece el botón:</p>
+<ul class="simple">
+<li><p><strong>Cargar más</strong></p></li>
+</ul>
+<p>Esto confirma que la tabla no intenta renderizar de una sola vez el universo
+completo del parquet, sino una vista previa incremental.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="artefactos-de-salida">
+<h2>Artefactos de salida<a class="headerlink" href="#artefactos-de-salida" title="Link to this heading"></a></h2>
+<p>El flujo batch persiste un archivo de predicciones que luego puede:</p>
+<ul class="simple">
+<li><p>abrirse como vista previa;</p></li>
+<li><p>descargarse desde la UI;</p></li>
+<li><p>reutilizarse desde el historial.</p></li>
+</ul>
+<p>En la implementación actual, la interfaz opera sobre una <code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code>
+resuelta por backend, en lugar de asumir manualmente una ruta fija.</p>
+</section>
+<hr class="docutils" />
+<section id="estados-de-error-en-batch">
+<h2>Estados de error en batch<a class="headerlink" href="#estados-de-error-en-batch" title="Link to this heading"></a></h2>
+<p>Si el job batch falla, la interfaz muestra un bloque de error con el detalle
+recibido del backend o un mensaje genérico.</p>
+<p>Las causas pueden incluir:</p>
+<ul class="simple">
+<li><p>champion no disponible;</p></li>
+<li><p>artefactos faltantes;</p></li>
+<li><p>error de lectura del feature-pack;</p></li>
+<li><p>fallo interno durante la inferencia;</p></li>
+<li><p>error al abrir vista previa histórica.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="comportamiento-de-sincronizacion-por-dataset">
+<h2>Comportamiento de sincronización por dataset<a class="headerlink" href="#comportamiento-de-sincronizacion-por-dataset" title="Link to this heading"></a></h2>
+<p>Cada vez que cambia el dataset seleccionado, la pestaña reinicia estados
+internos dependientes de ese dataset.</p>
+<section id="elementos-que-se-reinician">
+<h3>Elementos que se reinician<a class="headerlink" href="#elementos-que-se-reinician" title="Link to this heading"></a></h3>
+<p>Al cambiar de dataset, la UI limpia o reinicia:</p>
+<ul class="simple">
+<li><p>docente seleccionado;</p></li>
+<li><p>asignatura seleccionada;</p></li>
+<li><p>búsquedas activas;</p></li>
+<li><p>resultado individual;</p></li>
+<li><p>resultados batch;</p></li>
+<li><p>filtros de riesgo;</p></li>
+<li><p>vista previa;</p></li>
+<li><p>historial de runs cargado en memoria;</p></li>
+<li><p>polling activo de jobs anteriores.</p></li>
+</ul>
+</section>
+<section id="importancia-de-este-comportamiento">
+<h3>Importancia de este comportamiento<a class="headerlink" href="#importancia-de-este-comportamiento" title="Link to this heading"></a></h3>
+<p>Esto evita que el usuario vea resultados cruzados de un dataset anterior cuando
+ya cambió de contexto.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="alcance-real-de-la-pestana-en-la-version-actual">
+<h2>Alcance real de la pestaña en la versión actual<a class="headerlink" href="#alcance-real-de-la-pestana-en-la-version-actual" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Predicciones</strong> sí está diseñada para:</p>
+<ul class="simple">
+<li><p>ejecutar inferencia individual docente–asignatura;</p></li>
+<li><p>ejecutar inferencia batch por dataset;</p></li>
+<li><p>visualizar resultados con apoyo gráfico;</p></li>
+<li><p>revisar historial de ejecuciones batch;</p></li>
+<li><p>descargar artefactos de predicción.</p></li>
+</ul>
+<p>La pestaña <strong>Predicciones</strong> no está diseñada para:</p>
+<ul class="simple">
+<li><p>cargar datasets nuevos;</p></li>
+<li><p>entrenar modelos;</p></li>
+<li><p>seleccionar manualmente hiperparámetros;</p></li>
+<li><p>cambiar manualmente la familia activa de inferencia;</p></li>
+<li><p>administrar directamente los artefactos del entrenamiento.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="flujo-de-trabajo-recomendado">
+<h2>Flujo de trabajo recomendado<a class="headerlink" href="#flujo-de-trabajo-recomendado" title="Link to this heading"></a></h2>
+<p>En la versión actual de NeuroCampus, el flujo recomendado es:</p>
+<ol class="arabic simple">
+<li><p>cargar y preparar el dataset en <strong>Datos</strong>;</p></li>
+<li><p>asegurar en <strong>Modelos</strong> que existe campeón para <code class="docutils literal notranslate"><span class="pre">score_docente</span></code>;</p></li>
+<li><p>abrir <strong>Predicciones</strong> con el dataset correcto;</p></li>
+<li><p>ejecutar una predicción individual para validar el comportamiento esperado;</p></li>
+<li><p>ejecutar el batch si se necesita cobertura completa del dataset;</p></li>
+<li><p>revisar KPIs, distribución por riesgo y tabla filtrable;</p></li>
+<li><p>descargar el artefacto final si se requiere análisis externo o trazabilidad.</p></li>
+</ol>
 </section>
 <hr class="docutils" />
 <section id="relacion-con-otras-pestanas">
 <h2>Relación con otras pestañas<a class="headerlink" href="#relacion-con-otras-pestanas" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Predicciones</strong> se alimenta directamente del trabajo hecho en otras
+partes del sistema:</p>
 <ul class="simple">
-<li><p>Se apoya en:</p>
+<li><p><strong>Datos</strong></p>
 <ul>
-<li><p><strong>Modelos</strong>: elección y entrenamiento del modelo campeón.</p></li>
-<li><p><strong>Datos</strong>: estructura y preprocesamiento de los datasets.</p></li>
+<li><p>aporta datasets y artefactos base.</p></li>
 </ul>
 </li>
-<li><p>Alimenta:</p>
+<li><p><strong>Modelos</strong></p>
 <ul>
-<li><p><strong>Dashboard</strong>: KPIs y visualizaciones agregadas a nivel histórico,
-docente, asignatura y programa.</p></li>
+<li><p>aporta el modelo campeón que se usa para inferencia.</p></li>
+</ul>
+</li>
+<li><p><strong>Dashboard</strong></p>
+<ul>
+<li><p>puede reutilizar resultados agregados o indicadores derivados de
+predicciones persistidas.</p></li>
 </ul>
 </li>
 </ul>
+<p>Por eso, <strong>Predicciones</strong> debe entenderse como la etapa de <strong>inferencia y
+consulta de resultados</strong>, ubicada después de la preparación de datos y del
+ciclo de modelado.</p>
 </section>
 </section>
 
@@ -392,7 +1066,7 @@ docente, asignatura y programa.</p></li>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
         <a href="modelos.html" class="btn btn-neutral float-left" title="Pestaña «Modelos»" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
-        <a href="dashboard.html" class="btn btn-neutral float-right" title="Pestaña «Dashboard»" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../arquitectura/index.html" class="btn btn-neutral float-right" title="Arquitectura de NeuroCampus" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

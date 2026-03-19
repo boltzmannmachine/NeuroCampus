@@ -21,7 +21,7 @@
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
     <link rel="next" title="Pestaña «Predicciones»" href="predicciones.html" />
-    <link rel="prev" title="Pestaña «Datos» – Ingesta y análisis" href="datos.html" /> 
+    <link rel="prev" title="Pestaña «Datos»" href="datos.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,30 +46,197 @@
               <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Manual de usuario</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="datos.html">Pestaña «Datos» – Ingesta y análisis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dashboard.html">Pestaña «Dashboard»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datos.html">Pestaña «Datos»</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Pestaña «Modelos»</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#objetivo">Objetivo</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#organizacion-de-la-pantalla">Organización de la pantalla</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#flujo-de-trabajo-basico">Flujo de trabajo básico</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#comparativa-de-modelos">Comparativa de modelos</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#configuracion-rapida">1. Configuración rápida</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tabla-comparativa-de-metricas">2. Tabla comparativa de métricas</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#graficos-comparativos">3. Gráficos comparativos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estructura-general-de-la-pestana">Estructura general de la pestaña</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpestanas-actuales">Subpestañas actuales</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#detalles-del-mejor-modelo">Detalles del mejor modelo</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#resumen-del-modelo">1. Resumen del modelo</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#curvas-de-entrenamiento">2. Curvas de entrenamiento</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tiempo-por-epoca">3. Tiempo por época</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#matriz-de-confusion">4. Matriz de confusión</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#encabezado-de-contexto-global">Encabezado de contexto global</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#controles-visibles">Controles visibles</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#errores-frecuentes-y-recomendaciones">Errores frecuentes y recomendaciones</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#relacion-con-otras-secciones">Relación con otras secciones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataset">Dataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#comportamiento-real">Comportamiento real</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-puede-mostrar-cada-opcion">Qué puede mostrar cada opción</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#observacion-importante">Observación importante</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#familia">Familia</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#familias-disponibles-en-la-ui-actual">Familias disponibles en la UI actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implicacion-funcional">Implicación funcional</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#fuente-de-datos">Fuente de Datos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#valores-tipicos">Valores típicos</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#modelo-activo">Modelo activo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fuentes-de-resolucion-disponibles">Fuentes de resolución disponibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-hace">Qué hace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Comportamiento real</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#informacion-visible-tras-resolver">Información visible tras resolver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#chips-de-contexto">Chips de contexto</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#subpestana-resumen">Subpestaña «Resumen»</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Objetivo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bloques-principales">Bloques principales</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#champion-actual">1. Champion Actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ultimo-run-entrenado">2. Último Run Entrenado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estado-del-bundle">3. Estado del Bundle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tendencia-reciente-de-metricas">4. Tendencia reciente de métricas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#insights-rapidos">5. Insights rápidos</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#subpestana-entrenamiento">Subpestaña «Entrenamiento»</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Objetivo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#flujo-general">Flujo general</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#preparacion-del-feature-pack">Preparación del feature-pack</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Qué hace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resultado-esperado">Resultado esperado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#importancia">Importancia</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#formulario-de-entrenamiento">Formulario de entrenamiento</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#campos-visibles">Campos visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#modelos-disponibles">Modelos disponibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#epocas-y-semilla">Épocas y semilla</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auto-prepare">Auto-prepare</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#warm-start">Warm Start</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#overrides-json">Overrides JSON</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ejecucion-del-entrenamiento">Ejecución del entrenamiento</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estados-visibles">Estados visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progreso">Progreso</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resultado-del-entrenamiento">Resultado del entrenamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#comportamiento-de-fallback">Comportamiento de fallback</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#subpestana-ejecuciones">Subpestaña «Ejecuciones»</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Objetivo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vista-de-tabla">Vista de tabla</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#filtros-visibles">Filtros visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-permiten-filtrar">Qué permiten filtrar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tabla-de-runs">Tabla de runs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#acciones-tipicas">Acciones típicas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#vista-de-detalle-de-run">Vista de detalle de run</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#secciones-visibles-en-el-detalle">Secciones visibles en el detalle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#identidad-y-contrato">1. Identidad y Contrato</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id7">2. Warm Start</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metricas">3. Métricas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#y-5-curvas-por-epoca">4. y 5. Curvas por época</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#matriz-de-confusion">6. Matriz de Confusión</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#y-true-vs-y-pred">7. y_true vs y_pred</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#features">8. Features</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#artefactos-bundle">9. Artefactos / Bundle</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#subpestana-campeon">Subpestaña «Campeón»</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Objetivo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#que-muestra">Qué muestra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id9">Champion actual</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id10">Acciones disponibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#restricciones-importantes">Restricciones importantes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#reemplazar-champion">Reemplazar champion</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#flujo">Flujo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id11">Comportamiento real</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ranking-de-runs">Ranking de runs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#que-permite">Qué permite</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#regla-de-ordenamiento">Regla de ordenamiento</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#subpestana-sweep">Subpestaña «Sweep»</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id12">Objetivo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#formulario-de-sweep">Formulario de sweep</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id13">Campos visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#warm-start-from">warm_start_from</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auto-promote">Auto-promote</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#overrides-por-modelo">Overrides por modelo</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ejecucion-y-progreso">Ejecución y progreso</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dos-modos-posibles">Dos modos posibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id14">Progreso</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#resultados-del-sweep">Resultados del sweep</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ganador-del-sweep">1. Ganador del Sweep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#candidatos-del-sweep">2. Candidatos del Sweep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#comparador-side-by-side">3. Comparador Side-by-Side</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#subpestana-artefactos">Subpestaña «Artefactos»</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id16">Objetivo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resolucion-del-bundle">Resolución del bundle</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fuentes-disponibles">Fuentes disponibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id17">Flujo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manejo-de-errores">Manejo de errores</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#informacion-mostrada">Información mostrada</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#artefactos-del-bundle">1. Artefactos del Bundle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visor-json">2. Visor JSON</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id18">Comportamiento real</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#subpestana-diagnostico">Subpestaña «Diagnóstico»</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id19">Objetivo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#componentes-principales">Componentes principales</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tarjetas-de-salud">Tarjetas de salud</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#posibles-estados-globales">Posibles estados globales</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#contract-checks">Contract Checks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id20">Fuente de datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id21">Acciones disponibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-incluye-el-reporte">Qué incluye el reporte</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utilidad">Utilidad</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#advertencias">Advertencias</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#especificacion-de-errores">Especificación de errores</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#comportamiento-transversal-de-la-pestana">Comportamiento transversal de la pestaña</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#integracion-backend-first-con-fallback-visual">Integración backend-first con fallback visual</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#implicacion-importante-para-el-usuario">Implicación importante para el usuario</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#navegacion-hacia-predicciones">Navegación hacia Predicciones</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#que-hacen">Qué hacen</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#importante">Importante</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
 <li class="toctree-l2"><a class="reference internal" href="predicciones.html">Pestaña «Predicciones»</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dashboard.html">Pestaña «Dashboard»</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
@@ -108,275 +275,1097 @@
 <h1>Pestaña «Modelos»<a class="headerlink" href="#pestana-modelos" title="Link to this heading"></a></h1>
 <section id="objetivo">
 <h2>Objetivo<a class="headerlink" href="#objetivo" title="Link to this heading"></a></h2>
-<p>La pestaña <strong>Modelos</strong> permite entrenar y comparar diferentes arquitecturas de
-Máquinas de Boltzmann (BM, RBM, DBM y variantes “puras”) sobre los datasets
-preprocesados, para seleccionar el modelo con mejor desempeño y usarlo en las
-predicciones posteriores.</p>
-<p>Está pensada para usuarios técnicos o analistas de datos que necesiten:</p>
+<p>La pestaña <strong>Modelos</strong> concentra el flujo de entrenamiento, comparación,
+selección y diagnóstico de modelos de la familia de Redes de Boltzmann dentro de
+NeuroCampus.</p>
+<p>Desde esta pestaña el usuario puede:</p>
 <ul class="simple">
-<li><p>Ejecutar entrenamientos controlados.</p></li>
-<li><p>Revisar métricas y curvas de aprendizaje.</p></li>
-<li><p>Entender cómo se comportan los distintos modelos sobre un mismo dataset.</p></li>
+<li><p>seleccionar el <strong>dataset</strong> activo para trabajo de modelado;</p></li>
+<li><p>elegir la <strong>familia de problema</strong> a resolver;</p></li>
+<li><p>revisar el <strong>modelo campeón</strong> actual;</p></li>
+<li><p>entrenar nuevos modelos con diferentes estrategias;</p></li>
+<li><p>inspeccionar ejecuciones históricas;</p></li>
+<li><p>ejecutar un <strong>sweep</strong> comparativo entre varios modelos;</p></li>
+<li><p>revisar el estado del <strong>bundle de artefactos</strong>;</p></li>
+<li><p>correr validaciones de consistencia y diagnóstico.</p></li>
 </ul>
+<p>La pestaña no se limita a entrenar un modelo aislado: también administra el
+<strong>contexto completo de modelado</strong> que luego se reutiliza en la pestaña
+<strong>Predicciones</strong>.</p>
 </section>
 <hr class="docutils" />
-<section id="organizacion-de-la-pantalla">
-<h2>Organización de la pantalla<a class="headerlink" href="#organizacion-de-la-pantalla" title="Link to this heading"></a></h2>
-<p>La interfaz se organiza en:</p>
+<section id="estructura-general-de-la-pestana">
+<h2>Estructura general de la pestaña<a class="headerlink" href="#estructura-general-de-la-pestana" title="Link to this heading"></a></h2>
+<p>La implementación actual de <strong>Modelos</strong> tiene dos niveles de navegación:</p>
 <ol class="arabic simple">
-<li><p><strong>Barra superior</strong></p>
+<li><p>un <strong>encabezado de contexto global</strong>;</p></li>
+<li><p>siete <strong>subpestañas</strong> funcionales.</p></li>
+</ol>
+<section id="subpestanas-actuales">
+<h3>Subpestañas actuales<a class="headerlink" href="#subpestanas-actuales" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Resumen</strong></p></li>
+<li><p><strong>Entrenamiento</strong></p></li>
+<li><p><strong>Ejecuciones</strong></p></li>
+<li><p><strong>Campeón</strong></p></li>
+<li><p><strong>Sweep</strong></p></li>
+<li><p><strong>Artefactos</strong></p></li>
+<li><p><strong>Diagnóstico</strong></p></li>
+</ol>
+<p>El orden anterior coincide con la navegación real de la UI.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="encabezado-de-contexto-global">
+<h2>Encabezado de contexto global<a class="headerlink" href="#encabezado-de-contexto-global" title="Link to this heading"></a></h2>
+<p>Antes de entrar a cualquiera de las subpestañas, la pantalla muestra un bloque
+superior persistente que define el contexto del modelado.</p>
+<section id="controles-visibles">
+<h3>Controles visibles<a class="headerlink" href="#controles-visibles" title="Link to this heading"></a></h3>
+<p>La cabecera incluye:</p>
 <ul class="simple">
-<li><p>Selector de <strong>dataset activo</strong> (por periodo o identificador).</p></li>
-<li><p>Botón principal <strong>«Entrenar todos los modelos»</strong>.</p></li>
-<li><p>Opcionalmente, acceso a ajustes avanzados (épocas, tamaño de batch, etc.).</p></li>
+<li><p>selector de <strong>Dataset</strong>;</p></li>
+<li><p>selector de <strong>Familia</strong>;</p></li>
+<li><p>campo informativo de <strong>Fuente de Datos</strong>;</p></li>
+<li><p>resolvedor de <strong>Modelo activo</strong>;</p></li>
+<li><p>chips de contexto con metadatos del problema.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Link to this heading"></a></h2>
+<p>El selector <strong>Dataset</strong> determina el conjunto de datos sobre el cual se listan,
+entrenan y evalúan los modelos.</p>
+<section id="comportamiento-real">
+<h3>Comportamiento real<a class="headerlink" href="#comportamiento-real" title="Link to this heading"></a></h3>
+<p>La UI intenta cargar primero la lista real desde backend por medio de
+<code class="docutils literal notranslate"><span class="pre">/modelos/datasets</span></code>.</p>
+<p>Si el backend no responde o aún no expone la información completa, la interfaz
+usa un conjunto de valores de respaldo para mantener la experiencia visual.</p>
+</section>
+<section id="que-puede-mostrar-cada-opcion">
+<h3>Qué puede mostrar cada opción<a class="headerlink" href="#que-puede-mostrar-cada-opcion" title="Link to this heading"></a></h3>
+<p>Dependiendo de la información disponible, el selector puede mostrar detalles
+como:</p>
+<ul class="simple">
+<li><p>número de filas;</p></li>
+<li><p>número de pares;</p></li>
+<li><p>disponibilidad de <code class="docutils literal notranslate"><span class="pre">train_matrix</span></code>;</p></li>
+<li><p>disponibilidad de <code class="docutils literal notranslate"><span class="pre">pair_matrix</span></code>.</p></li>
+</ul>
+</section>
+<section id="observacion-importante">
+<h3>Observación importante<a class="headerlink" href="#observacion-importante" title="Link to this heading"></a></h3>
+<p>La UI usa identificadores internos tipo <code class="docutils literal notranslate"><span class="pre">ds_2025_1</span></code>, pero el backend trabaja con
+IDs canónicos como <code class="docutils literal notranslate"><span class="pre">2025-1</span></code>.</p>
+<p>La pestaña resuelve esta diferencia de forma automática, por lo que el usuario
+no necesita transformar manualmente el identificador.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="familia">
+<h2>Familia<a class="headerlink" href="#familia" title="Link to this heading"></a></h2>
+<p>El selector <strong>Familia</strong> define qué problema de modelado se está trabajando.</p>
+<section id="familias-disponibles-en-la-ui-actual">
+<h3>Familias disponibles en la UI actual<a class="headerlink" href="#familias-disponibles-en-la-ui-actual" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Desempeño por Sentimiento</strong></p>
+<ul class="simple">
+<li><p>familia técnica: <code class="docutils literal notranslate"><span class="pre">sentiment_desempeno</span></code></p></li>
+<li><p>tipo de tarea: <strong>clasificación</strong></p></li>
+<li><p>nivel de entrada: <strong>row</strong></p></li>
+<li><p>fuente de datos: <strong>feature_pack</strong></p></li>
+<li><p>métrica principal: <strong>val_f1_macro</strong></p></li>
+<li><p>modo de comparación: <strong>max</strong></p></li>
 </ul>
 </li>
-<li><p><strong>Pestañas internas</strong></p>
+<li><p><strong>Calificación Docente</strong></p>
 <ul class="simple">
-<li><p><strong>Comparativa de modelos</strong><br />
-Vista general para comparar resultados de BM, RBM, DBM y variantes.</p></li>
-<li><p><strong>Detalles del mejor modelo</strong><br />
-Análisis en profundidad del modelo con mejor métrica global.</p></li>
+<li><p>familia técnica: <code class="docutils literal notranslate"><span class="pre">score_docente</span></code></p></li>
+<li><p>tipo de tarea: <strong>regresión</strong></p></li>
+<li><p>nivel de entrada: <strong>pair</strong></p></li>
+<li><p>fuente de datos: <strong>pair_matrix</strong></p></li>
+<li><p>métrica principal: <strong>val_rmse</strong></p></li>
+<li><p>modo de comparación: <strong>min</strong></p></li>
 </ul>
 </li>
 </ol>
-<p>La navegación entre pestañas no reinicia los resultados; se reusa el último
-experimento lanzado para el dataset actual.</p>
+</section>
+<section id="implicacion-funcional">
+<h3>Implicación funcional<a class="headerlink" href="#implicacion-funcional" title="Link to this heading"></a></h3>
+<p>Cambiar de familia modifica:</p>
+<ul class="simple">
+<li><p>el tipo de tarea reportado por la UI;</p></li>
+<li><p>la métrica principal usada para ranking;</p></li>
+<li><p>el tipo de datos esperado;</p></li>
+<li><p>la interpretación de runs, champion y sweep.</p></li>
+</ul>
+</section>
 </section>
 <hr class="docutils" />
-<section id="flujo-de-trabajo-basico">
-<h2>Flujo de trabajo básico<a class="headerlink" href="#flujo-de-trabajo-basico" title="Link to this heading"></a></h2>
+<section id="fuente-de-datos">
+<h2>Fuente de Datos<a class="headerlink" href="#fuente-de-datos" title="Link to this heading"></a></h2>
+<p>La cabecera muestra un campo de solo lectura llamado <strong>Fuente de Datos</strong>.</p>
+<p>Este valor no se edita manualmente: se deriva automáticamente de la familia
+seleccionada.</p>
+<section id="valores-tipicos">
+<h3>Valores típicos<a class="headerlink" href="#valores-tipicos" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">feature_pack</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pair_matrix</span></code></p></li>
+</ul>
+<p>Esto ayuda a entender desde qué artefacto parte el proceso de entrenamiento.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="modelo-activo">
+<h2>Modelo activo<a class="headerlink" href="#modelo-activo" title="Link to this heading"></a></h2>
+<p>La cabecera también incluye un resolvedor de <strong>modelo activo</strong>.</p>
+<section id="fuentes-de-resolucion-disponibles">
+<h3>Fuentes de resolución disponibles<a class="headerlink" href="#fuentes-de-resolucion-disponibles" title="Link to this heading"></a></h3>
+<p>El usuario puede resolver el modelo desde:</p>
+<ul class="simple">
+<li><p><strong>Champion</strong></p></li>
+<li><p><strong>Run ID</strong></p></li>
+</ul>
+</section>
+<section id="que-hace">
+<h3>Qué hace<a class="headerlink" href="#que-hace" title="Link to this heading"></a></h3>
+<p>Al resolver el modelo activo, la UI intenta determinar cuál run debe tomarse
+como referencia para inferencia o trazabilidad.</p>
+</section>
+<section id="id1">
+<h3>Comportamiento real<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>si se elige <strong>Champion</strong>, la UI consulta el campeón actual del dataset y la
+familia seleccionados;</p></li>
+<li><p>si se elige <strong>Run ID</strong>, la UI intenta resolver un run específico;</p></li>
+<li><p>si el run existe pero el bundle está incompleto, la interfaz puede mostrar una
+advertencia tipo <code class="docutils literal notranslate"><span class="pre">422:</span> <span class="pre">Bundle</span> <span class="pre">incompleto</span> <span class="pre">para</span> <span class="pre">inferencia</span></code>.</p></li>
+</ul>
+</section>
+<section id="informacion-visible-tras-resolver">
+<h3>Información visible tras resolver<a class="headerlink" href="#informacion-visible-tras-resolver" title="Link to this heading"></a></h3>
+<p>Cuando la resolución es exitosa, la cabecera muestra al menos:</p>
+<ul class="simple">
+<li><p>ID de ejecución resuelto;</p></li>
+<li><p>fuente de resolución;</p></li>
+<li><p>estado del bundle;</p></li>
+<li><p>métrica principal;</p></li>
+<li><p>valor de la métrica;</p></li>
+<li><p>modelo resuelto.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="chips-de-contexto">
+<h2>Chips de contexto<a class="headerlink" href="#chips-de-contexto" title="Link to this heading"></a></h2>
+<p>En la cabecera se muestran chips resumen con información derivada de la familia
+seleccionada, por ejemplo:</p>
+<ul class="simple">
+<li><p><strong>Tipo de tarea</strong></p></li>
+<li><p><strong>Nivel de entrada</strong></p></li>
+<li><p><strong>Métrica principal</strong></p></li>
+</ul>
+<p>Estos chips no son interactivos, pero ayudan a interpretar correctamente el
+resto de la pestaña.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="subpestana-resumen">
+<h1>Subpestaña «Resumen»<a class="headerlink" href="#subpestana-resumen" title="Link to this heading"></a></h1>
+<section id="id2">
+<h2>Objetivo<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>La subpestaña <strong>Resumen</strong> ofrece una vista rápida del estado del modelado para
+el dataset y la familia activos.</p>
+<p>Su función es responder preguntas como:</p>
+<ul class="simple">
+<li><p>¿cuál es el champion actual?</p></li>
+<li><p>¿cuál fue el último run entrenado?</p></li>
+<li><p>¿cómo está el bundle?</p></li>
+<li><p>¿cómo se ven las métricas recientes?</p></li>
+</ul>
+</section>
+<section id="bloques-principales">
+<h2>Bloques principales<a class="headerlink" href="#bloques-principales" title="Link to this heading"></a></h2>
+<p>La UI actual presenta estos componentes:</p>
 <ol class="arabic simple">
-<li><p><strong>Seleccionar dataset</strong></p>
+<li><p><strong>Champion Actual</strong></p></li>
+<li><p><strong>Último Run Entrenado</strong></p></li>
+<li><p><strong>Estado del Bundle</strong></p></li>
+<li><p><strong>Tendencia reciente de métricas</strong></p></li>
+<li><p><strong>Insights rápidos</strong></p></li>
+</ol>
+<section id="champion-actual">
+<h3>1. Champion Actual<a class="headerlink" href="#champion-actual" title="Link to this heading"></a></h3>
+<p>Muestra el run que actualmente actúa como campeón del contexto seleccionado.</p>
+<p>Puede incluir:</p>
 <ul class="simple">
-<li><p>En la parte superior, escoge el periodo o identificador de dataset sobre el
-que quieras entrenar.</p></li>
-<li><p>Idealmente es un dataset que ya pasó por:</p>
-<ul>
-<li><p>Preprocesamiento (limpieza, codificación).</p></li>
-<li><p>Enriquecimiento con BETO (si el modelo usa características de texto).</p></li>
+<li><p>run ID;</p></li>
+<li><p>modelo;</p></li>
+<li><p>valor de la métrica principal;</p></li>
+<li><p>fecha de promoción;</p></li>
+<li><p>estado del bundle;</p></li>
+<li><p>indicadores de warm start y features de texto.</p></li>
 </ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Configurar parámetros de entrenamiento (opcional)</strong></p>
+<section id="acciones-disponibles">
+<h4>Acciones disponibles<a class="headerlink" href="#acciones-disponibles" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>En el panel de configuración rápida puedes ajustar:</p>
-<ul>
-<li><p>Número de épocas.</p></li>
-<li><p>Tamaño de batch.</p></li>
-<li><p>Tasas de aprendizaje.</p></li>
+<li><p><strong>Ver Run</strong></p></li>
+<li><p><strong>Usar en Predictions</strong></p></li>
 </ul>
-</li>
-<li><p>Si no se ajustan, se usan valores por defecto recomendados.</p></li>
-</ul>
-</li>
-<li><p><strong>Entrenar los modelos</strong></p>
-<ul class="simple">
-<li><p>Pulsa <strong>«Entrenar BM/RBM/DBM/BM pura/RBM pura»</strong> o el botón principal
-equivalente.</p></li>
-<li><p>El backend lanzará los jobs correspondientes para cada modelo:</p>
-<ul>
-<li><p>BM (Máquina de Boltzmann completa),</p></li>
-<li><p>RBM (Restricted Boltzmann Machine),</p></li>
-<li><p>DBM (Deep Boltzmann Machine),</p></li>
-<li><p>variantes “puras” según la configuración interna.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Revisar la comparativa de modelos</strong></p>
-<ul class="simple">
-<li><p>Al finalizar el entrenamiento, se actualiza la pestaña <strong>Comparativa de
-modelos</strong> con una tabla y gráficos de resumen.</p></li>
-</ul>
-</li>
-<li><p><strong>Seleccionar el modelo campeón</strong></p>
-<ul class="simple">
-<li><p>El sistema resalta automáticamente la fila del <strong>mejor modelo</strong> según la
-métrica principal configurada (por ejemplo, F1 o accuracy).</p></li>
-<li><p>Desde ahí puedes ir a <strong>Detalles del mejor modelo</strong> para analizarlo con
-mayor profundidad.</p></li>
-</ul>
-</li>
+<p>La acción de usar en predicciones puede quedar deshabilitada si el modelo no es
+compatible con el contrato de inferencia o si el bundle está incompleto.</p>
+</section>
+</section>
+<section id="ultimo-run-entrenado">
+<h3>2. Último Run Entrenado<a class="headerlink" href="#ultimo-run-entrenado" title="Link to this heading"></a></h3>
+<p>Resume la ejecución más reciente registrada para el contexto actual.</p>
+<p>Permite identificar rápidamente si hubo entrenamientos recientes y si vale la
+pena inspeccionarlos con más detalle.</p>
+</section>
+<section id="estado-del-bundle">
+<h3>3. Estado del Bundle<a class="headerlink" href="#estado-del-bundle" title="Link to this heading"></a></h3>
+<p>Presenta un chequeo resumido del bundle de artefactos del champion o del run
+más relevante.</p>
+</section>
+<section id="tendencia-reciente-de-metricas">
+<h3>4. Tendencia reciente de métricas<a class="headerlink" href="#tendencia-reciente-de-metricas" title="Link to this heading"></a></h3>
+<p>La UI muestra un gráfico simple de evolución para las ejecuciones recientes,
+centrado en la métrica principal de la familia activa.</p>
+</section>
+<section id="insights-rapidos">
+<h3>5. Insights rápidos<a class="headerlink" href="#insights-rapidos" title="Link to this heading"></a></h3>
+<p>Incluye observaciones resumidas derivadas del estado del champion, runs recientes
+y bundle.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="subpestana-entrenamiento">
+<h1>Subpestaña «Entrenamiento»<a class="headerlink" href="#subpestana-entrenamiento" title="Link to this heading"></a></h1>
+<section id="id3">
+<h2>Objetivo<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>La subpestaña <strong>Entrenamiento</strong> permite lanzar una nueva corrida de entrenamiento
+para el dataset y la familia activos.</p>
+</section>
+<section id="flujo-general">
+<h2>Flujo general<a class="headerlink" href="#flujo-general" title="Link to this heading"></a></h2>
+<p>El flujo actual se apoya en dos pasos:</p>
+<ol class="arabic simple">
+<li><p>validar o preparar el artefacto de entrada requerido;</p></li>
+<li><p>lanzar el entrenamiento con la estrategia y parámetros seleccionados.</p></li>
 </ol>
 </section>
 <hr class="docutils" />
-<section id="comparativa-de-modelos">
-<h2>Comparativa de modelos<a class="headerlink" href="#comparativa-de-modelos" title="Link to this heading"></a></h2>
-<p>En esta pestaña se muestra:</p>
-<section id="configuracion-rapida">
-<h3>1. Configuración rápida<a class="headerlink" href="#configuracion-rapida" title="Link to this heading"></a></h3>
-<p>Pequeña card donde se visualizan:</p>
-<ul class="simple">
-<li><p>Dataset actual.</p></li>
-<li><p>Hiperparámetros globales usados en el entrenamiento.</p></li>
-<li><p>Fecha y hora del último experimento.</p></li>
-</ul>
-<p>Sirve como contexto al analizar las métricas.</p>
+<section id="preparacion-del-feature-pack">
+<h2>Preparación del feature-pack<a class="headerlink" href="#preparacion-del-feature-pack" title="Link to this heading"></a></h2>
+<p>En la parte superior se ofrece una acción para preparar el <strong>feature-pack</strong>.</p>
+<section id="id4">
+<h3>Qué hace<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>La UI intenta verificar primero si el feature-pack ya existe.</p>
+<p>Si no existe, llama al endpoint de preparación correspondiente y luego vuelve a
+validar su disponibilidad.</p>
 </section>
-<section id="tabla-comparativa-de-metricas">
-<h3>2. Tabla comparativa de métricas<a class="headerlink" href="#tabla-comparativa-de-metricas" title="Link to this heading"></a></h3>
-<p>Tabla principal con:</p>
+<section id="resultado-esperado">
+<h3>Resultado esperado<a class="headerlink" href="#resultado-esperado" title="Link to this heading"></a></h3>
+<p>El estado visual pasa por algo similar a:</p>
 <ul class="simple">
-<li><p><strong>Filas</strong>: cada modelo evaluado (BM, RBM, DBM, BM pura, RBM pura, etc.).</p></li>
-<li><p><strong>Columnas típicas</strong>:</p>
-<ul>
-<li><p>Accuracy (exactitud),</p></li>
-<li><p>Precision,</p></li>
-<li><p>Recall,</p></li>
-<li><p>F1-score,</p></li>
-<li><p>Tiempo total de entrenamiento,</p></li>
-<li><p>Número de parámetros (si está disponible),</p></li>
-<li><p>Identificador del modelo/artefacto guardado.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">idle</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">preparing</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ready</span></code></p></li>
 </ul>
-</li>
-</ul>
-<p>La <strong>fila del mejor modelo</strong> se destaca visualmente (por ejemplo, con un fondo
-ligeramente diferente o un icono).</p>
 </section>
-<section id="graficos-comparativos">
-<h3>3. Gráficos comparativos<a class="headerlink" href="#graficos-comparativos" title="Link to this heading"></a></h3>
-<p>Según la configuración, se suelen mostrar:</p>
+<section id="importancia">
+<h3>Importancia<a class="headerlink" href="#importancia" title="Link to this heading"></a></h3>
+<p>Este paso es especialmente relevante para familias que dependen de
+<code class="docutils literal notranslate"><span class="pre">feature_pack</span></code> como fuente de datos.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="formulario-de-entrenamiento">
+<h2>Formulario de entrenamiento<a class="headerlink" href="#formulario-de-entrenamiento" title="Link to this heading"></a></h2>
+<p>La tarjeta principal se llama <strong>Entrenar Modelo</strong>.</p>
+<section id="campos-visibles">
+<h3>Campos visibles<a class="headerlink" href="#campos-visibles" title="Link to this heading"></a></h3>
+<p>La implementación actual presenta al menos estos campos:</p>
 <ul class="simple">
-<li><p><strong>Gráfico de barras comparativas</strong>:</p>
-<ul>
-<li><p>Eje X: modelos.</p></li>
-<li><p>Eje Y: métrica seleccionada (p. ej., F1).</p></li>
-<li><p>Permite ver rápidamente qué arquitectura ofrece mejor desempeño.</p></li>
+<li><p><strong>Modelo</strong></p></li>
+<li><p><strong>Épocas</strong></p></li>
+<li><p><strong>Semilla</strong></p></li>
+<li><p><strong>Auto-prepare</strong></p></li>
+<li><p><strong>Warm Start</strong></p></li>
+<li><p><strong>warm_start_from</strong></p></li>
+<li><p><strong>warm_start_id_de_ejecución</strong></p></li>
+<li><p><strong>Overrides JSON</strong></p></li>
 </ul>
-</li>
-<li><p><strong>Gráfico de barras apiladas o agrupadas</strong> (opcional):</p>
-<ul>
-<li><p>Para visualizar varias métricas a la vez (por ejemplo, precision y recall).</p></li>
+</section>
+<section id="modelos-disponibles">
+<h3>Modelos disponibles<a class="headerlink" href="#modelos-disponibles" title="Link to this heading"></a></h3>
+<p>El selector de modelo ofrece actualmente tres estrategias:</p>
+<ol class="arabic simple">
+<li><p><strong>RBM General</strong> (<code class="docutils literal notranslate"><span class="pre">rbm_general</span></code>)</p></li>
+<li><p><strong>RBM Restringida</strong> (<code class="docutils literal notranslate"><span class="pre">rbm_restringida</span></code>)</p></li>
+<li><p><strong>DBM Manual</strong> (<code class="docutils literal notranslate"><span class="pre">dbm_manual</span></code>)</p></li>
+</ol>
+</section>
+<section id="epocas-y-semilla">
+<h3>Épocas y semilla<a class="headerlink" href="#epocas-y-semilla" title="Link to this heading"></a></h3>
+<p>Permiten controlar:</p>
+<ul class="simple">
+<li><p>cantidad de épocas del entrenamiento;</p></li>
+<li><p>semilla explícita del experimento.</p></li>
 </ul>
-</li>
+</section>
+<section id="auto-prepare">
+<h3>Auto-prepare<a class="headerlink" href="#auto-prepare" title="Link to this heading"></a></h3>
+<p>Si está activado, el backend puede intentar preparar automáticamente artefactos
+faltantes antes del entrenamiento.</p>
+</section>
+<section id="warm-start">
+<h3>Warm Start<a class="headerlink" href="#warm-start" title="Link to this heading"></a></h3>
+<p>La UI permite activar warm start y elegir su procedencia.</p>
+<section id="origenes-soportados-en-la-interfaz">
+<h4>Orígenes soportados en la interfaz<a class="headerlink" href="#origenes-soportados-en-la-interfaz" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">champion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">none</span></code></p></li>
+</ul>
+<p>Si se elige <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, el formulario exige un identificador de ejecución válido.</p>
+</section>
+</section>
+<section id="overrides-json">
+<h3>Overrides JSON<a class="headerlink" href="#overrides-json" title="Link to this heading"></a></h3>
+<p>La UI incluye una sección expandible para pasar hiperparámetros adicionales en
+JSON.</p>
+<section id="id5">
+<h4>Observación importante<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
+<p>El JSON debe ser válido. Si no lo es, la interfaz bloquea el envío y muestra un
+mensaje de error.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ejecucion-del-entrenamiento">
+<h2>Ejecución del entrenamiento<a class="headerlink" href="#ejecucion-del-entrenamiento" title="Link to this heading"></a></h2>
+<p>Al iniciar el entrenamiento, la UI intenta llamar al backend y recibe un
+<code class="docutils literal notranslate"><span class="pre">job_id</span></code>, que luego utiliza para polling del estado.</p>
+<section id="estados-visibles">
+<h3>Estados visibles<a class="headerlink" href="#estados-visibles" title="Link to this heading"></a></h3>
+<p>El entrenamiento puede pasar por estados como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">idle</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">queued</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">running</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">completed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">failed</span></code></p></li>
+</ul>
+</section>
+<section id="progreso">
+<h3>Progreso<a class="headerlink" href="#progreso" title="Link to this heading"></a></h3>
+<p>La interfaz muestra una barra de progreso.</p>
+<ul class="simple">
+<li><p>si el backend reporta progreso real, se usa ese valor;</p></li>
+<li><p>si no lo hace, la UI simula un avance conservador para no dejar la pantalla
+sin retroalimentación.</p></li>
+</ul>
+</section>
+<section id="resultado-del-entrenamiento">
+<h3>Resultado del entrenamiento<a class="headerlink" href="#resultado-del-entrenamiento" title="Link to this heading"></a></h3>
+<p>Cuando el entrenamiento termina, la tarjeta <strong>Resultado del Entrenamiento</strong>
+resume el run generado.</p>
+<p>Puede incluir:</p>
+<ul class="simple">
+<li><p>run ID;</p></li>
+<li><p>modelo entrenado;</p></li>
+<li><p>métrica principal;</p></li>
+<li><p>estado;</p></li>
+<li><p>bundle;</p></li>
+<li><p>información de warm start;</p></li>
+<li><p>acciones para abrir el run o usarlo en predicciones.</p></li>
+</ul>
+</section>
+<section id="comportamiento-de-fallback">
+<h3>Comportamiento de fallback<a class="headerlink" href="#comportamiento-de-fallback" title="Link to this heading"></a></h3>
+<p>Si el backend no responde como espera la UI, la pestaña puede construir un
+resultado mínimo para no romper la experiencia visual. Esto mantiene la
+interfaz navegable, pero no debe interpretarse como sustituto de un run real.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="subpestana-ejecuciones">
+<h1>Subpestaña «Ejecuciones»<a class="headerlink" href="#subpestana-ejecuciones" title="Link to this heading"></a></h1>
+<section id="id6">
+<h2>Objetivo<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<p>La subpestaña <strong>Ejecuciones</strong> permite revisar el histórico de runs del dataset y
+la familia seleccionados.</p>
+<p>Tiene dos modos de trabajo:</p>
+<ol class="arabic simple">
+<li><p><strong>tabla de runs</strong> con filtros;</p></li>
+<li><p><strong>detalle de run</strong>.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="vista-de-tabla">
+<h2>Vista de tabla<a class="headerlink" href="#vista-de-tabla" title="Link to this heading"></a></h2>
+<p>La parte superior contiene filtros para acotar las ejecuciones mostradas.</p>
+<section id="filtros-visibles">
+<h3>Filtros visibles<a class="headerlink" href="#filtros-visibles" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Modelo</strong></p></li>
+<li><p><strong>Estado</strong></p></li>
+<li><p><strong>Warm Start</strong></p></li>
+<li><p><strong>Texto</strong></p></li>
+</ul>
+</section>
+<section id="que-permiten-filtrar">
+<h3>Qué permiten filtrar<a class="headerlink" href="#que-permiten-filtrar" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>tipo de estrategia utilizada;</p></li>
+<li><p>estado del run;</p></li>
+<li><p>si usó warm start o no;</p></li>
+<li><p>si incorpora features de texto o no.</p></li>
+</ul>
+</section>
+<section id="tabla-de-runs">
+<h3>Tabla de runs<a class="headerlink" href="#tabla-de-runs" title="Link to this heading"></a></h3>
+<p>La tabla lista, como mínimo:</p>
+<ul class="simple">
+<li><p>fecha;</p></li>
+<li><p>run ID;</p></li>
+<li><p>modelo;</p></li>
+<li><p>estado;</p></li>
+<li><p>métrica principal;</p></li>
+<li><p>bundle;</p></li>
+<li><p>acciones.</p></li>
+</ul>
+</section>
+<section id="acciones-tipicas">
+<h3>Acciones típicas<a class="headerlink" href="#acciones-tipicas" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>abrir el detalle del run;</p></li>
+<li><p>usar el run en predicciones, cuando aplica.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="detalles-del-mejor-modelo">
-<h2>Detalles del mejor modelo<a class="headerlink" href="#detalles-del-mejor-modelo" title="Link to this heading"></a></h2>
-<p>Al seleccionar la pestaña <strong>Detalles del mejor modelo</strong>, se muestran:</p>
-<section id="resumen-del-modelo">
-<h3>1. Resumen del modelo<a class="headerlink" href="#resumen-del-modelo" title="Link to this heading"></a></h3>
-<p>Card con:</p>
+<section id="vista-de-detalle-de-run">
+<h2>Vista de detalle de run<a class="headerlink" href="#vista-de-detalle-de-run" title="Link to this heading"></a></h2>
+<p>Cuando se selecciona un run, la subpestaña cambia a una vista detallada.</p>
+<section id="secciones-visibles-en-el-detalle">
+<h3>Secciones visibles en el detalle<a class="headerlink" href="#secciones-visibles-en-el-detalle" title="Link to this heading"></a></h3>
+<p>La UI actual muestra varias secciones, entre ellas:</p>
+<ol class="arabic simple">
+<li><p><strong>Identidad y Contrato</strong></p></li>
+<li><p><strong>Warm Start</strong></p></li>
+<li><p><strong>Métricas</strong></p></li>
+<li><p><strong>Loss por Época</strong></p></li>
+<li><p><strong>Métrica principal por Época</strong></p></li>
+<li><p><strong>Matriz de Confusión</strong> (cuando aplica)</p></li>
+<li><p><strong>y_true vs y_pred</strong> (cuando aplica)</p></li>
+<li><p><strong>Features</strong></p></li>
+<li><p><strong>Artefactos / Bundle</strong></p></li>
+</ol>
+</section>
+<section id="identidad-y-contrato">
+<h3>1. Identidad y Contrato<a class="headerlink" href="#identidad-y-contrato" title="Link to this heading"></a></h3>
+<p>Resume el contexto estructural del run, por ejemplo:</p>
 <ul class="simple">
-<li><p>Nombre del modelo (por ejemplo, <code class="docutils literal notranslate"><span class="pre">RBM_manual</span></code> o <code class="docutils literal notranslate"><span class="pre">DBM</span></code>).</p></li>
-<li><p>Métricas clave (Accuracy, F1, etc.).</p></li>
-<li><p>Hiperparámetros (número de neuronas ocultas, capas, tasa de aprendizaje,
-épocas, etc.).</p></li>
-<li><p>Ruta del artefacto guardado (por ejemplo, en <code class="docutils literal notranslate"><span class="pre">artifacts/</span></code>).</p></li>
+<li><p>run ID;</p></li>
+<li><p>dataset;</p></li>
+<li><p>familia;</p></li>
+<li><p>modelo;</p></li>
+<li><p>target;</p></li>
+<li><p>fuente de datos;</p></li>
+<li><p>tipo de tarea.</p></li>
 </ul>
 </section>
-<section id="curvas-de-entrenamiento">
-<h3>2. Curvas de entrenamiento<a class="headerlink" href="#curvas-de-entrenamiento" title="Link to this heading"></a></h3>
-<p>Gráficas que permiten entender el comportamiento del modelo durante el
-entrenamiento:</p>
+<section id="id7">
+<h3>2. Warm Start<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>Describe si el entrenamiento fue iniciado desde:</p>
 <ul class="simple">
-<li><p><strong>Curva de pérdida (loss vs epoch)</strong>:</p>
-<ul>
-<li><p>Eje X: epochs.</p></li>
-<li><p>Eje Y: valor de la función de pérdida.</p></li>
-<li><p>Permite ver si el entrenamiento ha convergido o si hay sobreajuste.</p></li>
+<li><p>cero;</p></li>
+<li><p>un champion previo;</p></li>
+<li><p>un run específico.</p></li>
 </ul>
-</li>
-<li><p><strong>Curva de accuracy (accuracy vs epoch)</strong>:</p>
-<ul>
-<li><p>Eje X: epochs.</p></li>
-<li><p>Eje Y: exactitud en entrenamiento/validación (si aplica).</p></li>
-</ul>
-</li>
+<p>También puede mostrar si el warm start se resolvió correctamente o si fue
+omitido por incompatibilidad.</p>
+</section>
+<section id="metricas">
+<h3>3. Métricas<a class="headerlink" href="#metricas" title="Link to this heading"></a></h3>
+<p>Presenta las métricas registradas del run.</p>
+<p>La interpretación depende de la familia activa:</p>
+<ul class="simple">
+<li><p>clasificación: se priorizan métricas como <code class="docutils literal notranslate"><span class="pre">val_f1_macro</span></code> y <code class="docutils literal notranslate"><span class="pre">accuracy</span></code>;</p></li>
+<li><p>regresión: se priorizan métricas como <code class="docutils literal notranslate"><span class="pre">val_rmse</span></code>, <code class="docutils literal notranslate"><span class="pre">val_mae</span></code> y <code class="docutils literal notranslate"><span class="pre">val_r2</span></code>.</p></li>
 </ul>
 </section>
-<section id="tiempo-por-epoca">
-<h3>3. Tiempo por época<a class="headerlink" href="#tiempo-por-epoca" title="Link to this heading"></a></h3>
-<p>Gráfico adicional:</p>
+<section id="y-5-curvas-por-epoca">
+<h3>4. y 5. Curvas por época<a class="headerlink" href="#y-5-curvas-por-epoca" title="Link to this heading"></a></h3>
+<p>La UI muestra gráficas de evolución por época para:</p>
 <ul class="simple">
-<li><p><strong>Gráfico de barras o de línea</strong>:</p>
-<ul>
-<li><p>Eje X: epochs.</p></li>
-<li><p>Eje Y: tiempo de entrenamiento por epoch.</p></li>
-<li><p>Útil para comparar modelos pesados (como DBM) frente a otros más ligeros.</p></li>
+<li><p>pérdida;</p></li>
+<li><p>métrica principal.</p></li>
 </ul>
-</li>
-</ul>
+<p>Esto permite inspeccionar estabilidad, convergencia o sobreajuste.</p>
 </section>
 <section id="matriz-de-confusion">
-<h3>4. Matriz de confusión<a class="headerlink" href="#matriz-de-confusion" title="Link to this heading"></a></h3>
-<p>Visualización esencial para entender qué está clasificando bien o mal el
-modelo:</p>
+<h3>6. Matriz de Confusión<a class="headerlink" href="#matriz-de-confusion" title="Link to this heading"></a></h3>
+<p>Aparece en tareas de clasificación cuando el backend dispone de ese artefacto.</p>
+</section>
+<section id="y-true-vs-y-pred">
+<h3>7. y_true vs y_pred<a class="headerlink" href="#y-true-vs-y-pred" title="Link to this heading"></a></h3>
+<p>Aparece principalmente en tareas de regresión o escenarios donde la UI puede
+representar pares de valor real y valor predicho.</p>
+</section>
+<section id="features">
+<h3>8. Features<a class="headerlink" href="#features" title="Link to this heading"></a></h3>
+<p>Muestra información como:</p>
 <ul class="simple">
-<li><p><strong>Matriz de confusión</strong> (idealmente en forma de mapa de calor):</p>
-<ul>
-<li><p>Ejes: clases verdaderas vs clases predichas (por ejemplo, alto/bajo
-rendimiento).</p></li>
-<li><p>Cada celda indica el número de casos.</p></li>
+<li><p>número total de features;</p></li>
+<li><p>número de features de texto;</p></li>
+<li><p>columnas textuales utilizadas.</p></li>
 </ul>
-</li>
-<li><p>Métricas derivadas:</p>
-<ul>
-<li><p>TP (True Positive),</p></li>
-<li><p>TN (True Negative),</p></li>
-<li><p>FP (False Positive),</p></li>
-<li><p>FN (False Negative).</p></li>
-</ul>
-</li>
-</ul>
+</section>
+<section id="artefactos-bundle">
+<h3>9. Artefactos / Bundle<a class="headerlink" href="#artefactos-bundle" title="Link to this heading"></a></h3>
+<p>Resume el estado del bundle asociado al run y su checklist de componentes.</p>
+</section>
 </section>
 </section>
 <hr class="docutils" />
-<section id="errores-frecuentes-y-recomendaciones">
-<h2>Errores frecuentes y recomendaciones<a class="headerlink" href="#errores-frecuentes-y-recomendaciones" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><strong>No aparece ningún modelo en la tabla</strong><br />
-Verifica que:</p>
+<section id="subpestana-campeon">
+<h1>Subpestaña «Campeón»<a class="headerlink" href="#subpestana-campeon" title="Link to this heading"></a></h1>
+<section id="id8">
+<h2>Objetivo<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<p>La subpestaña <strong>Campeón</strong> permite inspeccionar y administrar el <strong>champion</strong> del
+contexto actual.</p>
+</section>
+<section id="que-muestra">
+<h2>Qué muestra<a class="headerlink" href="#que-muestra" title="Link to this heading"></a></h2>
+<p>La UI presenta:</p>
 <ol class="arabic simple">
-<li><p>Hay un dataset seleccionado.</p></li>
-<li><p>Se ha ejecutado al menos un entrenamiento para ese dataset.</p></li>
+<li><p>el champion actual;</p></li>
+<li><p>una sección para reemplazarlo;</p></li>
+<li><p>un ranking de runs completados.</p></li>
 </ol>
-</li>
-<li><p><strong>Las métricas son muy bajas para todos los modelos</strong><br />
-Puede indicar:</p>
-<ul>
-<li><p>Problemas con el preprocesamiento del dataset.</p></li>
-<li><p>Hiperparámetros muy poco adecuados (épocas insuficientes, learning rate
-muy alto, etc.).</p></li>
+</section>
+<hr class="docutils" />
+<section id="id9">
+<h2>Champion actual<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<p>Cuando existe un champion, se muestra una tarjeta con información como:</p>
+<ul class="simple">
+<li><p>run ID;</p></li>
+<li><p>modelo;</p></li>
+<li><p>métrica principal;</p></li>
+<li><p>fecha de promoción;</p></li>
+<li><p>estado del bundle;</p></li>
+<li><p>indicadores de warm start y texto.</p></li>
 </ul>
-</li>
-<li><p><strong>El entrenamiento tarda demasiado</strong></p>
-<ul>
-<li><p>Considera reducir el tamaño de las capas ocultas o el número de epochs.</p></li>
-<li><p>Revisa si es necesario entrenar todos los modelos o solo un subconjunto.</p></li>
+<section id="id10">
+<h3>Acciones disponibles<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Usar Champion en Predictions</strong></p></li>
+<li><p><strong>Ver Run</strong></p></li>
+<li><p><strong>Reemplazar Champion</strong></p></li>
 </ul>
-</li>
+</section>
+<section id="restricciones-importantes">
+<h3>Restricciones importantes<a class="headerlink" href="#restricciones-importantes" title="Link to this heading"></a></h3>
+<p>La UI protege el contrato con Predicciones.</p>
+<p>Por eso, aunque existan múltiples runs entrenados, solo algunos modelos son
+considerados compatibles para actuar como champion global reutilizable en
+predicción.</p>
+<p>Si el champion no es deployable o su bundle está incompleto, la interfaz puede
+bloquear el uso directo en Predicciones y mostrar una explicación.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="reemplazar-champion">
+<h2>Reemplazar champion<a class="headerlink" href="#reemplazar-champion" title="Link to this heading"></a></h2>
+<p>La sección <strong>Seleccionar Nuevo Champion</strong> permite promover otro run.</p>
+<section id="flujo">
+<h3>Flujo<a class="headerlink" href="#flujo" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>la UI lista runs completados compatibles;</p></li>
+<li><p>el usuario selecciona uno;</p></li>
+<li><p>confirma la promoción;</p></li>
+<li><p>el backend actualiza el champion si el endpoint está disponible.</p></li>
+</ol>
+</section>
+<section id="id11">
+<h3>Comportamiento real<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<p>Si el backend aún no soporta completamente la promoción esperada por la UI,
+puede mantenerse feedback visual de prototipo. Por eso la confirmación visual no
+siempre equivale a una persistencia efectiva si el entorno backend no está
+alineado.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ranking-de-runs">
+<h2>Ranking de runs<a class="headerlink" href="#ranking-de-runs" title="Link to this heading"></a></h2>
+<p>Debajo del champion, la pestaña muestra una tabla ordenada por la métrica
+principal de la familia activa.</p>
+<section id="que-permite">
+<h3>Qué permite<a class="headerlink" href="#que-permite" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>comparar runs entre sí;</p></li>
+<li><p>identificar el champion actual;</p></li>
+<li><p>abrir cualquier run para inspección.</p></li>
+</ul>
+</section>
+<section id="regla-de-ordenamiento">
+<h3>Regla de ordenamiento<a class="headerlink" href="#regla-de-ordenamiento" title="Link to this heading"></a></h3>
+<p>La comparación respeta el <code class="docutils literal notranslate"><span class="pre">metric_mode</span></code> de la familia:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code> para clasificación;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code> para regresión.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="subpestana-sweep">
+<h1>Subpestaña «Sweep»<a class="headerlink" href="#subpestana-sweep" title="Link to this heading"></a></h1>
+<section id="id12">
+<h2>Objetivo<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<p>La subpestaña <strong>Sweep</strong> ejecuta una comparación automática entre varios modelos
+para un mismo dataset y familia.</p>
+<p>En la implementación actual, el sweep está pensado para entrenar y contrastar
+<strong>tres estrategias</strong>:</p>
+<ul class="simple">
+<li><p>RBM General</p></li>
+<li><p>RBM Restringida</p></li>
+<li><p>DBM Manual</p></li>
 </ul>
 </section>
 <hr class="docutils" />
-<section id="relacion-con-otras-secciones">
-<h2>Relación con otras secciones<a class="headerlink" href="#relacion-con-otras-secciones" title="Link to this heading"></a></h2>
+<section id="formulario-de-sweep">
+<h2>Formulario de sweep<a class="headerlink" href="#formulario-de-sweep" title="Link to this heading"></a></h2>
+<p>La tarjeta principal se titula <strong>Sweep — Entrenar 3 Modelos</strong>.</p>
+<section id="id13">
+<h3>Campos visibles<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>La pestaña <strong>Modelos</strong> se alimenta de:</p>
-<ul>
-<li><p>Los datasets preparados en la pestaña <strong>Datos</strong>.</p></li>
-<li><p>La teoría de BM/RBM/DBM descrita en la sección de <strong>Teoría de modelos</strong>.</p></li>
-</ul>
-</li>
-<li><p>El modelo campeón seleccionado se usa posteriormente en:</p>
-<ul>
-<li><p><strong>Predicciones</strong> (para inferencias individuales o por lote).</p></li>
-<li><p><strong>Dashboard</strong> (para métricas agregadas y proyecciones).</p></li>
-</ul>
-</li>
+<li><p><strong>Epochs</strong></p></li>
+<li><p><strong>Seed</strong></p></li>
+<li><p><strong>warm_start_from</strong></p></li>
+<li><p><strong>Auto-promote</strong></p></li>
+<li><p><strong>Overrides por modelo (JSON)</strong></p></li>
 </ul>
 </section>
+<section id="warm-start-from">
+<h3>warm_start_from<a class="headerlink" href="#warm-start-from" title="Link to this heading"></a></h3>
+<p>En esta vista la UI actual permite seleccionar principalmente:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">champion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">none</span></code></p></li>
+</ul>
+</section>
+<section id="auto-promote">
+<h3>Auto-promote<a class="headerlink" href="#auto-promote" title="Link to this heading"></a></h3>
+<p>Si esta opción está activada, el backend puede promover automáticamente al
+mejor candidato como champion al finalizar el sweep.</p>
+</section>
+<section id="overrides-por-modelo">
+<h3>Overrides por modelo<a class="headerlink" href="#overrides-por-modelo" title="Link to this heading"></a></h3>
+<p>La interfaz permite introducir JSON independiente para cada una de las tres
+estrategias del sweep.</p>
+<p>Si alguno de esos JSON es inválido, el sweep no se lanza.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ejecucion-y-progreso">
+<h2>Ejecución y progreso<a class="headerlink" href="#ejecucion-y-progreso" title="Link to this heading"></a></h2>
+<p>Al iniciar el sweep, la UI intenta usar el flujo real de backend.</p>
+<section id="dos-modos-posibles">
+<h3>Dos modos posibles<a class="headerlink" href="#dos-modos-posibles" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>sweep con polling</strong></p></li>
+<li><p><strong>sweep con respuesta directa</strong></p></li>
+</ol>
+<p>Si el backend responde con un job asíncrono, la interfaz consulta su estado
+hasta completarlo.</p>
+</section>
+<section id="id14">
+<h3>Progreso<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<p>Al igual que en entrenamiento, la UI usa:</p>
+<ul class="simple">
+<li><p>progreso real si el backend lo entrega;</p></li>
+<li><p>progreso sintético si no lo entrega.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="resultados-del-sweep">
+<h2>Resultados del sweep<a class="headerlink" href="#resultados-del-sweep" title="Link to this heading"></a></h2>
+<p>Cuando el proceso termina, la interfaz muestra:</p>
+<ol class="arabic simple">
+<li><p><strong>Ganador del Sweep</strong></p></li>
+<li><p><strong>Candidatos del Sweep</strong></p></li>
+<li><p><strong>Comparador Side-by-Side</strong></p></li>
+</ol>
+<section id="ganador-del-sweep">
+<h3>1. Ganador del Sweep<a class="headerlink" href="#ganador-del-sweep" title="Link to this heading"></a></h3>
+<p>Resume el mejor run según la métrica principal de la familia.</p>
+<p>Incluye:</p>
+<ul class="simple">
+<li><p>run ID;</p></li>
+<li><p>modelo ganador;</p></li>
+<li><p>valor de la métrica;</p></li>
+<li><p>razón del resultado.</p></li>
+</ul>
+<section id="regla-de-seleccion">
+<h4>Regla de selección<a class="headerlink" href="#regla-de-seleccion" title="Link to this heading"></a></h4>
+<p>La UI documenta explícitamente que la elección sigue:</p>
+<ul class="simple">
+<li><p>métrica principal de la familia;</p></li>
+<li><p>modo <code class="docutils literal notranslate"><span class="pre">max</span></code> o <code class="docutils literal notranslate"><span class="pre">min</span></code> según corresponda;</p></li>
+<li><p>tie-breaker por <code class="docutils literal notranslate"><span class="pre">model_name</span></code> y luego <code class="docutils literal notranslate"><span class="pre">run_id</span></code> en caso de empate.</p></li>
+</ul>
+</section>
+<section id="id15">
+<h4>Acciones disponibles<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Abrir Ganador</strong></p></li>
+<li><p><strong>Promover Champion</strong></p></li>
+<li><p><strong>Comparar Runs</strong></p></li>
+</ul>
+</section>
+</section>
+<section id="candidatos-del-sweep">
+<h3>2. Candidatos del Sweep<a class="headerlink" href="#candidatos-del-sweep" title="Link to this heading"></a></h3>
+<p>La tabla de candidatos muestra para cada run:</p>
+<ul class="simple">
+<li><p>modelo;</p></li>
+<li><p>run ID;</p></li>
+<li><p>métrica principal;</p></li>
+<li><p>estado de warm start;</p></li>
+<li><p>uso de texto;</p></li>
+<li><p>estado del bundle;</p></li>
+<li><p>si fue el ganador.</p></li>
+</ul>
+</section>
+<section id="comparador-side-by-side">
+<h3>3. Comparador Side-by-Side<a class="headerlink" href="#comparador-side-by-side" title="Link to this heading"></a></h3>
+<p>Permite ver los tres candidatos en paralelo, comparando:</p>
+<ul class="simple">
+<li><p>métrica principal;</p></li>
+<li><p>métricas secundarias;</p></li>
+<li><p>número de features;</p></li>
+<li><p>features de texto;</p></li>
+<li><p>warm start;</p></li>
+<li><p>estado del bundle.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="subpestana-artefactos">
+<h1>Subpestaña «Artefactos»<a class="headerlink" href="#subpestana-artefactos" title="Link to this heading"></a></h1>
+<section id="id16">
+<h2>Objetivo<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<p>La subpestaña <strong>Artefactos</strong> permite resolver un run y examinar su <strong>bundle</strong> de
+archivos asociados.</p>
+<p>Su función es verificar si el run tiene los componentes necesarios para
+predicción, trazabilidad o auditoría técnica.</p>
+</section>
+<section id="resolucion-del-bundle">
+<h2>Resolución del bundle<a class="headerlink" href="#resolucion-del-bundle" title="Link to this heading"></a></h2>
+<p>La UI ofrece un bloque llamado <strong>Seleccionar Bundle</strong>.</p>
+<section id="fuentes-disponibles">
+<h3>Fuentes disponibles<a class="headerlink" href="#fuentes-disponibles" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Champion</strong></p></li>
+<li><p><strong>Run ID</strong></p></li>
+</ul>
+</section>
+<section id="id17">
+<h3>Flujo<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>el usuario elige la fuente;</p></li>
+<li><p>si corresponde, ingresa un run ID;</p></li>
+<li><p>pulsa <strong>Resolver</strong>.</p></li>
+</ol>
+</section>
+<section id="manejo-de-errores">
+<h3>Manejo de errores<a class="headerlink" href="#manejo-de-errores" title="Link to this heading"></a></h3>
+<p>La interfaz puede mostrar errores cuando:</p>
+<ul class="simple">
+<li><p>el run no existe;</p></li>
+<li><p>el champion no existe para el contexto;</p></li>
+<li><p>el bundle está incompleto.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="informacion-mostrada">
+<h2>Información mostrada<a class="headerlink" href="#informacion-mostrada" title="Link to this heading"></a></h2>
+<p>Una vez resuelto el bundle, la UI presenta dos grupos principales:</p>
+<ol class="arabic simple">
+<li><p><strong>Artefactos del Bundle</strong></p></li>
+<li><p><strong>Visor JSON</strong></p></li>
+</ol>
+<section id="artefactos-del-bundle">
+<h3>1. Artefactos del Bundle<a class="headerlink" href="#artefactos-del-bundle" title="Link to this heading"></a></h3>
+<p>Resume el checklist de archivos esperados, por ejemplo:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predictor.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">job_meta.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">preprocess.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model/</span></code></p></li>
+</ul>
+</section>
+<section id="visor-json">
+<h3>2. Visor JSON<a class="headerlink" href="#visor-json" title="Link to this heading"></a></h3>
+<p>La interfaz permite alternar entre pestañas para inspeccionar el contenido JSON
+real cuando el backend lo provee.</p>
+<p>Las pestañas visibles actuales son:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predictor.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">job_meta.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">preprocess.json</span></code></p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Comportamiento real<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<p>La prioridad de la UI es:</p>
+<ol class="arabic simple">
+<li><p>mostrar artefactos reales devueltos por backend;</p></li>
+<li><p>si no están disponibles, usar contenido de respaldo del prototipo.</p></li>
+</ol>
+<p>Por ello, esta subpestaña es muy útil para validar contratos, pero también debe
+interpretarse teniendo en cuenta si está trabajando contra datos reales o contra
+fallback visual.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="subpestana-diagnostico">
+<h1>Subpestaña «Diagnóstico»<a class="headerlink" href="#subpestana-diagnostico" title="Link to this heading"></a></h1>
+<section id="id19">
+<h2>Objetivo<a class="headerlink" href="#id19" title="Link to this heading"></a></h2>
+<p>La subpestaña <strong>Diagnóstico</strong> sintetiza chequeos de salud y consistencia del
+contexto de modelado actual.</p>
+<p>No entrena ni promueve modelos: su función es <strong>validar el estado</strong> del sistema
+para el dataset y la familia seleccionados.</p>
+</section>
+<section id="componentes-principales">
+<h2>Componentes principales<a class="headerlink" href="#componentes-principales" title="Link to this heading"></a></h2>
+<p>La UI muestra:</p>
+<ol class="arabic simple">
+<li><p>tarjetas de salud general;</p></li>
+<li><p>lista de <strong>Contract Checks</strong>;</p></li>
+<li><p>panel de advertencias;</p></li>
+<li><p>especificación de errores de referencia.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="tarjetas-de-salud">
+<h2>Tarjetas de salud<a class="headerlink" href="#tarjetas-de-salud" title="Link to this heading"></a></h2>
+<p>En la parte superior se presentan cuatro tarjetas:</p>
+<ul class="simple">
+<li><p><strong>Health</strong></p></li>
+<li><p><strong>Pass</strong></p></li>
+<li><p><strong>Warn</strong></p></li>
+<li><p><strong>Fail</strong></p></li>
+</ul>
+<section id="posibles-estados-globales">
+<h3>Posibles estados globales<a class="headerlink" href="#posibles-estados-globales" title="Link to this heading"></a></h3>
+<p>La salud general se resume como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Healthy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Degraded</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Unhealthy</span></code></p></li>
+</ul>
+<p>según la cantidad de checks en warning o fallo.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="contract-checks">
+<h2>Contract Checks<a class="headerlink" href="#contract-checks" title="Link to this heading"></a></h2>
+<p>La tarjeta principal se llama <strong>Contract Checks</strong>.</p>
+<section id="id20">
+<h3>Fuente de datos<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<p>La UI indica explícitamente si el diagnóstico se construyó desde:</p>
+<ul class="simple">
+<li><p><strong>Backend real</strong></p></li>
+<li><p><strong>Fallback prototipo</strong></p></li>
+</ul>
+</section>
+<section id="id21">
+<h3>Acciones disponibles<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Revalidar</strong></p></li>
+<li><p><strong>Copiar Reporte</strong></p></li>
+</ul>
+</section>
+<section id="que-incluye-el-reporte">
+<h3>Qué incluye el reporte<a class="headerlink" href="#que-incluye-el-reporte" title="Link to this heading"></a></h3>
+<p>El diagnóstico resume:</p>
+<ul class="simple">
+<li><p>familia;</p></li>
+<li><p>dataset;</p></li>
+<li><p>fecha;</p></li>
+<li><p>fuente de datos;</p></li>
+<li><p>lista de checks;</p></li>
+<li><p>lista de warnings;</p></li>
+<li><p>resumen total de pass, warn y fail.</p></li>
+</ul>
+</section>
+<section id="utilidad">
+<h3>Utilidad<a class="headerlink" href="#utilidad" title="Link to this heading"></a></h3>
+<p>Esta subpestaña es especialmente valiosa para verificar si el contexto actual
+está listo para ser usado en predicciones o para comparar si la UI está leyendo
+backend real o datos de fallback.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="advertencias">
+<h2>Advertencias<a class="headerlink" href="#advertencias" title="Link to this heading"></a></h2>
+<p>La sección <strong>Advertencias</strong> agrupa mensajes contextuales derivados del snapshot
+de diagnóstico.</p>
+<p>Sirve para llamar la atención sobre problemas que no necesariamente bloquean el
+flujo, pero sí pueden afectar consistencia, deployabilidad o interpretación de
+resultados.</p>
+</section>
+<hr class="docutils" />
+<section id="especificacion-de-errores">
+<h2>Especificación de errores<a class="headerlink" href="#especificacion-de-errores" title="Link to this heading"></a></h2>
+<p>La UI incluye una sección de referencia llamada <strong>Especificación de Errores</strong>.</p>
+<p>Su propósito es servir como guía rápida para interpretar los fallos o warnings
+reportados por la pestaña.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="comportamiento-transversal-de-la-pestana">
+<h1>Comportamiento transversal de la pestaña<a class="headerlink" href="#comportamiento-transversal-de-la-pestana" title="Link to this heading"></a></h1>
+<section id="integracion-backend-first-con-fallback-visual">
+<h2>Integración backend-first con fallback visual<a class="headerlink" href="#integracion-backend-first-con-fallback-visual" title="Link to this heading"></a></h2>
+<p>La arquitectura actual de <strong>Modelos</strong> intenta usar primero el backend real para:</p>
+<ul class="simple">
+<li><p>datasets;</p></li>
+<li><p>champion;</p></li>
+<li><p>listado de runs;</p></li>
+<li><p>detalle de runs;</p></li>
+<li><p>readiness;</p></li>
+<li><p>feature-pack;</p></li>
+<li><p>entrenamiento;</p></li>
+<li><p>sweep;</p></li>
+<li><p>promoción de champion;</p></li>
+<li><p>bundle;</p></li>
+<li><p>diagnóstico.</p></li>
+</ul>
+<p>Si alguno de esos contratos aún no está disponible o falla, la UI conserva la
+experiencia visual por medio de datos mock o resultados construidos localmente.</p>
+<section id="implicacion-importante-para-el-usuario">
+<h3>Implicación importante para el usuario<a class="headerlink" href="#implicacion-importante-para-el-usuario" title="Link to this heading"></a></h3>
+<p>Esto significa que la pestaña es <strong>usable</strong> incluso cuando algunos contratos aún
+están en evolución, pero también implica que no todo lo que aparece en pantalla
+representa siempre persistencia efectiva en backend.</p>
+<p>Cuando se requiera validación operativa real, conviene verificar:</p>
+<ul class="simple">
+<li><p>que el endpoint backend haya respondido;</p></li>
+<li><p>que el run exista realmente;</p></li>
+<li><p>que el bundle esté completo;</p></li>
+<li><p>que el champion haya sido promovido en backend y no solo en la UI.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="navegacion-hacia-predicciones">
+<h2>Navegación hacia Predicciones<a class="headerlink" href="#navegacion-hacia-predicciones" title="Link to this heading"></a></h2>
+<p>Varias subpestañas ofrecen acciones del tipo:</p>
+<ul class="simple">
+<li><p><strong>Usar en Predictions</strong></p></li>
+<li><p><strong>Usar Champion en Predictions</strong></p></li>
+</ul>
+<section id="que-hacen">
+<h3>Qué hacen<a class="headerlink" href="#que-hacen" title="Link to this heading"></a></h3>
+<p>Estas acciones transfieren al contexto global:</p>
+<ul class="simple">
+<li><p>dataset activo;</p></li>
+<li><p>familia seleccionada;</p></li>
+<li><p>run solicitado para trazabilidad.</p></li>
+</ul>
+<p>Luego la UI navega a la pestaña o ruta de <strong>Predicciones</strong>.</p>
+</section>
+<section id="importante">
+<h3>Importante<a class="headerlink" href="#importante" title="Link to this heading"></a></h3>
+<p>La inferencia no necesariamente se ejecuta directamente con cualquier run:</p>
+<p>en la arquitectura actual, <strong>Predicciones</strong> sigue resolviendo inferencia con el
+modelo champion compatible del dataset y la familia soportados por backend.</p>
+<p>El run seleccionado desde Modelos funciona sobre todo como contexto de UI y
+trazabilidad.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="flujo-de-trabajo-recomendado">
+<h1>Flujo de trabajo recomendado<a class="headerlink" href="#flujo-de-trabajo-recomendado" title="Link to this heading"></a></h1>
+<p>En la versión actual de NeuroCampus, un flujo recomendado dentro de <strong>Modelos</strong>
+es:</p>
+<ol class="arabic simple">
+<li><p>seleccionar el <strong>dataset</strong> correcto;</p></li>
+<li><p>elegir la <strong>familia</strong> adecuada;</p></li>
+<li><p>revisar el <strong>Resumen</strong> para entender el estado actual;</p></li>
+<li><p>preparar el <strong>feature-pack</strong> si es necesario;</p></li>
+<li><p>lanzar un nuevo <strong>Entrenamiento</strong>;</p></li>
+<li><p>inspeccionar el resultado en <strong>Ejecuciones</strong>;</p></li>
+<li><p>comparar alternativas con <strong>Sweep</strong> si se desea;</p></li>
+<li><p>promover o validar el <strong>Campeón</strong>;</p></li>
+<li><p>verificar el bundle en <strong>Artefactos</strong>;</p></li>
+<li><p>cerrar con revisión en <strong>Diagnóstico</strong>;</p></li>
+<li><p>pasar a <strong>Predicciones</strong> cuando el contexto esté listo.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="alcance-real-de-la-pestana-en-la-version-actual">
+<h1>Alcance real de la pestaña en la versión actual<a class="headerlink" href="#alcance-real-de-la-pestana-en-la-version-actual" title="Link to this heading"></a></h1>
+<p>La pestaña <strong>Modelos</strong> sí está diseñada para:</p>
+<ul class="simple">
+<li><p>orquestar el contexto de modelado;</p></li>
+<li><p>entrenar modelos;</p></li>
+<li><p>comparar estrategias;</p></li>
+<li><p>revisar ejecuciones;</p></li>
+<li><p>administrar el champion;</p></li>
+<li><p>verificar artefactos;</p></li>
+<li><p>validar consistencia operativa.</p></li>
+</ul>
+<p>La pestaña <strong>Modelos</strong> no está diseñada para:</p>
+<ul class="simple">
+<li><p>cargar archivos de dataset directamente;</p></li>
+<li><p>consolidar históricos institucionales;</p></li>
+<li><p>mostrar la analítica agregada del dashboard;</p></li>
+<li><p>ejecutar el flujo final de predicciones como acción principal.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="relacion-con-otras-pestanas">
+<h1>Relación con otras pestañas<a class="headerlink" href="#relacion-con-otras-pestanas" title="Link to this heading"></a></h1>
+<p>La pestaña <strong>Modelos</strong> depende de artefactos construidos en <strong>Datos</strong> y prepara
+el contexto que después se consume en <strong>Predicciones</strong>.</p>
+<p>En términos funcionales:</p>
+<ul class="simple">
+<li><p><strong>Datos</strong> alimenta a <strong>Modelos</strong> con datasets y feature-packs;</p></li>
+<li><p><strong>Modelos</strong> define qué runs, champions y bundles están listos;</p></li>
+<li><p><strong>Predicciones</strong> reutiliza ese contexto para inferencia;</p></li>
+<li><p><strong>Dashboard</strong> consume indirectamente parte de los resultados agregados del
+sistema, pero no sustituye la gestión detallada de modelos.</p></li>
+</ul>
+<p>Por ello, <strong>Modelos</strong> es la pestaña central del ciclo de experimentación y
+selección técnica dentro de NeuroCampus.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
-        <a href="datos.html" class="btn btn-neutral float-left" title="Pestaña «Datos» – Ingesta y análisis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="datos.html" class="btn btn-neutral float-left" title="Pestaña «Datos»" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
         <a href="predicciones.html" class="btn btn-neutral float-right" title="Pestaña «Predicciones»" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

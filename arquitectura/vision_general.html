@@ -47,10 +47,63 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../manual/index.html">Manual de usuario</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Arquitectura de NeuroCampus</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Visión general de la arquitectura</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Visión general de la arquitectura</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#proposito">Propósito</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vista-global-del-sistema">Vista global del sistema</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#frontend">Frontend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stack">Stack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estructura-real-de-navegacion">Estructura real de navegación</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#componentes-funcionales-principales">Componentes funcionales principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#capa-de-servicios-frontend">Capa de servicios frontend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estado-compartido">Estado compartido</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#backend-api">Backend API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Stack</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#responsabilidades-del-backend-principal">Responsabilidades del backend principal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#routers-activos">Routers activos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#esquemas">Esquemas</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#flujo-funcional-del-sistema">Flujo funcional del sistema</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#datos">1. Datos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modelos">2. Modelos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#predicciones">3. Predicciones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dashboard">4. Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#capa-de-datos">Capa de datos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#capa-de-modelos">Capa de modelos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#componentes-principales">Componentes principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#responsabilidad-de-esta-capa">Responsabilidad de esta capa</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#jobs-y-procesos-batch">Jobs y procesos batch</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#jobs-relevantes-de-la-version-actual">Jobs relevantes de la versión actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#por-que-existen">Por qué existen</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#observabilidad-y-logging">Observabilidad y logging</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#componentes-destacados">Componentes destacados</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#objetivo">Objetivo</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#persistencia-y-artefactos">Persistencia y artefactos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tests-y-calidad">Tests y calidad</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentacion-y-publicacion">Documentación y publicación</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#material-legacy">Material legacy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#principios-arquitectonicos-observables-en-la-version-actual">Principios arquitectónicos observables en la versión actual</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#separacion-por-dominios">1. Separación por dominios</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#orquestacion-por-api-y-jobs">2. Orquestación por API y jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#persistencia-orientada-a-artefactos">3. Persistencia orientada a artefactos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reutilizacion-de-componentes">4. Reutilización de componentes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#trazabilidad-operativa">5. Trazabilidad operativa</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#resumen">Resumen</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="backend.html">Arquitectura del backend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="frontend.html">Arquitectura del frontend</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html">Pipeline de modelos (BM, RBM, DBM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_modelos.html">Pipeline de modelos</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
@@ -86,151 +139,574 @@
              
   <section id="vision-general-de-la-arquitectura">
 <h1>Visión general de la arquitectura<a class="headerlink" href="#vision-general-de-la-arquitectura" title="Link to this heading"></a></h1>
-<p>NeuroCampus está organizado en varias capas bien separadas:</p>
+<section id="proposito">
+<h2>Propósito<a class="headerlink" href="#proposito" title="Link to this heading"></a></h2>
+<p>NeuroCampus es una plataforma para procesar evaluaciones docentes, construir
+artefactos de datos, entrenar modelos basados en Máquinas de Boltzmann,
+ejecutar predicciones y exponer resultados agregados mediante una interfaz web.</p>
+<p>La arquitectura actual del sistema está organizada para soportar cuatro flujos
+funcionales principales:</p>
+<ol class="arabic simple">
+<li><p><strong>Datos</strong></p></li>
+<li><p><strong>Modelos</strong></p></li>
+<li><p><strong>Predicciones</strong></p></li>
+<li><p><strong>Dashboard</strong></p></li>
+</ol>
+<p>Estos cuatro flujos están reflejados tanto en el frontend como en el backend y
+constituyen la estructura operativa real del software en su versión vigente.</p>
+</section>
+<hr class="docutils" />
+<section id="vista-global-del-sistema">
+<h2>Vista global del sistema<a class="headerlink" href="#vista-global-del-sistema" title="Link to this heading"></a></h2>
+<p>A alto nivel, NeuroCampus se compone de cinco capas principales:</p>
+<ol class="arabic simple">
+<li><p><strong>Frontend web</strong></p></li>
+<li><p><strong>API backend</strong></p></li>
+<li><p><strong>Capa de datos y artefactos</strong></p></li>
+<li><p><strong>Capa de modelos y entrenamiento</strong></p></li>
+<li><p><strong>Jobs y observabilidad</strong></p></li>
+</ol>
+<p>La relación entre estas capas es la siguiente:</p>
 <ul class="simple">
-<li><p><strong>Frontend</strong> (React + TypeScript, Vite):</p>
-<ul>
-<li><p>Ubicación: <code class="docutils literal notranslate"><span class="pre">frontend/</span></code>.</p></li>
-<li><p>Páginas principales:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">DataUpload.tsx</span></code> (pestaña Datos),</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Models.tsx</span></code> (pestaña Modelos),</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Prediction.tsx</span></code> (pestaña Predicciones),</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Dashboard.tsx</span></code> (pestaña Dashboard),</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">AdminCleanup.tsx</span></code>, <code class="docutils literal notranslate"><span class="pre">Jobs.tsx</span></code>, etc.</p></li>
+<li><p>el <strong>frontend</strong> ofrece la interfaz de operación y consulta;</p></li>
+<li><p>la <strong>API backend</strong> expone endpoints por dominio;</p></li>
+<li><p>la <strong>capa de datos</strong> gestiona validación, persistencia y artefactos;</p></li>
+<li><p>la <strong>capa de modelos</strong> resuelve entrenamiento, evaluación y selección de
+corridas;</p></li>
+<li><p>la <strong>capa de jobs</strong> ejecuta procesos pesados o asíncronos como
+preprocesamiento, unificación, feature-pack y entrenamiento.</p></li>
 </ul>
-</li>
-<li><p>Navegación con React Router:</p>
-<ul>
-<li><p>Definida en <code class="docutils literal notranslate"><span class="pre">src/routes/Router.tsx</span></code>.</p></li>
-<li><p>Layout principal en <code class="docutils literal notranslate"><span class="pre">src/layout/MainLayout.tsx</span></code> con <code class="docutils literal notranslate"><span class="pre">Sidebar</span></code> y <code class="docutils literal notranslate"><span class="pre">Topbar</span></code>.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Backend API</strong> (FastAPI + Python):</p>
-<ul>
-<li><p>Ubicación: <code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/</span></code>.</p></li>
-<li><p>Punto de entrada de la API:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/main.py</span></code>.</p></li>
-</ul>
-</li>
-<li><p>Routers:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/routers/datos.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/routers/modelos.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/routers/prediccion.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/routers/jobs.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/routers/admin_cleanup.py</span></code>.</p></li>
-</ul>
-</li>
-<li><p>Esquemas Pydantic:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/schemas/datos.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/schemas/modelos.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/schemas/prediccion.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/schemas/jobs.py</span></code>.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Capa de datos</strong>:</p>
-<ul>
-<li><p>Ubicación: <code class="docutils literal notranslate"><span class="pre">neurocampus/data/</span></code>.</p></li>
-<li><p>Componentes principales:</p>
-<ul>
-<li><p>Adaptadores (<code class="docutils literal notranslate"><span class="pre">data/adapters/*.py</span></code>) para trabajar con DataFrames y rutas
-de almacenamiento.</p></li>
-<li><p>Cadena de validación y preprocesamiento (<code class="docutils literal notranslate"><span class="pre">data/chain/*.py</span></code>).</p></li>
-<li><p>Facade de datos (<code class="docutils literal notranslate"><span class="pre">data/facades/datos_facade.py</span></code>).</p></li>
-<li><p>Utilidades para el dashboard de la pestaña Datos
-(<code class="docutils literal notranslate"><span class="pre">data/datos_dashboard.py</span></code>).</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Capa de modelos</strong> (BM, RBM, DBM):</p>
-<ul>
-<li><p>Ubicación: <code class="docutils literal notranslate"><span class="pre">neurocampus/models/</span></code>.</p></li>
-<li><p>Modelos base y manuales:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">bm_manual.py</span></code>, <code class="docutils literal notranslate"><span class="pre">rbm_manual.py</span></code>, <code class="docutils literal notranslate"><span class="pre">dbm_manual.py</span></code>.</p></li>
-</ul>
-</li>
-<li><p>Estrategias de entrenamiento:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/strategies/bm_manual_strategy.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/strategies/rbm_manual_strategy.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/strategies/dbm_manual_strategy.py</span></code>,</p></li>
-<li><p>otros modelos relacionados (<code class="docutils literal notranslate"><span class="pre">modelo_rbm_general</span></code>, <code class="docutils literal notranslate"><span class="pre">modelo_rbm_restringida</span></code>, etc.).</p></li>
-</ul>
-</li>
-<li><p>Registros y facades:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/registry.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/facades/modelos_facade.py</span></code>.</p></li>
-</ul>
-</li>
-<li><p>Utilidades:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/audit_kfold.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/hparam_search.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">models/utils_boltzmann.py</span></code>,</p></li>
-<li><p>plantillas de entrenamiento (<code class="docutils literal notranslate"><span class="pre">models/templates/plantilla_entrenamiento.py</span></code>).</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Orquestación de jobs</strong>:</p>
-<ul>
-<li><p>Ubicación: <code class="docutils literal notranslate"><span class="pre">neurocampus/app/jobs/</span></code>.</p></li>
-<li><p>Comandos para CLI / backend batch:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_preprocesar_beto.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_preprocesar_batch.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_cargar_dataset.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_train_rbm_manual.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_train_dbm_manual.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_eval_confusion.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_score_docente.py</span></code>,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cmd_autoretrain.py</span></code>.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Observabilidad y logging</strong>:</p>
-<ul>
-<li><p>Ubicación: <code class="docutils literal notranslate"><span class="pre">neurocampus/observability/</span></code>.</p></li>
-<li><p>Middleware de correlación (<code class="docutils literal notranslate"><span class="pre">middleware_correlation.py</span></code>),
-filtros de logging (<code class="docutils literal notranslate"><span class="pre">logging_filters.py</span></code>),
-bus de eventos (<code class="docutils literal notranslate"><span class="pre">bus_eventos.py</span></code>) y destinos de logging (<code class="docutils literal notranslate"><span class="pre">destinos/log_handler.py</span></code>).</p></li>
-<li><p>Configuración de logging:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">neurocampus/app/logging_config.py</span></code>.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Makefile y scripts</strong>:</p>
-<ul>
-<li><p>En la raíz (<code class="docutils literal notranslate"><span class="pre">Makefile</span></code>) se definen comandos para:</p>
-<ul>
-<li><p>ejecutar tests,</p></li>
-<li><p>arrancar backend y frontend,</p></li>
-<li><p>lanzar pipelines de preparación y entrenamiento.</p></li>
-</ul>
-</li>
-<li><p>Scripts adicionales en <code class="docutils literal notranslate"><span class="pre">scripts/</span></code> para experimentos y utilidades.</p></li>
-</ul>
-</li>
-</ul>
-<p>Esta organización permite:</p>
+</section>
+<hr class="docutils" />
+<section id="frontend">
+<h2>Frontend<a class="headerlink" href="#frontend" title="Link to this heading"></a></h2>
+<section id="stack">
+<h3>Stack<a class="headerlink" href="#stack" title="Link to this heading"></a></h3>
+<p>El frontend está implementado con:</p>
 <ul class="simple">
-<li><p>Mantener la API limpia y desacoplada de la lógica de modelos.</p></li>
-<li><p>Reutilizar la capa de datos y modelos desde jobs batch o desde los endpoints.</p></li>
-<li><p>Escalar el frontend sin mezclar lógica de negocio con componentes de UI.</p></li>
+<li><p><strong>React</strong></p></li>
+<li><p><strong>TypeScript</strong></p></li>
+<li><p><strong>Vite</strong></p></li>
+<li><p><strong>React Router</strong></p></li>
 </ul>
+<p>Su ubicación principal es:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>frontend/
+</pre></div>
+</div>
+</section>
+<section id="estructura-real-de-navegacion">
+<h3>Estructura real de navegación<a class="headerlink" href="#estructura-real-de-navegacion" title="Link to this heading"></a></h3>
+<p>La navegación vigente está definida en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>frontend/src/routes/Router.tsx
+</pre></div>
+</div>
+<p>Las rutas activas actuales son:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/dashboard</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/datos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/models</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/prediction</span></code></p></li>
+</ul>
+<p>Estas rutas cargan las cuatro páginas principales:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DashboardPage.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DatosPage.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ModelosPage.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PrediccionesPage.tsx</span></code></p></li>
+</ul>
+<p>El layout principal se monta con:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>frontend/src/layouts/AppShell.tsx
+</pre></div>
+</div>
+<p>La barra lateral está implementada en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>frontend/src/components/Sidebar.tsx
+</pre></div>
+</div>
+</section>
+<section id="componentes-funcionales-principales">
+<h3>Componentes funcionales principales<a class="headerlink" href="#componentes-funcionales-principales" title="Link to this heading"></a></h3>
+<p>La UI operativa real se concentra en estos componentes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/components/DashboardTab.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/components/DataTab.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/components/ModelsTab.tsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/components/PredictionsTab.tsx</span></code></p></li>
+</ul>
+<p>Cada uno representa una pestaña funcional completa y consume servicios del
+backend mediante clientes HTTP específicos.</p>
+</section>
+<section id="capa-de-servicios-frontend">
+<h3>Capa de servicios frontend<a class="headerlink" href="#capa-de-servicios-frontend" title="Link to this heading"></a></h3>
+<p>El acceso a backend está encapsulado en:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/services/datos.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/services/jobs.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/services/modelos.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/services/prediccion.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/services/predicciones.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/services/dashboard.ts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">frontend/src/services/adminCleanup.ts</span></code></p></li>
+</ul>
+<p>Esto permite separar:</p>
+<ul class="simple">
+<li><p>lógica de presentación;</p></li>
+<li><p>contratos HTTP;</p></li>
+<li><p>tipado de payloads;</p></li>
+<li><p>composición de estados y flujos.</p></li>
+</ul>
+</section>
+<section id="estado-compartido">
+<h3>Estado compartido<a class="headerlink" href="#estado-compartido" title="Link to this heading"></a></h3>
+<p>La sincronización de contexto entre pestañas se apoya en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>frontend/src/state/appFilters.store.ts
+</pre></div>
+</div>
+<p>Este estado compartido es especialmente importante entre <strong>Modelos</strong> y
+<strong>Predicciones</strong>, donde se conserva trazabilidad del dataset, el run
+seleccionado y el origen lógico de la predicción.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="backend-api">
+<h2>Backend API<a class="headerlink" href="#backend-api" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>Stack<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>El backend está construido con:</p>
+<ul class="simple">
+<li><p><strong>FastAPI</strong></p></li>
+<li><p><strong>Python</strong></p></li>
+<li><p><strong>Pydantic</strong></p></li>
+</ul>
+<p>Su punto de entrada principal es:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>backend/src/neurocampus/app/main.py
+</pre></div>
+</div>
+</section>
+<section id="responsabilidades-del-backend-principal">
+<h3>Responsabilidades del backend principal<a class="headerlink" href="#responsabilidades-del-backend-principal" title="Link to this heading"></a></h3>
+<p>La aplicación principal de FastAPI se encarga de:</p>
+<ul class="simple">
+<li><p>registrar routers por dominio;</p></li>
+<li><p>exponer el endpoint <code class="docutils literal notranslate"><span class="pre">/health</span></code>;</p></li>
+<li><p>habilitar CORS para el frontend;</p></li>
+<li><p>aplicar límite de tamaño de subida;</p></li>
+<li><p>conectar middleware de <code class="docutils literal notranslate"><span class="pre">Correlation-Id</span></code>;</p></li>
+<li><p>activar logging y observabilidad.</p></li>
+</ul>
+</section>
+<section id="routers-activos">
+<h3>Routers activos<a class="headerlink" href="#routers-activos" title="Link to this heading"></a></h3>
+<p>La versión actual registra los siguientes routers:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/datos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/jobs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/modelos</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/prediccion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/dashboard</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/predicciones</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/admin/cleanup</span></code></p></li>
+</ul>
+<p>Estos routers viven en:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/routers/datos.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/routers/jobs.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/routers/modelos.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/routers/prediccion.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/routers/dashboard.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/routers/predicciones.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/routers/admin_cleanup.py</span></code></p></li>
+</ul>
+</section>
+<section id="esquemas">
+<h3>Esquemas<a class="headerlink" href="#esquemas" title="Link to this heading"></a></h3>
+<p>Los contratos del backend se modelan con esquemas en:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/schemas/datos.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/schemas/jobs.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/schemas/modelos.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/schemas/prediccion.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/schemas/predicciones.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend/src/neurocampus/app/schemas/dashboard.py</span></code></p></li>
+</ul>
+<p>Estos esquemas formalizan payloads de entrada, respuestas, estados de jobs y
+estructuras utilizadas por el frontend.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="flujo-funcional-del-sistema">
+<h2>Flujo funcional del sistema<a class="headerlink" href="#flujo-funcional-del-sistema" title="Link to this heading"></a></h2>
+</section>
+<section id="datos">
+<h2>1. Datos<a class="headerlink" href="#datos" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Datos</strong> es el punto de entrada del pipeline.</p>
+<p>Desde aquí el sistema permite:</p>
+<ul class="simple">
+<li><p>validar datasets;</p></li>
+<li><p>subir archivos al backend;</p></li>
+<li><p>fijar un dataset activo por periodo;</p></li>
+<li><p>ejecutar análisis de sentimientos con BETO;</p></li>
+<li><p>unificar históricos;</p></li>
+<li><p>construir paquetes de características.</p></li>
+</ul>
+<p>Este flujo se conecta principalmente con:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">routers/datos.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">routers/jobs.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">app/jobs/cmd_cargar_dataset.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">app/jobs/cmd_preprocesar_beto.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">app/jobs/cmd_preprocesar_batch.py</span></code></p></li>
+</ul>
+<p>Los artefactos generados en esta etapa alimentan directamente el resto del
+sistema.</p>
+</section>
+<section id="modelos">
+<h2>2. Modelos<a class="headerlink" href="#modelos" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Modelos</strong> consume datasets y artefactos preparados para ejecutar el
+ciclo de modelado.</p>
+<p>La implementación actual organiza esta área en siete subpestañas:</p>
+<ul class="simple">
+<li><p>Resumen</p></li>
+<li><p>Entrenamiento</p></li>
+<li><p>Ejecuciones</p></li>
+<li><p>Campeón</p></li>
+<li><p>Sweep</p></li>
+<li><p>Artefactos</p></li>
+<li><p>Diagnóstico</p></li>
+</ul>
+<p>Desde esta capa se gestionan tareas como:</p>
+<ul class="simple">
+<li><p>selección de dataset de trabajo;</p></li>
+<li><p>lanzamiento de entrenamientos;</p></li>
+<li><p>seguimiento de corridas;</p></li>
+<li><p>comparación de resultados;</p></li>
+<li><p>selección de champion;</p></li>
+<li><p>consulta de artefactos y diagnósticos.</p></li>
+</ul>
+<p>Su núcleo backend se apoya en:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">routers/modelos.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">schemas/modelos.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">models/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">app/jobs/cmd_train_rbm_manual.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">app/jobs/cmd_train_dbm_manual.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">app/jobs/cmd_eval_confusion.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">app/jobs/cmd_autoretrain.py</span></code></p></li>
+</ul>
+</section>
+<section id="predicciones">
+<h2>3. Predicciones<a class="headerlink" href="#predicciones" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Predicciones</strong> resuelve la inferencia del sistema.</p>
+<p>En la versión actual existen dos dominios relacionados:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">prediccion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predicciones</span></code></p></li>
+</ul>
+<p>Esto refleja dos formas de trabajar:</p>
+<ul class="simple">
+<li><p>predicción online o batch desde el dominio más simple de inferencia;</p></li>
+<li><p>predicciones persistidas, runs, preview y flujos más ricos asociados a
+<code class="docutils literal notranslate"><span class="pre">score_docente</span></code>.</p></li>
+</ul>
+<p>La UI vigente trabaja sobre selección contextual de:</p>
+<ul class="simple">
+<li><p>dataset;</p></li>
+<li><p>docente;</p></li>
+<li><p>asignatura;</p></li>
+<li><p>runs disponibles o champion activo, según el caso.</p></li>
+</ul>
+<p>Backend asociado:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">routers/prediccion.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">routers/predicciones.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">schemas/prediccion.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">schemas/predicciones.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">app/jobs/cmd_score_docente.py</span></code></p></li>
+</ul>
+</section>
+<section id="dashboard">
+<h2>4. Dashboard<a class="headerlink" href="#dashboard" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Dashboard</strong> es la capa de consulta agregada del sistema.</p>
+<p>A diferencia de Datos, Modelos y Predicciones, el Dashboard no opera sobre un
+archivo puntual, sino sobre históricos consolidados.</p>
+<p>Sus fuentes principales son:</p>
+<ul class="simple">
+<li><p>histórico procesado;</p></li>
+<li><p>histórico etiquetado;</p></li>
+<li><p>KPIs agregados de predicciones persistidas;</p></li>
+<li><p>catálogos institucionales.</p></li>
+</ul>
+<p>El backend del dashboard se apoya en:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">routers/dashboard.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">schemas/dashboard.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dashboard/queries.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dashboard/aggregations.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dashboard/predictions_kpis.py</span></code></p></li>
+</ul>
+<p>Esta capa resume el comportamiento del sistema mediante:</p>
+<ul class="simple">
+<li><p>KPIs;</p></li>
+<li><p>rankings;</p></li>
+<li><p>series temporales;</p></li>
+<li><p>radar de indicadores;</p></li>
+<li><p>sentimiento;</p></li>
+<li><p>nube de palabras.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="capa-de-datos">
+<h2>Capa de datos<a class="headerlink" href="#capa-de-datos" title="Link to this heading"></a></h2>
+<p>La lógica de manejo de datos está centralizada en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>backend/src/neurocampus/data/
+</pre></div>
+</div>
+<p>Aquí se agrupan componentes como:</p>
+<ul class="simple">
+<li><p>adaptadores de almacenamiento;</p></li>
+<li><p>utilidades para DataFrames;</p></li>
+<li><p>helpers de persistencia y rutas;</p></li>
+<li><p>piezas de transformación y soporte al pipeline.</p></li>
+</ul>
+<p>Además, el backend mantiene directorios de trabajo y artefactos como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">data/raw/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/processed/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/labeled/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">historico/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/predictions/</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/models/</span></code> o equivalentes de entrenamiento según el flujo
+ejecutado.</p></li>
+</ul>
+<p>La convención general del proyecto es que los datasets y artefactos queden
+organizados por <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>, que en muchos flujos coincide con el semestre o
+periodo activo.</p>
+</section>
+<hr class="docutils" />
+<section id="capa-de-modelos">
+<h2>Capa de modelos<a class="headerlink" href="#capa-de-modelos" title="Link to this heading"></a></h2>
+<p>La capa de modelos vive en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>backend/src/neurocampus/models/
+</pre></div>
+</div>
+<p>Esta capa contiene la lógica de entrenamiento y evaluación de modelos basados en
+Máquinas de Boltzmann.</p>
+<section id="componentes-principales">
+<h3>Componentes principales<a class="headerlink" href="#componentes-principales" title="Link to this heading"></a></h3>
+<p>Entre los módulos relevantes se encuentran:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bm_manual.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rbm_manual.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dbm_manual.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hparam_search.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">registry.py</span></code></p></li>
+<li><p>estrategias y utilidades auxiliares</p></li>
+</ul>
+</section>
+<section id="responsabilidad-de-esta-capa">
+<h3>Responsabilidad de esta capa<a class="headerlink" href="#responsabilidad-de-esta-capa" title="Link to this heading"></a></h3>
+<p>Su función es desacoplar la lógica matemática y experimental de la superficie de
+API.</p>
+<p>Así, los routers no implementan directamente el entrenamiento, sino que delegan
+en funciones, estrategias y jobs especializados.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="jobs-y-procesos-batch">
+<h2>Jobs y procesos batch<a class="headerlink" href="#jobs-y-procesos-batch" title="Link to this heading"></a></h2>
+<p>Una parte importante del sistema está diseñada alrededor de procesos pesados o
+asíncronos.</p>
+<p>Estos comandos viven en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>backend/src/neurocampus/app/jobs/
+</pre></div>
+</div>
+<section id="jobs-relevantes-de-la-version-actual">
+<h3>Jobs relevantes de la versión actual<a class="headerlink" href="#jobs-relevantes-de-la-version-actual" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cmd_cargar_dataset.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cmd_preprocesar_batch.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cmd_preprocesar_beto.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cmd_train_rbm_manual.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cmd_train_dbm_manual.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cmd_eval_confusion.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cmd_score_docente.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cmd_autoretrain.py</span></code></p></li>
+</ul>
+</section>
+<section id="por-que-existen">
+<h3>Por qué existen<a class="headerlink" href="#por-que-existen" title="Link to this heading"></a></h3>
+<p>Estos jobs permiten:</p>
+<ul class="simple">
+<li><p>ejecutar tareas largas sin bloquear la UI;</p></li>
+<li><p>reutilizar lógica desde CLI y desde la API;</p></li>
+<li><p>registrar estado, salida y errores por corrida;</p></li>
+<li><p>mantener trazabilidad operativa del pipeline.</p></li>
+</ul>
+<p>En la práctica, la API actúa muchas veces como capa de orquestación sobre estos
+procesos.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="observabilidad-y-logging">
+<h2>Observabilidad y logging<a class="headerlink" href="#observabilidad-y-logging" title="Link to this heading"></a></h2>
+<p>La observabilidad del sistema está organizada en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>backend/src/neurocampus/observability/
+</pre></div>
+</div>
+<section id="componentes-destacados">
+<h3>Componentes destacados<a class="headerlink" href="#componentes-destacados" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>middleware de correlación;</p></li>
+<li><p>contexto de logging;</p></li>
+<li><p>filtros y destinos de logging;</p></li>
+<li><p>wiring de eventos de entrenamiento y predicción.</p></li>
+</ul>
+</section>
+<section id="objetivo">
+<h3>Objetivo<a class="headerlink" href="#objetivo" title="Link to this heading"></a></h3>
+<p>Esta capa permite:</p>
+<ul class="simple">
+<li><p>asociar eventos a una petición concreta;</p></li>
+<li><p>mejorar trazabilidad entre frontend, backend y jobs;</p></li>
+<li><p>registrar eventos <code class="docutils literal notranslate"><span class="pre">training.*</span></code> y <code class="docutils literal notranslate"><span class="pre">prediction.*</span></code>;</p></li>
+<li><p>facilitar diagnóstico operativo.</p></li>
+</ul>
+<p>El backend también define su configuración de logging en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>backend/src/neurocampus/app/logging_config.py
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="persistencia-y-artefactos">
+<h2>Persistencia y artefactos<a class="headerlink" href="#persistencia-y-artefactos" title="Link to this heading"></a></h2>
+<p>Una característica central de NeuroCampus es que no trabaja solo con respuestas
+HTTP efímeras, sino con artefactos persistidos en disco.</p>
+<p>Entre los artefactos más importantes están:</p>
+<ul class="simple">
+<li><p>datasets validados o procesados;</p></li>
+<li><p>datasets etiquetados por BETO;</p></li>
+<li><p>históricos unificados;</p></li>
+<li><p>feature-packs;</p></li>
+<li><p>corridas de entrenamiento;</p></li>
+<li><p>métricas y diagnósticos;</p></li>
+<li><p>salidas de predicción.</p></li>
+</ul>
+<p>Esto explica por qué varias áreas del sistema consultan tanto endpoints de API
+como estructuras de archivos generadas por jobs previos.</p>
+</section>
+<hr class="docutils" />
+<section id="tests-y-calidad">
+<h2>Tests y calidad<a class="headerlink" href="#tests-y-calidad" title="Link to this heading"></a></h2>
+<p>El repositorio incluye pruebas automáticas en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>tests/
+</pre></div>
+</div>
+<p>Además, existen pruebas o validaciones específicas en distintas capas del
+proyecto, incluyendo servicios frontend y componentes del backend.</p>
+<p>La presencia de tests es importante porque la arquitectura actual combina:</p>
+<ul class="simple">
+<li><p>endpoints HTTP;</p></li>
+<li><p>procesamiento de archivos;</p></li>
+<li><p>jobs asíncronos;</p></li>
+<li><p>lógica estadística y de modelado.</p></li>
+</ul>
+<p>En este contexto, la documentación debe entenderse como complemento de una base
+que ya incorpora validación técnica automatizada.</p>
+</section>
+<hr class="docutils" />
+<section id="documentacion-y-publicacion">
+<h2>Documentación y publicación<a class="headerlink" href="#documentacion-y-publicacion" title="Link to this heading"></a></h2>
+<p>El repositorio contiene una documentación estructurada con Sphinx en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>docs/source/
+</pre></div>
+</div>
+<p>Esta documentación se divide en:</p>
+<ul class="simple">
+<li><p>manual de usuario;</p></li>
+<li><p>arquitectura;</p></li>
+<li><p>teoría;</p></li>
+<li><p>API backend;</p></li>
+<li><p>API Python;</p></li>
+<li><p>devops.</p></li>
+</ul>
+<p>También existe un workflow para publicación documental en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>.github/workflows/docs.yml
+</pre></div>
+</div>
+<p>Esto confirma que la arquitectura del proyecto no solo contempla software de
+aplicación, sino también una capa formal de documentación versionada.</p>
+</section>
+<hr class="docutils" />
+<section id="material-legacy">
+<h2>Material legacy<a class="headerlink" href="#material-legacy" title="Link to this heading"></a></h2>
+<p>El repositorio conserva una implementación anterior de la UI en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>archive/legacy_ui/
+</pre></div>
+</div>
+<p>Este material no corresponde a la interfaz operativa actual, pero sí es útil
+como referencia histórica del proyecto.</p>
+<p>Por esta razón, la documentación vigente debe distinguir claramente entre:</p>
+<ul class="simple">
+<li><p>arquitectura actual;</p></li>
+<li><p>documentación histórica o de transición.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="principios-arquitectonicos-observables-en-la-version-actual">
+<h2>Principios arquitectónicos observables en la versión actual<a class="headerlink" href="#principios-arquitectonicos-observables-en-la-version-actual" title="Link to this heading"></a></h2>
+<p>A partir de la implementación vigente, la arquitectura de NeuroCampus responde a
+estos principios prácticos:</p>
+<section id="separacion-por-dominios">
+<h3>1. Separación por dominios<a class="headerlink" href="#separacion-por-dominios" title="Link to this heading"></a></h3>
+<p>Los flujos de Datos, Modelos, Predicciones y Dashboard están claramente
+separados tanto en frontend como en backend.</p>
+</section>
+<section id="orquestacion-por-api-y-jobs">
+<h3>2. Orquestación por API y jobs<a class="headerlink" href="#orquestacion-por-api-y-jobs" title="Link to this heading"></a></h3>
+<p>La API no resuelve todo en memoria durante una sola petición; en muchos casos
+coordina jobs que producen artefactos persistidos.</p>
+</section>
+<section id="persistencia-orientada-a-artefactos">
+<h3>3. Persistencia orientada a artefactos<a class="headerlink" href="#persistencia-orientada-a-artefactos" title="Link to this heading"></a></h3>
+<p>Buena parte del valor del sistema reside en archivos generados por etapas
+anteriores del pipeline.</p>
+</section>
+<section id="reutilizacion-de-componentes">
+<h3>4. Reutilización de componentes<a class="headerlink" href="#reutilizacion-de-componentes" title="Link to this heading"></a></h3>
+<p>La lógica de datos, entrenamiento y predicción puede reutilizarse desde routers,
+servicios y jobs.</p>
+</section>
+<section id="trazabilidad-operativa">
+<h3>5. Trazabilidad operativa<a class="headerlink" href="#trazabilidad-operativa" title="Link to this heading"></a></h3>
+<p>La incorporación de logging contextual y correlación de peticiones refleja un
+interés explícito por observabilidad y mantenimiento.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="resumen">
+<h2>Resumen<a class="headerlink" href="#resumen" title="Link to this heading"></a></h2>
+<p>La arquitectura actual de NeuroCampus puede entenderse como un sistema web de
+analítica y modelado con cuatro dominios funcionales principales:</p>
+<ul class="simple">
+<li><p><strong>Datos</strong>: ingesta, validación y preparación</p></li>
+<li><p><strong>Modelos</strong>: entrenamiento, comparación y champion</p></li>
+<li><p><strong>Predicciones</strong>: inferencia y salidas persistidas</p></li>
+<li><p><strong>Dashboard</strong>: lectura agregada e histórica</p></li>
+</ul>
+<p>Esta arquitectura está soportada por:</p>
+<ul class="simple">
+<li><p>un frontend React/TypeScript organizado por pestañas y servicios;</p></li>
+<li><p>un backend FastAPI organizado por routers y esquemas;</p></li>
+<li><p>una capa de jobs que ejecuta procesos pesados;</p></li>
+<li><p>una capa de datos y modelos reutilizable;</p></li>
+<li><p>observabilidad para trazabilidad y diagnóstico;</p></li>
+<li><p>documentación Sphinx integrada al repositorio.</p></li>
+</ul>
+<p>En conjunto, esto convierte a NeuroCampus en una plataforma orientada no solo a
+visualizar información, sino a sostener un pipeline completo de datos,
+modelado, predicción y análisis institucional.</p>
+</section>
 </section>
 
 

@@ -20,8 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="Arquitectura de NeuroCampus" href="../arquitectura/index.html" />
-    <link rel="prev" title="Pestaña «Predicciones»" href="predicciones.html" /> 
+    <link rel="next" title="Pestaña «Datos»" href="datos.html" />
+    <link rel="prev" title="Manual de usuario" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,37 +46,75 @@
               <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Manual de usuario</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="datos.html">Pestaña «Datos» – Ingesta y análisis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modelos.html">Pestaña «Modelos»</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predicciones.html">Pestaña «Predicciones»</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Pestaña «Dashboard»</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#objetivo">Objetivo</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#organizacion-de-la-pantalla">Organización de la pantalla</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fuente-de-informacion">Fuente de información</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#encabezado-y-estado-de-carga">Encabezado y estado de carga</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estados-que-puede-mostrar-la-interfaz">Estados que puede mostrar la interfaz</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#filtros-globales">Filtros globales</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#seleccion-de-ambito">1. Selección de ámbito</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#aplicar-y-limpiar-filtros">2. Aplicar y limpiar filtros</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#semestre-periodo">1. Semestre / Periodo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#asignatura">2. Asignatura</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#docente">3. Docente</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#observaciones-importantes-sobre-los-filtros">Observaciones importantes sobre los filtros</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#tarjetas-de-kpis">Tarjetas de KPIs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#graficos-principales">Gráficos principales</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#historico-por-docente-y-por-asignatura">1. Histórico por docente y por asignatura</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ranking-de-docentes-por-desempeno-proyectado">2. Ranking de docentes por desempeño proyectado</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#riesgo-en-caso-de-bajo-rendimiento">3. Riesgo en caso de bajo rendimiento</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tarjetas-kpi">Tarjetas KPI</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#predicciones-totales">1. Predicciones Totales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exactitud-del-modelo">2. Exactitud del Modelo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#evaluaciones-registradas">3. Evaluaciones Registradas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#alto-rendimiento">4. % Alto Rendimiento</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#comparacion-desempeno-real-vs-predicho">Comparación desempeño real vs predicho</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#grafico-de-dispersion-scatter-plot">1. Gráfico de dispersión (scatter plot)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#grafico-de-barras-agrupadas">2. Gráfico de barras agrupadas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seccion-como-estamos-ahora">Sección: «¿Cómo estamos ahora?»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#distribucion-de-riesgo-por-asignatura">1. Distribución de Riesgo por Asignatura</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ranking-de-docentes">2. Ranking de Docentes</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#promedio-historico-vs-semestres-especificos">Promedio histórico vs semestres específicos</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#grafico-de-lineas-o-barras">1. Gráfico de líneas o barras</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seccion-analisis-de-indicadores-comparacion-historica-vs-semestre-actual">Sección: «Análisis de Indicadores - Comparación Histórica vs Semestre Actual»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#que-compara">Qué compara</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Qué representa</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Utilidad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#comportamiento-contextual">Comportamiento contextual</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#recomendaciones-de-uso">Recomendaciones de uso</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seccion-como-hemos-cambiado-vista-temporal">Sección: «¿Cómo hemos cambiado? - Vista Temporal»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#historico-por-entidad-seleccionada">1. Histórico por Entidad Seleccionada</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#promedio-historico-vs-semestre-actual">2. Promedio Histórico vs Semestre Actual</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#seccion-contexto-cualitativo-tendencias-en-comentarios">Sección: «Contexto Cualitativo - Tendencias en Comentarios»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nube-de-palabras">Nube de palabras</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#convencion-visual">Convención visual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Utilidad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#disponibilidad">Disponibilidad</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#comportamiento-general-de-la-pestana">Comportamiento general de la pestaña</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#carga-de-datos">Carga de datos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#deshabilitacion-de-controles">Deshabilitación de controles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reaccion-a-cambios-de-filtros">Reacción a cambios de filtros</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#alcance-real-del-dashboard-en-la-version-actual">Alcance real del Dashboard en la versión actual</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="datos.html">Pestaña «Datos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html">Pestaña «Modelos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-resumen">Subpestaña «Resumen»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-entrenamiento">Subpestaña «Entrenamiento»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-ejecuciones">Subpestaña «Ejecuciones»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-campeon">Subpestaña «Campeón»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-sweep">Subpestaña «Sweep»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-artefactos">Subpestaña «Artefactos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-diagnostico">Subpestaña «Diagnóstico»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#comportamiento-transversal-de-la-pestana">Comportamiento transversal de la pestaña</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="predicciones.html">Pestaña «Predicciones»</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
@@ -115,304 +153,426 @@
 <h1>Pestaña «Dashboard»<a class="headerlink" href="#pestana-dashboard" title="Link to this heading"></a></h1>
 <section id="objetivo">
 <h2>Objetivo<a class="headerlink" href="#objetivo" title="Link to this heading"></a></h2>
-<p>La pestaña <strong>Dashboard</strong> muestra una vista global del desempeño y riesgo
-académico, basada en:</p>
+<p>La pestaña <strong>Dashboard</strong> presenta una vista consolidada del desempeño académico
+e institucional a partir del <strong>histórico unificado</strong> del sistema.</p>
+<p>Su propósito es permitir una lectura rápida del estado general de la institución
+mediante indicadores agregados, rankings, comparaciones históricas y contexto
+cualitativo de comentarios.</p>
+<p>A diferencia de otras pestañas, el Dashboard <strong>no trabaja directamente sobre un
+dataset puntual cargado por el usuario</strong>. Su información proviene del histórico
+procesado y, cuando está disponible, del histórico etiquetado con análisis de
+sentimientos.</p>
+</section>
+<hr class="docutils" />
+<section id="fuente-de-informacion">
+<h2>Fuente de información<a class="headerlink" href="#fuente-de-informacion" title="Link to this heading"></a></h2>
+<p>El Dashboard consume información del backend a través de los endpoints
+<code class="docutils literal notranslate"><span class="pre">/dashboard/*</span></code>.</p>
+<p>Las visualizaciones se construyen a partir de dos fuentes principales:</p>
 <ul class="simple">
-<li><p>Datasets históricos de evaluaciones.</p></li>
-<li><p>Predicciones generadas por el modelo campeón.</p></li>
-<li><p>Indicadores y KPIs clave para la toma de decisiones.</p></li>
+<li><p><strong>Histórico procesado</strong>:</p>
+<ul>
+<li><p>base para KPIs, series temporales, rankings y radar de indicadores.</p></li>
 </ul>
-<p>Permite a coordinadores, directores de programa y analistas:</p>
+</li>
+<li><p><strong>Histórico etiquetado</strong>:</p>
+<ul>
+<li><p>base para análisis de sentimientos y nube de palabras.</p></li>
+</ul>
+</li>
+</ul>
+<p>En consecuencia:</p>
 <ul class="simple">
-<li><p>Identificar docentes/asignaturas con mayor riesgo de bajo rendimiento.</p></li>
-<li><p>Monitorizar la evolución temporal del desempeño.</p></li>
-<li><p>Comparar real vs predicho y detectar desviaciones.</p></li>
+<li><p>si el histórico procesado no está listo, la pestaña no puede operar con
+normalidad;</p></li>
+<li><p>si el histórico etiquetado no está listo, algunas visualizaciones cualitativas
+pueden no estar disponibles temporalmente.</p></li>
 </ul>
 </section>
 <hr class="docutils" />
-<section id="organizacion-de-la-pantalla">
-<h2>Organización de la pantalla<a class="headerlink" href="#organizacion-de-la-pantalla" title="Link to this heading"></a></h2>
-<p>La pantalla se organiza en:</p>
-<ol class="arabic simple">
-<li><p><strong>Zona de filtros (arriba)</strong></p>
+<section id="encabezado-y-estado-de-carga">
+<h2>Encabezado y estado de carga<a class="headerlink" href="#encabezado-y-estado-de-carga" title="Link to this heading"></a></h2>
+<p>En la parte superior se muestra:</p>
 <ul class="simple">
-<li><p>Filtros típicos:</p>
-<ul>
-<li><p>Semestre / periodo.</p></li>
-<li><p>Facultad / programa.</p></li>
-<li><p>Docente.</p></li>
-<li><p>Asignatura.</p></li>
+<li><p>el título <strong>Dashboard</strong>;</p></li>
+<li><p>el subtítulo <strong>Diagnóstico General de la Institución</strong>;</p></li>
+<li><p>mensajes de estado del sistema.</p></li>
 </ul>
-</li>
-<li><p>Botón <strong>«Aplicar filtros»</strong> para actualizar las visualizaciones.</p></li>
-</ul>
-</li>
-<li><p><strong>Tarjetas de KPIs (debajo de filtros)</strong></p>
+<section id="estados-que-puede-mostrar-la-interfaz">
+<h3>Estados que puede mostrar la interfaz<a class="headerlink" href="#estados-que-puede-mostrar-la-interfaz" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Pequeñas cards con valores clave:</p>
+<li><p><strong>Cargando datos del histórico…</strong></p>
 <ul>
-<li><p>Predicciones totales.</p></li>
-<li><p>Exactitud del modelo (en validación / test).</p></li>
-<li><p>Último dataset registrado.</p></li>
-<li><p>Número de evaluaciones registradas en el periodo.</p></li>
-<li><p>Porcentaje de casos en riesgo alto.</p></li>
+<li><p>aparece mientras el frontend consulta la información del dashboard.</p></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><p><strong>Zona de gráficos (en grid)</strong></p>
-<ul class="simple">
-<li><p>Gráficos organizados en filas, máximo 2 por fila para mantener claridad:</p>
+<li><p><strong>Error</strong></p>
 <ul>
-<li><p>Históricos por docente/asignatura.</p></li>
-<li><p>Ranking de docentes.</p></li>
-<li><p>Distribución de riesgo.</p></li>
-<li><p>Comparación desempeño real vs predicho.</p></li>
-<li><p>Promedio histórico vs semestres específicos.</p></li>
+<li><p>aparece si falla la carga de datos desde el backend.</p></li>
+</ul>
+</li>
+<li><p><strong>Histórico en actualización…</strong></p>
+<ul>
+<li><p>aparece cuando el histórico procesado o el histórico etiquetado aún no están
+listos.</p></li>
 </ul>
 </li>
 </ul>
-</li>
-</ol>
+<p>Este comportamiento permite al usuario saber si la información mostrada está
+disponible completamente o si alguna parte del pipeline todavía está pendiente.</p>
+</section>
 </section>
 <hr class="docutils" />
 <section id="filtros-globales">
 <h2>Filtros globales<a class="headerlink" href="#filtros-globales" title="Link to this heading"></a></h2>
-<section id="seleccion-de-ambito">
-<h3>1. Selección de ámbito<a class="headerlink" href="#seleccion-de-ambito" title="Link to this heading"></a></h3>
+<p>La barra de filtros actual contiene <strong>tres controles</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Semestre / Periodo</strong></p></li>
+<li><p><strong>Asignatura</strong></p></li>
+<li><p><strong>Docente</strong></p></li>
+</ol>
+<section id="semestre-periodo">
+<h3>1. Semestre / Periodo<a class="headerlink" href="#semestre-periodo" title="Link to this heading"></a></h3>
+<p>Este filtro permite seleccionar:</p>
 <ul class="simple">
-<li><p><strong>Semestre / periodo</strong>:</p>
-<ul>
-<li><p>Selecciona uno o varios semestres para analizar (por ejemplo, <code class="docutils literal notranslate"><span class="pre">2023-2</span></code>,
-<code class="docutils literal notranslate"><span class="pre">2024-1</span></code>).</p></li>
+<li><p>un periodo específico, por ejemplo <code class="docutils literal notranslate"><span class="pre">2024-2</span></code>;</p></li>
+<li><p>o la opción <strong>Histórico (todo)</strong>.</p></li>
 </ul>
-</li>
-<li><p><strong>Programa / facultad</strong>:</p>
-<ul>
-<li><p>Limita el análisis a un subconjunto de la institución (por ejemplo,
-“Ingeniería”, “Ciencias Económicas”).</p></li>
-</ul>
-</li>
-<li><p><strong>Docente / asignatura</strong>:</p>
-<ul>
-<li><p>Permite enfocarse en un docente o asignatura concreta.</p></li>
-</ul>
-</li>
-</ul>
-</section>
-<section id="aplicar-y-limpiar-filtros">
-<h3>2. Aplicar y limpiar filtros<a class="headerlink" href="#aplicar-y-limpiar-filtros" title="Link to this heading"></a></h3>
+<section id="comportamiento">
+<h4>Comportamiento<a class="headerlink" href="#comportamiento" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p><strong>Aplicar filtros</strong>:</p>
-<ul>
-<li><p>Refresca todos los KPIs y gráficos con el contexto actual.</p></li>
-</ul>
-</li>
-<li><p><strong>Limpiar filtros</strong> (opcional):</p>
-<ul>
-<li><p>Vuelve a la vista global de la institución.</p></li>
-</ul>
-</li>
+<li><p>Cuando se elige un <strong>periodo específico</strong>, los KPIs y rankings se calculan
+sobre ese periodo.</p></li>
+<li><p>Cuando se elige <strong>Histórico (todo)</strong>, el dashboard usa el rango completo de
+periodos disponibles en el histórico.</p></li>
 </ul>
 </section>
 </section>
-<hr class="docutils" />
-<section id="tarjetas-de-kpis">
-<h2>Tarjetas de KPIs<a class="headerlink" href="#tarjetas-de-kpis" title="Link to this heading"></a></h2>
-<p>Ejemplos de KPIs que pueden aparecer:</p>
+<section id="asignatura">
+<h3>2. Asignatura<a class="headerlink" href="#asignatura" title="Link to this heading"></a></h3>
+<p>Permite limitar la vista a:</p>
 <ul class="simple">
-<li><p><strong>Predicciones totales</strong>:</p>
-<ul>
-<li><p>Número total de predicciones generadas en el periodo filtrado.</p></li>
-</ul>
-</li>
-<li><p><strong>Exactitud del modelo</strong>:</p>
-<ul>
-<li><p>Métrica de desempeño del modelo en el conjunto de evaluación.</p></li>
-</ul>
-</li>
-<li><p><strong>Último dataset registrado</strong>:</p>
-<ul>
-<li><p>Identificador y fecha del último dataset cargado.</p></li>
-</ul>
-</li>
-<li><p><strong>Número de evaluaciones registradas</strong>:</p>
-<ul>
-<li><p>Cantidad de encuestas o registros en el rango temporal seleccionado.</p></li>
-</ul>
-</li>
-<li><p><strong>Porcentaje de riesgo alto</strong>:</p>
-<ul>
-<li><p>Proporción de casos clasificados como alto riesgo de bajo rendimiento.</p></li>
-</ul>
-</li>
-</ul>
-<p>Estas tarjetas se actualizan al modificar los filtros y sirven como resumen
-rápido antes de entrar en el detalle de los gráficos.</p>
-</section>
-<hr class="docutils" />
-<section id="graficos-principales">
-<h2>Gráficos principales<a class="headerlink" href="#graficos-principales" title="Link to this heading"></a></h2>
-<section id="historico-por-docente-y-por-asignatura">
-<h3>1. Histórico por docente y por asignatura<a class="headerlink" href="#historico-por-docente-y-por-asignatura" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><strong>Gráfico de líneas o barras</strong>:</p>
-<ul>
-<li><p>Eje X: semestres o periodos.</p></li>
-<li><p>Eje Y: indicador de desempeño (real o predicho, según configuración).</p></li>
-</ul>
-</li>
-<li><p>Permite analizar:</p>
-<ul>
-<li><p>Tendencias de cada docente o asignatura.</p></li>
-<li><p>Mejoras o deterioros a lo largo del tiempo.</p></li>
-</ul>
-</li>
-<li><p>En modo multi-serie, se pueden comparar varios docentes o asignaturas
-simultáneamente (con posibilidad de activar/desactivar series en la leyenda).</p></li>
+<li><p><strong>Todas las Asignaturas</strong>, o</p></li>
+<li><p>una asignatura específica disponible en el catálogo del periodo/rango actual.</p></li>
 </ul>
 </section>
-<section id="ranking-de-docentes-por-desempeno-proyectado">
-<h3>2. Ranking de docentes por desempeño proyectado<a class="headerlink" href="#ranking-de-docentes-por-desempeno-proyectado" title="Link to this heading"></a></h3>
+<section id="docente">
+<h3>3. Docente<a class="headerlink" href="#docente" title="Link to this heading"></a></h3>
+<p>Permite limitar la vista a:</p>
 <ul class="simple">
-<li><p><strong>Gráfico de barras horizontales</strong>:</p>
-<ul>
-<li><p>Eje Y: docentes (ordenados de mejor a peor o viceversa).</p></li>
-<li><p>Eje X: indicador de desempeño (predicho o combinado).</p></li>
-</ul>
-</li>
-<li><p>Usado para:</p>
-<ul>
-<li><p>Identificar rápidamente a los mejores docentes según las evaluaciones.</p></li>
-<li><p>Localizar casos con desempeño significativamente por debajo de la media.</p></li>
-</ul>
-</li>
+<li><p><strong>Todos los Docentes</strong>, o</p></li>
+<li><p>un docente específico disponible en el catálogo del periodo/rango actual.</p></li>
 </ul>
 </section>
-<section id="riesgo-en-caso-de-bajo-rendimiento">
-<h3>3. Riesgo en caso de bajo rendimiento<a class="headerlink" href="#riesgo-en-caso-de-bajo-rendimiento" title="Link to this heading"></a></h3>
+<section id="observaciones-importantes-sobre-los-filtros">
+<h3>Observaciones importantes sobre los filtros<a class="headerlink" href="#observaciones-importantes-sobre-los-filtros" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><strong>Gráfico de barras apiladas</strong>:</p>
-<ul>
-<li><p>Eje X: asignaturas o programas.</p></li>
-<li><p>Eje Y: número de evaluaciones/casos.</p></li>
-<li><p>Segmentos apilados:</p>
-<ul>
-<li><p>Bajo riesgo,</p></li>
-<li><p>Riesgo medio,</p></li>
-<li><p>Alto riesgo.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>Permite observar “dónde se acumula el problema”:</p>
-<ul>
-<li><p>Programas con un gran volumen de casos en riesgo alto.</p></li>
-<li><p>Asignaturas con concentración de evaluaciones negativas.</p></li>
-</ul>
-</li>
+<li><p>Los catálogos de docente y asignatura se recalculan según el periodo o rango
+seleccionado.</p></li>
+<li><p>Si un docente o una asignatura dejan de existir en el catálogo filtrado,
+la interfaz reinicia ese filtro a la opción general.</p></li>
+<li><p>En la versión actual de la UI, el backend soporta también filtro por
+<strong>programa</strong>, pero ese control <strong>no está expuesto</strong> todavía en la barra visual
+del Dashboard.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="comparacion-desempeno-real-vs-predicho">
-<h2>Comparación desempeño real vs predicho<a class="headerlink" href="#comparacion-desempeno-real-vs-predicho" title="Link to this heading"></a></h2>
-<p>Cuando se dispone de datos reales y predicciones para los mismos casos:</p>
-<section id="grafico-de-dispersion-scatter-plot">
-<h3>1. Gráfico de dispersión (scatter plot)<a class="headerlink" href="#grafico-de-dispersion-scatter-plot" title="Link to this heading"></a></h3>
+<section id="tarjetas-kpi">
+<h2>Tarjetas KPI<a class="headerlink" href="#tarjetas-kpi" title="Link to this heading"></a></h2>
+<p>Debajo de los filtros se muestran <strong>cuatro tarjetas principales</strong>.</p>
+<section id="predicciones-totales">
+<h3>1. Predicciones Totales<a class="headerlink" href="#predicciones-totales" title="Link to this heading"></a></h3>
+<p>Indica el número total de predicciones persistidas para el contexto filtrado.</p>
+<p>Se calcula a partir de los artefactos de predicción asociados al periodo o rango
+seleccionado.</p>
+</section>
+<section id="exactitud-del-modelo">
+<h3>2. Exactitud del Modelo<a class="headerlink" href="#exactitud-del-modelo" title="Link to this heading"></a></h3>
+<p>Muestra la exactitud del modelo campeón en forma de porcentaje.</p>
+<p>En la interfaz actual esta tarjeta se presenta como:</p>
 <ul class="simple">
-<li><p>Eje X: desempeño real.</p></li>
-<li><p>Eje Y: desempeño predicho.</p></li>
-<li><p>Puntos cercanos a la diagonal <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">x</span></code> indican buena calibración del modelo.</p></li>
+<li><p><strong>Exactitud del Modelo</strong></p></li>
+<li><p>subtítulo: <strong>F1-Score Champion</strong></p></li>
 </ul>
-<p>Complementos:</p>
+<p>Esta tarjeta se mantiene para conectar el Dashboard con el rendimiento del modelo
+activo, aunque conceptualmente no proviene del mismo histórico que las otras
+métricas agregadas.</p>
+</section>
+<section id="evaluaciones-registradas">
+<h3>3. Evaluaciones Registradas<a class="headerlink" href="#evaluaciones-registradas" title="Link to this heading"></a></h3>
+<p>Indica la cantidad de evaluaciones presentes en el histórico filtrado.</p>
+<p>Es uno de los indicadores básicos para validar el volumen de información que
+soporta las visualizaciones del dashboard.</p>
+</section>
+<section id="alto-rendimiento">
+<h3>4. % Alto Rendimiento<a class="headerlink" href="#alto-rendimiento" title="Link to this heading"></a></h3>
+<p>Representa el porcentaje agregado de alto rendimiento en el contexto
+seleccionado.</p>
+<p>Sirve como señal rápida del estado general del desempeño en el periodo,
+docente o asignatura filtrados.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="seccion-como-estamos-ahora">
+<h2>Sección: «¿Cómo estamos ahora?»<a class="headerlink" href="#seccion-como-estamos-ahora" title="Link to this heading"></a></h2>
+<p>Esta sección ofrece una <strong>vista transversal del estado actual</strong> mediante dos
+visualizaciones.</p>
+<section id="distribucion-de-riesgo-por-asignatura">
+<h3>1. Distribución de Riesgo por Asignatura<a class="headerlink" href="#distribucion-de-riesgo-por-asignatura" title="Link to this heading"></a></h3>
+<p>Se muestra como un <strong>gráfico de barras apiladas</strong>.</p>
+<section id="que-representa">
+<h4>Qué representa<a class="headerlink" href="#que-representa" title="Link to this heading"></a></h4>
+<p>Para cada asignatura se presentan tres segmentos:</p>
 <ul class="simple">
-<li><p>Línea diagonal (ideal).</p></li>
-<li><p>Colores por rango de riesgo o por programa.</p></li>
+<li><p><strong>Bajo Riesgo</strong></p></li>
+<li><p><strong>Medio Riesgo</strong></p></li>
+<li><p><strong>Alto Riesgo</strong></p></li>
 </ul>
 </section>
-<section id="grafico-de-barras-agrupadas">
-<h3>2. Gráfico de barras agrupadas<a class="headerlink" href="#grafico-de-barras-agrupadas" title="Link to this heading"></a></h3>
+<section id="utilidad">
+<h4>Utilidad<a class="headerlink" href="#utilidad" title="Link to this heading"></a></h4>
+<p>Permite identificar rápidamente:</p>
 <ul class="simple">
-<li><p>Eje X: docentes o asignaturas.</p></li>
-<li><p>Eje Y: indicador de desempeño.</p></li>
-<li><p>Dos barras por grupo:</p>
-<ul>
-<li><p>Real.</p></li>
-<li><p>Predicho.</p></li>
+<li><p>asignaturas con mayor concentración de riesgo;</p></li>
+<li><p>distribución comparativa entre asignaturas;</p></li>
+<li><p>áreas que requieren atención o intervención.</p></li>
 </ul>
-</li>
-<li><p>Útil para identificar sistemáticas de sobreestimación o subestimación.</p></li>
+</section>
+</section>
+<section id="ranking-de-docentes">
+<h3>2. Ranking de Docentes<a class="headerlink" href="#ranking-de-docentes" title="Link to this heading"></a></h3>
+<p>Se muestra como un <strong>gráfico de barras horizontales</strong>.</p>
+<section id="modos-disponibles">
+<h4>Modos disponibles<a class="headerlink" href="#modos-disponibles" title="Link to this heading"></a></h4>
+<p>La interfaz permite alternar entre dos vistas:</p>
+<ul class="simple">
+<li><p><strong>Top Mejores</strong></p></li>
+<li><p><strong>A Intervenir</strong></p></li>
+</ul>
+</section>
+<section id="interpretacion">
+<h4>Interpretación<a class="headerlink" href="#interpretacion" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Top Mejores</strong> prioriza docentes con mejor score.</p></li>
+<li><p><strong>A Intervenir</strong> prioriza docentes con menor score o mayor necesidad de
+seguimiento.</p></li>
+</ul>
+</section>
+<section id="id1">
+<h4>Utilidad<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<p>Este gráfico facilita:</p>
+<ul class="simple">
+<li><p>identificar referentes de buen desempeño;</p></li>
+<li><p>detectar casos prioritarios para acompañamiento;</p></li>
+<li><p>comparar docentes dentro del contexto filtrado.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="seccion-analisis-de-indicadores-comparacion-historica-vs-semestre-actual">
+<h2>Sección: «Análisis de Indicadores - Comparación Histórica vs Semestre Actual»<a class="headerlink" href="#seccion-analisis-de-indicadores-comparacion-historica-vs-semestre-actual" title="Link to this heading"></a></h2>
+<p>Esta sección usa un <strong>gráfico radar</strong> para comparar indicadores agregados.</p>
+<section id="que-compara">
+<h3>Qué compara<a class="headerlink" href="#que-compara" title="Link to this heading"></a></h3>
+<p>El radar muestra dos perfiles:</p>
+<ul class="simple">
+<li><p><strong>Promedio Histórico (Todos los Semestres)</strong></p></li>
+<li><p><strong>Semestre seleccionado</strong></p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Qué representa<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>Cada eje corresponde a un indicador derivado de preguntas o dimensiones del
+histórico procesado.</p>
+</section>
+<section id="id3">
+<h3>Utilidad<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Este gráfico ayuda a responder preguntas como:</p>
+<ul class="simple">
+<li><p>¿el semestre actual está por encima o por debajo del promedio histórico?</p></li>
+<li><p>¿en qué dimensiones se observan mejoras o retrocesos?</p></li>
+<li><p>¿el perfil actual mantiene un comportamiento estable o cambia de forma clara?</p></li>
+</ul>
+</section>
+<section id="comportamiento-contextual">
+<h3>Comportamiento contextual<a class="headerlink" href="#comportamiento-contextual" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Si el usuario selecciona un docente, el radar se interpreta como el perfil de
+ese docente dentro del contexto filtrado.</p></li>
+<li><p>Si no hay un docente específico seleccionado, el radar se interpreta como un
+<strong>perfil global de indicadores</strong>.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="promedio-historico-vs-semestres-especificos">
-<h2>Promedio histórico vs semestres específicos<a class="headerlink" href="#promedio-historico-vs-semestres-especificos" title="Link to this heading"></a></h2>
-<section id="grafico-de-lineas-o-barras">
-<h3>1. Gráfico de líneas o barras<a class="headerlink" href="#grafico-de-lineas-o-barras" title="Link to this heading"></a></h3>
-<p>Se comparan dos series:</p>
+<section id="seccion-como-hemos-cambiado-vista-temporal">
+<h2>Sección: «¿Cómo hemos cambiado? - Vista Temporal»<a class="headerlink" href="#seccion-como-hemos-cambiado-vista-temporal" title="Link to this heading"></a></h2>
+<p>Esta sección presenta dos gráficos de evolución histórica.</p>
+<section id="historico-por-entidad-seleccionada">
+<h3>1. Histórico por Entidad Seleccionada<a class="headerlink" href="#historico-por-entidad-seleccionada" title="Link to this heading"></a></h3>
+<p>Se muestra como un <strong>gráfico de líneas</strong>.</p>
+<section id="id4">
+<h4>Qué representa<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p><strong>Promedio histórico general</strong>:</p>
-<ul>
-<li><p>Media de desempeño en un rango amplio de semestres.</p></li>
+<li><p>si hay un docente seleccionado, se visualiza el histórico de ese docente;</p></li>
+<li><p>si no lo hay, se presenta un histórico agregado de la entidad filtrada.</p></li>
 </ul>
-</li>
-<li><p><strong>Promedio del semestre seleccionado</strong>:</p>
-<ul>
-<li><p>Media de desempeño en el semestre filtrado.</p></li>
-</ul>
-</li>
-</ul>
-<p>Ejes típicos:</p>
+</section>
+<section id="id5">
+<h4>Utilidad<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
+<p>Permite observar:</p>
 <ul class="simple">
-<li><p>Eje X: semestres.</p></li>
-<li><p>Eje Y: promedio de desempeño global o por unidad académica.</p></li>
+<li><p>evolución del desempeño a lo largo de varios periodos;</p></li>
+<li><p>estabilidad o variación temporal;</p></li>
+<li><p>patrones de mejora o deterioro.</p></li>
 </ul>
-<p>Esto permite contestar preguntas como:</p>
+</section>
+</section>
+<section id="promedio-historico-vs-semestre-actual">
+<h3>2. Promedio Histórico vs Semestre Actual<a class="headerlink" href="#promedio-historico-vs-semestre-actual" title="Link to this heading"></a></h3>
+<p>También se muestra como un <strong>gráfico de líneas</strong>.</p>
+<section id="series-comparadas">
+<h4>Series comparadas<a class="headerlink" href="#series-comparadas" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><p>“¿El último semestre ha mejorado o empeorado respecto a la media histórica?”</p></li>
-<li><p>“¿Está este programa por encima o por debajo del promedio institucional?”</p></li>
+<li><p><strong>Promedio Histórico</strong></p></li>
+<li><p><strong>Semestre Actual</strong></p></li>
+</ul>
+</section>
+<section id="id6">
+<h4>Utilidad<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
+<p>Sirve para contrastar:</p>
+<ul class="simple">
+<li><p>el comportamiento general acumulado,</p></li>
+<li><p>frente al valor del periodo activo.</p></li>
+</ul>
+<p>Es una visualización útil para detectar desviaciones del semestre más reciente
+respecto al comportamiento histórico.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="seccion-contexto-cualitativo-tendencias-en-comentarios">
+<h2>Sección: «Contexto Cualitativo - Tendencias en Comentarios»<a class="headerlink" href="#seccion-contexto-cualitativo-tendencias-en-comentarios" title="Link to this heading"></a></h2>
+<p>La parte final de la pestaña muestra una <strong>nube de palabras</strong> derivada del
+análisis textual de comentarios.</p>
+<section id="nube-de-palabras">
+<h3>Nube de palabras<a class="headerlink" href="#nube-de-palabras" title="Link to this heading"></a></h3>
+<p>Cada término se representa con:</p>
+<ul class="simple">
+<li><p>tamaño relativo según su frecuencia;</p></li>
+<li><p>color según su polaridad estimada.</p></li>
+</ul>
+</section>
+<section id="convencion-visual">
+<h3>Convención visual<a class="headerlink" href="#convencion-visual" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Verde</strong>: positivo</p></li>
+<li><p><strong>Gris</strong>: neutral</p></li>
+<li><p><strong>Rojo</strong>: negativo</p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>Utilidad<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<p>La nube de palabras permite:</p>
+<ul class="simple">
+<li><p>identificar conceptos recurrentes en comentarios;</p></li>
+<li><p>detectar señales cualitativas positivas o negativas;</p></li>
+<li><p>complementar la lectura cuantitativa del Dashboard con contexto textual.</p></li>
+</ul>
+</section>
+<section id="disponibilidad">
+<h3>Disponibilidad<a class="headerlink" href="#disponibilidad" title="Link to this heading"></a></h3>
+<p>Esta visualización depende del histórico etiquetado.</p>
+<p>Si el backend aún no dispone del histórico etiquetado, la UI puede mostrar una
+versión de respaldo o dejar esta sección con información no definitiva hasta que
+el proceso esté completo.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="comportamiento-general-de-la-pestana">
+<h2>Comportamiento general de la pestaña<a class="headerlink" href="#comportamiento-general-de-la-pestana" title="Link to this heading"></a></h2>
+<section id="carga-de-datos">
+<h3>Carga de datos<a class="headerlink" href="#carga-de-datos" title="Link to this heading"></a></h3>
+<p>La pestaña realiza consultas al backend para obtener:</p>
+<ul class="simple">
+<li><p>estado del histórico;</p></li>
+<li><p>periodos disponibles;</p></li>
+<li><p>catálogos;</p></li>
+<li><p>KPIs;</p></li>
+<li><p>series históricas;</p></li>
+<li><p>rankings;</p></li>
+<li><p>radar;</p></li>
+<li><p>sentimiento;</p></li>
+<li><p>nube de palabras.</p></li>
+</ul>
+</section>
+<section id="deshabilitacion-de-controles">
+<h3>Deshabilitación de controles<a class="headerlink" href="#deshabilitacion-de-controles" title="Link to this heading"></a></h3>
+<p>Los filtros pueden quedar deshabilitados temporalmente cuando:</p>
+<ul class="simple">
+<li><p>la pestaña está cargando datos;</p></li>
+<li><p>el histórico procesado aún no está listo.</p></li>
+</ul>
+</section>
+<section id="reaccion-a-cambios-de-filtros">
+<h3>Reacción a cambios de filtros<a class="headerlink" href="#reaccion-a-cambios-de-filtros" title="Link to this heading"></a></h3>
+<p>Cada vez que cambia el periodo, docente o asignatura:</p>
+<ul class="simple">
+<li><p>se recalculan KPIs;</p></li>
+<li><p>se actualizan rankings;</p></li>
+<li><p>se actualizan series históricas;</p></li>
+<li><p>se reconstruyen gráficos agregados;</p></li>
+<li><p>se recalculan las visualizaciones cualitativas cuando aplica.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="recomendaciones-de-uso">
-<h2>Recomendaciones de uso<a class="headerlink" href="#recomendaciones-de-uso" title="Link to this heading"></a></h2>
+<section id="alcance-real-del-dashboard-en-la-version-actual">
+<h2>Alcance real del Dashboard en la versión actual<a class="headerlink" href="#alcance-real-del-dashboard-en-la-version-actual" title="Link to this heading"></a></h2>
+<p>En la implementación actual, esta pestaña está orientada a:</p>
 <ul class="simple">
-<li><p>Usa los filtros para <strong>acotar el contexto</strong> antes de interpretar gráficos:</p>
-<ul>
-<li><p>No es lo mismo analizar un docente aislado que un programa completo.</p></li>
+<li><p>monitoreo agregado;</p></li>
+<li><p>análisis histórico;</p></li>
+<li><p>apoyo a toma de decisiones;</p></li>
+<li><p>priorización institucional.</p></li>
 </ul>
-</li>
-<li><p>Combina las visualizaciones:</p>
-<ul>
-<li><p>Por ejemplo, revisa el <strong>ranking de docentes</strong> y luego observa el
-<strong>histórico de los casos en la parte baja del ranking</strong>.</p></li>
+<p>No está diseñada para:</p>
+<ul class="simple">
+<li><p>cargar archivos manualmente;</p></li>
+<li><p>editar datasets;</p></li>
+<li><p>lanzar entrenamientos;</p></li>
+<li><p>ejecutar predicciones individuales o masivas.</p></li>
 </ul>
-</li>
-<li><p>Utiliza la comparación <strong>real vs predicho</strong> para:</p>
-<ul>
-<li><p>Evaluar la confianza en el modelo.</p></li>
-<li><p>Detectar áreas donde el modelo puede necesitar ajustes o reentrenamiento.</p></li>
-</ul>
-</li>
-</ul>
+<p>Es una pestaña de <strong>consulta y análisis</strong>, no de operación del pipeline.</p>
 </section>
 <hr class="docutils" />
 <section id="relacion-con-otras-pestanas">
 <h2>Relación con otras pestañas<a class="headerlink" href="#relacion-con-otras-pestanas" title="Link to this heading"></a></h2>
+<p>El Dashboard depende indirectamente del trabajo realizado en otras áreas del
+sistema:</p>
 <ul class="simple">
-<li><p>La pestaña <strong>Dashboard</strong> se nutre de:</p>
+<li><p><strong>Datos</strong></p>
 <ul>
-<li><p>Los datasets cargados y preprocesados en <strong>Datos</strong>.</p></li>
-<li><p>Los modelos entrenados y validados en <strong>Modelos</strong>.</p></li>
-<li><p>Las predicciones generadas en <strong>Predicciones</strong> (especialmente en modo lote).</p></li>
+<li><p>aporta los insumos que alimentan el histórico institucional.</p></li>
+</ul>
+</li>
+<li><p><strong>Modelos</strong></p>
+<ul>
+<li><p>define el modelo campeón y el contexto de rendimiento predictivo.</p></li>
+</ul>
+</li>
+<li><p><strong>Predicciones</strong></p>
+<ul>
+<li><p>genera resultados persistidos que se reflejan en parte de los KPIs del
+dashboard.</p></li>
 </ul>
 </li>
 </ul>
-<p>Es la vista que cierra el ciclo: de los datos brutos y el entrenamiento de
-modelos, hasta la toma de decisiones basada en indicadores agregados.</p>
+<p>Por tanto, el Dashboard actúa como la <strong>vista consolidada final</strong> del sistema:
+resume y presenta en una sola pantalla el estado general construido a partir del
+histórico, los modelos y las predicciones.</p>
 </section>
 </section>
 
@@ -420,8 +580,8 @@ modelos, hasta la toma de decisiones basada en indicadores agregados.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
-        <a href="predicciones.html" class="btn btn-neutral float-left" title="Pestaña «Predicciones»" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
-        <a href="../arquitectura/index.html" class="btn btn-neutral float-right" title="Arquitectura de NeuroCampus" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Manual de usuario" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="datos.html" class="btn btn-neutral float-right" title="Pestaña «Datos»" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

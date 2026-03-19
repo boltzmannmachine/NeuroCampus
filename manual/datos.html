@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pestaña «Datos» – Ingesta y análisis &mdash; documentación de NeuroCampus - 0.1.0</title>
+  <title>Pestaña «Datos» &mdash; documentación de NeuroCampus - 0.1.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
@@ -21,7 +21,7 @@
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
     <link rel="next" title="Pestaña «Modelos»" href="modelos.html" />
-    <link rel="prev" title="Manual de usuario" href="index.html" /> 
+    <link rel="prev" title="Pestaña «Dashboard»" href="dashboard.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,14 +46,110 @@
               <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Manual de usuario</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Pestaña «Datos» – Ingesta y análisis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dashboard.html">Pestaña «Dashboard»</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Pestaña «Datos»</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#objetivo">Objetivo</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#flujo-de-trabajo">Flujo de trabajo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estructura-general-de-la-pestana">Estructura general de la pestaña</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#carga-del-dataset">1. Carga del Dataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#elementos-visibles">Elementos visibles</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#seleccion-del-archivo">Selección del archivo</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#formatos-visibles-en-la-ui">Formatos visibles en la UI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#observacion-importante">Observación importante</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#campo-nombre-del-dataset">Campo «Nombre del Dataset»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#estado-real-en-la-implementacion-actual">Estado real en la implementación actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implicacion-practica">Implicación práctica</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#selector-semestre">Selector «Semestre»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#que-hace">Qué hace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interpretacion-funcional">Interpretación funcional</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#opciones-de-procesamiento">Opciones de procesamiento</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aplica-pre-procesamiento">1. Aplica pre-procesamiento</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#correr-analisis-de-sentimientos-beto">2. Correr análisis de sentimientos (BETO)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generar-embeddings-tf-idf-lsa-64">3. Generar embeddings TF-IDF+LSA (64)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tratar-los-comentarios-vacios-como-sin-texto">4. Tratar los comentarios vacíos como SIN_TEXTO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forzar-la-reconstruccion-del-conjunto-de-datos-procesados">5. Forzar la reconstrucción del conjunto de datos procesados</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#boton-principal-load-and-process">Botón principal: «Load and Process»</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#secuencia-real-del-proceso">Secuencia real del proceso</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manejo-de-reemplazo">Manejo de reemplazo</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#barra-de-progreso-y-mensajes">Barra de progreso y mensajes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#confirmacion-visible-tras-carga">Confirmación visible tras carga</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#artefactos-de-datos">2. Artefactos de datos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#estado-del-proceso-beto">2.1 Estado del proceso BETO</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#informacion-que-puede-aparecer">Información que puede aparecer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#archivo-de-salida-esperado">Archivo de salida esperado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utilidad">Utilidad</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#unificacion-historica">2.2 Unificación histórica</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#botones-disponibles">Botones disponibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-hacen">Qué hacen</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#estados-visibles">Estados visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resultado-esperado">Resultado esperado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#uso-recomendado">Uso recomendado</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#paquete-de-caracteristicas">2.3 Paquete de características</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accion-disponible">Acción disponible</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Qué hace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Resultado esperado</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#para-que-sirve">Para qué sirve</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#resumen-del-dataset">3. Resumen del Dataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#indicadores-mostrados-en-la-ui-actual">Indicadores mostrados en la UI actual</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#importante">Importante</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#vista-previa-tabular">Vista previa tabular</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#columnas-visibles">Columnas visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#proposito">Propósito</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#observacion-funcional">Observación funcional</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#analisis-de-sentimientos-con-beto">4. Análisis de Sentimientos con BETO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#distribucion-de-polaridad">4.1 Distribución de polaridad</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#etiquetas-visibles">Etiquetas visibles</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#convencion-de-color">Convención de color</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#que-representa">Qué representa</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#distribucion-de-sentimientos-por-docente">4.2 Distribución de Sentimientos por docente</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Propósito</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Utilidad</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#estados-de-error-o-indisponibilidad">Estados de error o indisponibilidad</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="modelos.html">Pestaña «Modelos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-resumen">Subpestaña «Resumen»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-entrenamiento">Subpestaña «Entrenamiento»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-ejecuciones">Subpestaña «Ejecuciones»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-campeon">Subpestaña «Campeón»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-sweep">Subpestaña «Sweep»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-artefactos">Subpestaña «Artefactos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-diagnostico">Subpestaña «Diagnóstico»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#comportamiento-transversal-de-la-pestana">Comportamiento transversal de la pestaña</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
 <li class="toctree-l2"><a class="reference internal" href="predicciones.html">Pestaña «Predicciones»</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dashboard.html">Pestaña «Dashboard»</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
@@ -78,7 +174,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Manual de usuario</a></li>
-      <li class="breadcrumb-item active">Pestaña «Datos» – Ingesta y análisis</li>
+      <li class="breadcrumb-item active">Pestaña «Datos»</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/manual/datos.md.txt" rel="nofollow"> Ver código fuente de la página</a>
       </li>
@@ -88,54 +184,521 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pestana-datos-ingesta-y-analisis">
-<h1>Pestaña «Datos» – Ingesta y análisis<a class="headerlink" href="#pestana-datos-ingesta-y-analisis" title="Link to this heading"></a></h1>
+  <section id="pestana-datos">
+<h1>Pestaña «Datos»<a class="headerlink" href="#pestana-datos" title="Link to this heading"></a></h1>
 <section id="objetivo">
 <h2>Objetivo<a class="headerlink" href="#objetivo" title="Link to this heading"></a></h2>
-<p>Registrar nuevos datasets de evaluaciones docentes, aplicar el preprocesamiento definido
-en el backend y obtener un resumen estadístico y de sentimientos.</p>
+<p>La pestaña <strong>Datos</strong> concentra el flujo de ingestión, validación, carga y
+preparación de artefactos derivados a partir de datasets de evaluaciones
+docentes.</p>
+<p>Desde esta pestaña el usuario puede:</p>
+<ul class="simple">
+<li><p>seleccionar un periodo de trabajo;</p></li>
+<li><p>cargar un archivo de datos;</p></li>
+<li><p>validarlo y persistirlo en el backend;</p></li>
+<li><p>consultar un resumen del dataset activo;</p></li>
+<li><p>ejecutar análisis de sentimientos con BETO;</p></li>
+<li><p>unificar históricos;</p></li>
+<li><p>preparar el paquete de características para etapas posteriores del pipeline.</p></li>
+</ul>
+<p>Esta pestaña funciona como el punto de entrada operativo de los datos que luego
+alimentan otras partes del sistema, especialmente <strong>Modelos</strong>, <strong>Predicciones</strong>
+y <strong>Dashboard</strong>.</p>
 </section>
-<section id="flujo-de-trabajo">
-<h2>Flujo de trabajo<a class="headerlink" href="#flujo-de-trabajo" title="Link to this heading"></a></h2>
+<hr class="docutils" />
+<section id="estructura-general-de-la-pestana">
+<h2>Estructura general de la pestaña<a class="headerlink" href="#estructura-general-de-la-pestana" title="Link to this heading"></a></h2>
+<p>La interfaz actual está organizada en tres bloques funcionales:</p>
 <ol class="arabic simple">
-<li><p><strong>Ingreso de dataset</strong></p>
-<ul class="simple">
-<li><p>Seleccionar archivo (<code class="docutils literal notranslate"><span class="pre">.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code>, <code class="docutils literal notranslate"><span class="pre">.xls</span></code>, <code class="docutils literal notranslate"><span class="pre">.parquet</span></code>).</p></li>
-<li><p>Opciones:</p>
-<ul>
-<li><p><em>Sobrescribir si el dataset ya existe</em>.</p></li>
-<li><p><em>Aplicar preprocesamiento y actualizar resumen</em>.</p></li>
-<li><p><em>Ejecutar análisis de sentimientos con BETO</em>.</p></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>Carga y validación</strong></p>
-<ul class="simple">
-<li><p>Botón <strong>«Validar sin guardar»</strong>: envía el fichero al endpoint <code class="docutils literal notranslate"><span class="pre">/datos/validar</span></code> y
-muestra una vista previa de filas.</p></li>
-<li><p>Botón <strong>«Cargar y procesar»</strong>: usa <code class="docutils literal notranslate"><span class="pre">/datos/upload</span></code>, actualiza el resumen y, si está
-marcado, lanza el job BETO.</p></li>
-</ul>
-</li>
-<li><p><strong>Resumen del dataset</strong></p>
-<ul class="simple">
-<li><p>Métricas principales: número de filas, columnas, docentes y asignaturas.</p></li>
-<li><p>Rango de fechas, periodos, descripción de columnas.</p></li>
-</ul>
-</li>
-<li><p><strong>Análisis de sentimientos con BETO</strong></p>
-<ul class="simple">
-<li><p>Estado del job BETO.</p></li>
-<li><p>Gráficas:</p>
-<ul>
-<li><p>Distribución global (positivo / neutro / negativo).</p></li>
-<li><p>Distribución por docente (top 10).</p></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><p><strong>Carga del Dataset</strong></p></li>
+<li><p><strong>Artefactos de datos</strong></p></li>
+<li><p><strong>Resumen y análisis del dataset</strong></p></li>
 </ol>
+<p>Cuando el dataset ya fue cargado o existe un dataset activo en contexto, también
+se habilita la sección:</p>
+<ol class="arabic simple" start="4">
+<li><p><strong>Análisis de Sentimientos con BETO</strong></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="carga-del-dataset">
+<h2>1. Carga del Dataset<a class="headerlink" href="#carga-del-dataset" title="Link to this heading"></a></h2>
+<p>La primera tarjeta de la pestaña se llama <strong>Carga del Dataset</strong>.</p>
+<section id="elementos-visibles">
+<h3>Elementos visibles<a class="headerlink" href="#elementos-visibles" title="Link to this heading"></a></h3>
+<p>En esta sección la interfaz presenta:</p>
+<ul class="simple">
+<li><p>un área para seleccionar o arrastrar un archivo;</p></li>
+<li><p>el campo <strong>Nombre del Dataset</strong>;</p></li>
+<li><p>el selector <strong>Semestre</strong>;</p></li>
+<li><p>varias opciones de procesamiento;</p></li>
+<li><p>el botón principal <strong>Load and Process</strong>;</p></li>
+<li><p>una barra de progreso durante la subida;</p></li>
+<li><p>mensajes de error o confirmación.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="seleccion-del-archivo">
+<h2>Selección del archivo<a class="headerlink" href="#seleccion-del-archivo" title="Link to this heading"></a></h2>
+<p>El archivo puede cargarse de dos maneras:</p>
+<ul class="simple">
+<li><p>haciendo clic en el área de carga;</p></li>
+<li><p>arrastrando y soltando el archivo sobre la zona punteada.</p></li>
+</ul>
+<section id="formatos-visibles-en-la-ui">
+<h3>Formatos visibles en la UI<a class="headerlink" href="#formatos-visibles-en-la-ui" title="Link to this heading"></a></h3>
+<p>La interfaz actual muestra explícitamente:</p>
+<ul class="simple">
+<li><p><strong>CSV</strong></p></li>
+<li><p><strong>XLSX</strong></p></li>
+</ul>
+<p>con la nota visual:</p>
+<ul class="simple">
+<li><p><strong>Max 10MB</strong></p></li>
+</ul>
+</section>
+<section id="observacion-importante">
+<h3>Observación importante<a class="headerlink" href="#observacion-importante" title="Link to this heading"></a></h3>
+<p>A nivel de servicios frontend y backend existen referencias a validación para
+otros formatos como <code class="docutils literal notranslate"><span class="pre">parquet</span></code>, pero la interfaz actual guía al usuario
+principalmente a trabajar con <strong>CSV</strong> y <strong>XLSX</strong>. Para fines del manual de uso,
+estos son los formatos operativos principales de esta pestaña.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="campo-nombre-del-dataset">
+<h2>Campo «Nombre del Dataset»<a class="headerlink" href="#campo-nombre-del-dataset" title="Link to this heading"></a></h2>
+<p>La interfaz muestra un campo de texto llamado <strong>Nombre del Dataset</strong>.</p>
+<section id="estado-real-en-la-implementacion-actual">
+<h3>Estado real en la implementación actual<a class="headerlink" href="#estado-real-en-la-implementacion-actual" title="Link to this heading"></a></h3>
+<p>En la versión actual de la pestaña, este campo está visible, pero <strong>no define el
+identificador efectivo</strong> con el que se valida y carga el dataset en backend.</p>
+<p>El identificador lógico real utilizado por el flujo actual corresponde al valor
+seleccionado en <strong>Semestre</strong>.</p>
+</section>
+<section id="implicacion-practica">
+<h3>Implicación práctica<a class="headerlink" href="#implicacion-practica" title="Link to this heading"></a></h3>
+<p>Aunque el usuario puede escribir un nombre en este campo, el backend trabaja con
+el dataset asociado al <strong>periodo/semestre activo</strong>.</p>
+<p>Por ello, al operar la pestaña debe asumirse que el contexto real del dataset lo
+determina el selector de <strong>Semestre</strong>, no el texto escrito en este campo.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="selector-semestre">
+<h2>Selector «Semestre»<a class="headerlink" href="#selector-semestre" title="Link to this heading"></a></h2>
+<p>El selector de semestre establece el contexto principal de trabajo del dataset.</p>
+<section id="que-hace">
+<h3>Qué hace<a class="headerlink" href="#que-hace" title="Link to this heading"></a></h3>
+<p>Al cambiar el semestre:</p>
+<ul class="simple">
+<li><p>se actualiza el contexto global del frontend;</p></li>
+<li><p>cambia el identificador lógico del dataset activo;</p></li>
+<li><p>se reinician estados locales relacionados con jobs y mensajes;</p></li>
+<li><p>el panel queda listo para consultar o cargar información asociada a ese
+periodo.</p></li>
+</ul>
+</section>
+<section id="interpretacion-funcional">
+<h3>Interpretación funcional<a class="headerlink" href="#interpretacion-funcional" title="Link to this heading"></a></h3>
+<p>En la implementación actual, el semestre actúa como el <strong>dataset_id efectivo</strong>
+para:</p>
+<ul class="simple">
+<li><p>validación;</p></li>
+<li><p>carga;</p></li>
+<li><p>consulta de resumen;</p></li>
+<li><p>consulta de sentimientos;</p></li>
+<li><p>preparación de artefactos.</p></li>
+</ul>
+<p>Por ejemplo, si el usuario selecciona <code class="docutils literal notranslate"><span class="pre">2025-1</span></code>, ese valor es el que el sistema
+usa como referencia principal del dataset.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="opciones-de-procesamiento">
+<h2>Opciones de procesamiento<a class="headerlink" href="#opciones-de-procesamiento" title="Link to this heading"></a></h2>
+<p>Debajo del selector aparecen varias casillas de verificación.</p>
+<section id="aplica-pre-procesamiento">
+<h3>1. Aplica pre-procesamiento<a class="headerlink" href="#aplica-pre-procesamiento" title="Link to this heading"></a></h3>
+<p>La UI muestra esta opción como parte del flujo de carga.</p>
+<section id="estado-real-en-la-version-actual">
+<h4>Estado real en la versión actual<a class="headerlink" href="#estado-real-en-la-version-actual" title="Link to this heading"></a></h4>
+<p>Aunque la casilla está visible y puede activarse o desactivarse, <strong>no modifica
+de forma efectiva el flujo de carga actual en el frontend</strong>.</p>
+<p>Es decir, hoy funciona más como un elemento de interfaz heredado o reservado
+para evolución futura que como un control operativo real.</p>
+</section>
+</section>
+<section id="correr-analisis-de-sentimientos-beto">
+<h3>2. Correr análisis de sentimientos (BETO)<a class="headerlink" href="#correr-analisis-de-sentimientos-beto" title="Link to this heading"></a></h3>
+<p>Esta opción sí afecta el flujo.</p>
+<p>Si está activada, una vez cargado el dataset el frontend intenta lanzar el job
+de análisis de sentimientos con BETO.</p>
+</section>
+<section id="generar-embeddings-tf-idf-lsa-64">
+<h3>3. Generar embeddings TF-IDF+LSA (64)<a class="headerlink" href="#generar-embeddings-tf-idf-lsa-64" title="Link to this heading"></a></h3>
+<p>Esta opción aparece únicamente cuando está activa la ejecución de BETO.</p>
+<p>Controla el parámetro de generación de representaciones textuales adicionales
+durante el job.</p>
+</section>
+<section id="tratar-los-comentarios-vacios-como-sin-texto">
+<h3>4. Tratar los comentarios vacíos como SIN_TEXTO<a class="headerlink" href="#tratar-los-comentarios-vacios-como-sin-texto" title="Link to this heading"></a></h3>
+<p>También aparece cuando BETO está habilitado.</p>
+<p>Controla la política usada para comentarios vacíos o sin contenido útil.</p>
+</section>
+<section id="forzar-la-reconstruccion-del-conjunto-de-datos-procesados">
+<h3>5. Forzar la reconstrucción del conjunto de datos procesados<a class="headerlink" href="#forzar-la-reconstruccion-del-conjunto-de-datos-procesados" title="Link to this heading"></a></h3>
+<p>Esta opción permite solicitar la reconstrucción de la versión procesada del
+dataset cuando se ejecuta el flujo BETO.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="boton-principal-load-and-process">
+<h2>Botón principal: «Load and Process»<a class="headerlink" href="#boton-principal-load-and-process" title="Link to this heading"></a></h2>
+<p>Este botón inicia el flujo principal de la pestaña.</p>
+<section id="secuencia-real-del-proceso">
+<h3>Secuencia real del proceso<a class="headerlink" href="#secuencia-real-del-proceso" title="Link to this heading"></a></h3>
+<p>Cuando el usuario pulsa <strong>Load and Process</strong>, el frontend ejecuta este orden:</p>
+<ol class="arabic simple">
+<li><p>valida que se haya seleccionado un archivo;</p></li>
+<li><p>lanza una validación previa del dataset;</p></li>
+<li><p>si la validación falla, detiene el flujo;</p></li>
+<li><p>si la validación pasa, sube el archivo al backend;</p></li>
+<li><p>si el dataset ya existe, solicita confirmación para reemplazarlo;</p></li>
+<li><p>fija el dataset activo en el contexto global;</p></li>
+<li><p>si BETO está activado, intenta lanzar el job de sentimientos;</p></li>
+<li><p>refresca el resumen del dataset.</p></li>
+</ol>
+</section>
+<section id="manejo-de-reemplazo">
+<h3>Manejo de reemplazo<a class="headerlink" href="#manejo-de-reemplazo" title="Link to this heading"></a></h3>
+<p>Si el backend responde que el dataset ya existe, la interfaz muestra una
+confirmación para decidir si se desea hacer <strong>overwrite</strong>.</p>
+<p>Si el usuario acepta, se repite la subida con reemplazo habilitado.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="barra-de-progreso-y-mensajes">
+<h2>Barra de progreso y mensajes<a class="headerlink" href="#barra-de-progreso-y-mensajes" title="Link to this heading"></a></h2>
+<p>Durante la carga se muestra:</p>
+<ul class="simple">
+<li><p>una barra de progreso;</p></li>
+<li><p>el porcentaje de avance;</p></li>
+<li><p>el estado de procesamiento.</p></li>
+</ul>
+<p>La UI también puede mostrar:</p>
+<ul class="simple">
+<li><p>errores de validación;</p></li>
+<li><p>errores de subida;</p></li>
+<li><p>mensajes de fallo del job BETO;</p></li>
+<li><p>confirmación de filas leídas y válidas.</p></li>
+</ul>
+<section id="confirmacion-visible-tras-carga">
+<h3>Confirmación visible tras carga<a class="headerlink" href="#confirmacion-visible-tras-carga" title="Link to this heading"></a></h3>
+<p>Cuando la operación termina correctamente, la interfaz muestra un mensaje tipo:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">X</span> <span class="pre">rows</span> <span class="pre">read,</span> <span class="pre">Y</span> <span class="pre">valid</span></code></p></li>
+</ul>
+<p>Esto permite verificar rápidamente que el dataset fue reconocido y procesado por
+el backend.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="artefactos-de-datos">
+<h2>2. Artefactos de datos<a class="headerlink" href="#artefactos-de-datos" title="Link to this heading"></a></h2>
+<p>La segunda tarjeta se llama <strong>Artefactos de datos</strong>.</p>
+<p>Esta sección queda operativa cuando existe un dataset activo en el contexto.</p>
+<p>Su objetivo es habilitar procesos derivados necesarios para otras etapas del
+pipeline.</p>
+<p>La tarjeta contiene tres grupos:</p>
+<ol class="arabic simple">
+<li><p><strong>BETO</strong></p></li>
+<li><p><strong>Unificación</strong></p></li>
+<li><p><strong>Paquete de características</strong></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="estado-del-proceso-beto">
+<h2>2.1 Estado del proceso BETO<a class="headerlink" href="#estado-del-proceso-beto" title="Link to this heading"></a></h2>
+<p>La tarjeta muestra un resumen del job BETO asociado al dataset activo.</p>
+<section id="informacion-que-puede-aparecer">
+<h3>Información que puede aparecer<a class="headerlink" href="#informacion-que-puede-aparecer" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Status</strong></p></li>
+<li><p><strong>Text coverage</strong></p></li>
+<li><p><strong>Accepted</strong></p></li>
+<li><p><strong>text_feats</strong></p></li>
+<li><p><strong>empty_text_policy</strong></p></li>
+<li><p>ruta de salida del archivo etiquetado</p></li>
+</ul>
+</section>
+<section id="archivo-de-salida-esperado">
+<h3>Archivo de salida esperado<a class="headerlink" href="#archivo-de-salida-esperado" title="Link to this heading"></a></h3>
+<p>Cuando el proceso está asociado al dataset activo, la interfaz muestra como
+referencia una salida de este tipo:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>data/labeled/&lt;dataset_id&gt;_beto.parquet
+</pre></div>
+</div>
+</section>
+<section id="utilidad">
+<h3>Utilidad<a class="headerlink" href="#utilidad" title="Link to this heading"></a></h3>
+<p>Este bloque permite confirmar:</p>
+<ul class="simple">
+<li><p>si el análisis de sentimientos ya corrió;</p></li>
+<li><p>con qué parámetros se ejecutó;</p></li>
+<li><p>si produjo un artefacto etiquetado reutilizable.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="unificacion-historica">
+<h2>2.2 Unificación histórica<a class="headerlink" href="#unificacion-historica" title="Link to this heading"></a></h2>
+<p>Esta subsección se presenta como <strong>Unificación (historico/*)</strong>.</p>
+<section id="botones-disponibles">
+<h3>Botones disponibles<a class="headerlink" href="#botones-disponibles" title="Link to this heading"></a></h3>
+<p>La UI actual muestra dos acciones:</p>
+<ul class="simple">
+<li><p><strong>Unificar histórico</strong></p></li>
+<li><p><strong>Unify Labeled</strong></p></li>
+</ul>
+</section>
+<section id="que-hacen">
+<h3>Qué hacen<a class="headerlink" href="#que-hacen" title="Link to this heading"></a></h3>
+<section id="unificar-historico">
+<h4>Unificar histórico<a class="headerlink" href="#unificar-historico" title="Link to this heading"></a></h4>
+<p>Lanza el job de unificación del histórico general.</p>
+</section>
+<section id="unify-labeled">
+<h4>Unify Labeled<a class="headerlink" href="#unify-labeled" title="Link to this heading"></a></h4>
+<p>Lanza la unificación del histórico etiquetado, es decir, la versión asociada a
+datasets ya enriquecidos con sentimientos u otras salidas derivadas.</p>
+</section>
+</section>
+<section id="estados-visibles">
+<h3>Estados visibles<a class="headerlink" href="#estados-visibles" title="Link to this heading"></a></h3>
+<p>La interfaz puede mostrar:</p>
+<ul class="simple">
+<li><p><strong>Corriendo unificación…</strong></p></li>
+<li><p><strong>Unify failed</strong></p></li>
+<li><p><strong>Done</strong></p></li>
+</ul>
+</section>
+<section id="resultado-esperado">
+<h3>Resultado esperado<a class="headerlink" href="#resultado-esperado" title="Link to this heading"></a></h3>
+<p>Cuando termina correctamente, el backend devuelve una referencia de salida
+asociada a <code class="docutils literal notranslate"><span class="pre">historico/*</span></code>.</p>
+</section>
+<section id="uso-recomendado">
+<h3>Uso recomendado<a class="headerlink" href="#uso-recomendado" title="Link to this heading"></a></h3>
+<p>Esta acción se utiliza cuando se quiere consolidar información de múltiples
+datasets ya cargados para alimentar vistas históricas, especialmente el
+<strong>Dashboard</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="paquete-de-caracteristicas">
+<h2>2.3 Paquete de características<a class="headerlink" href="#paquete-de-caracteristicas" title="Link to this heading"></a></h2>
+<p>Esta subsección aparece como:</p>
+<ul class="simple">
+<li><p><strong>Paquete de características (artifacts/features/*)</strong></p></li>
+</ul>
+<section id="accion-disponible">
+<h3>Acción disponible<a class="headerlink" href="#accion-disponible" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Preparar Paquete de Características</strong></p></li>
+</ul>
+</section>
+<section id="id1">
+<h3>Qué hace<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Lanza un job de construcción del feature-pack para el dataset activo.</p>
+</section>
+<section id="id2">
+<h3>Resultado esperado<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>Cuando finaliza correctamente, la interfaz informa una salida de este tipo:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>artifacts/features/&lt;dataset_id&gt;/train_matrix.parquet
+</pre></div>
+</div>
+</section>
+<section id="para-que-sirve">
+<h3>Para qué sirve<a class="headerlink" href="#para-que-sirve" title="Link to this heading"></a></h3>
+<p>Este artefacto es relevante para etapas posteriores del pipeline de modelado, ya
+que prepara una matriz de entrenamiento o insumo estructurado para procesos de
+machine learning.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="resumen-del-dataset">
+<h2>3. Resumen del Dataset<a class="headerlink" href="#resumen-del-dataset" title="Link to this heading"></a></h2>
+<p>En la columna derecha aparece la tarjeta <strong>Resumen del Dataset</strong>.</p>
+<p>Esta sección se activa cuando existe un dataset cargado o seleccionado en el
+contexto.</p>
+<section id="indicadores-mostrados-en-la-ui-actual">
+<h3>Indicadores mostrados en la UI actual<a class="headerlink" href="#indicadores-mostrados-en-la-ui-actual" title="Link to this heading"></a></h3>
+<p>La implementación actual presenta tres KPI principales:</p>
+<ul class="simple">
+<li><p><strong>Total de Filas</strong></p></li>
+<li><p><strong>Columnas</strong></p></li>
+<li><p><strong>Docentes</strong></p></li>
+</ul>
+</section>
+<section id="importante">
+<h3>Importante<a class="headerlink" href="#importante" title="Link to this heading"></a></h3>
+<p>Aunque el backend puede manejar más información de resumen, la UI actual de esta
+pestaña muestra de forma visible esas tres métricas como resumen principal.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="vista-previa-tabular">
+<h2>Vista previa tabular<a class="headerlink" href="#vista-previa-tabular" title="Link to this heading"></a></h2>
+<p>Debajo de los KPIs aparece una tabla de vista previa.</p>
+<section id="columnas-visibles">
+<h3>Columnas visibles<a class="headerlink" href="#columnas-visibles" title="Link to this heading"></a></h3>
+<p>La tabla actual muestra:</p>
+<ul class="simple">
+<li><p><strong>ID</strong></p></li>
+<li><p><strong>Docente</strong></p></li>
+<li><p><strong>Materia</strong></p></li>
+<li><p><strong>Calificación</strong></p></li>
+<li><p><strong>Comentario</strong></p></li>
+</ul>
+</section>
+<section id="proposito">
+<h3>Propósito<a class="headerlink" href="#proposito" title="Link to this heading"></a></h3>
+<p>Esta tabla permite al usuario revisar rápidamente la estructura general de los
+registros y confirmar que el contenido cargado es coherente con lo esperado.</p>
+</section>
+<section id="observacion-funcional">
+<h3>Observación funcional<a class="headerlink" href="#observacion-funcional" title="Link to this heading"></a></h3>
+<p>La vista previa depende de la muestra devuelta por el proceso de validación y de
+las transformaciones internas que realiza el frontend para representarla.</p>
+<p>Debe entenderse como una <strong>verificación rápida de contenido</strong>, no como una vista
+completa del dataset persistido.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="analisis-de-sentimientos-con-beto">
+<h2>4. Análisis de Sentimientos con BETO<a class="headerlink" href="#analisis-de-sentimientos-con-beto" title="Link to this heading"></a></h2>
+<p>Cuando hay dataset activo y la opción BETO está habilitada, la pestaña muestra
+la sección <strong>Análisis de Sentimientos con BETO</strong>.</p>
+<p>Esta parte contiene dos visualizaciones principales:</p>
+<ol class="arabic simple">
+<li><p><strong>Distribución de polaridad</strong></p></li>
+<li><p><strong>Distribución de Sentimientos por docente</strong></p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="distribucion-de-polaridad">
+<h2>4.1 Distribución de polaridad<a class="headerlink" href="#distribucion-de-polaridad" title="Link to this heading"></a></h2>
+<p>Se muestra mediante un gráfico de torta.</p>
+<section id="etiquetas-visibles">
+<h3>Etiquetas visibles<a class="headerlink" href="#etiquetas-visibles" title="Link to this heading"></a></h3>
+<p>La interfaz traduce las etiquetas de sentimiento a:</p>
+<ul class="simple">
+<li><p><strong>Positivo</strong></p></li>
+<li><p><strong>Neutral</strong></p></li>
+<li><p><strong>Negativo</strong></p></li>
+</ul>
+</section>
+<section id="convencion-de-color">
+<h3>Convención de color<a class="headerlink" href="#convencion-de-color" title="Link to this heading"></a></h3>
+<p>La UI actual usa esta convención:</p>
+<ul class="simple">
+<li><p><strong>Verde</strong> para positivo</p></li>
+<li><p><strong>Gris</strong> para neutral</p></li>
+<li><p><strong>Rojo</strong> para negativo</p></li>
+</ul>
+</section>
+<section id="que-representa">
+<h3>Qué representa<a class="headerlink" href="#que-representa" title="Link to this heading"></a></h3>
+<p>El gráfico resume la distribución global de sentimientos del dataset activo.</p>
+<p>Sirve para obtener una lectura inmediata del balance general entre comentarios
+positivos, neutrales y negativos.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="distribucion-de-sentimientos-por-docente">
+<h2>4.2 Distribución de Sentimientos por docente<a class="headerlink" href="#distribucion-de-sentimientos-por-docente" title="Link to this heading"></a></h2>
+<p>La segunda visualización muestra la distribución agregada de sentimientos por
+docente.</p>
+<section id="id3">
+<h3>Propósito<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Permite comparar cómo se distribuyen las polaridades entre distintos docentes
+del dataset activo.</p>
+</section>
+<section id="id4">
+<h3>Utilidad<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>Esta visualización ayuda a:</p>
+<ul class="simple">
+<li><p>detectar docentes con mayor concentración de comentarios negativos;</p></li>
+<li><p>comparar perfiles cualitativos;</p></li>
+<li><p>identificar patrones generales de percepción.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="estados-de-error-o-indisponibilidad">
+<h2>Estados de error o indisponibilidad<a class="headerlink" href="#estados-de-error-o-indisponibilidad" title="Link to this heading"></a></h2>
+<p>La pestaña puede mostrar mensajes no intrusivos cuando ciertos endpoints aún no
+están disponibles o no devuelven información lista para mostrar.</p>
+<p>Por ejemplo:</p>
+<ul class="simple">
+<li><p>errores asociados al endpoint de <strong>Sentimientos</strong>;</p></li>
+<li><p>errores asociados al endpoint de <strong>Resumen</strong>;</p></li>
+<li><p>fallos del job BETO;</p></li>
+<li><p>fallos del job de unificación;</p></li>
+<li><p>fallos del feature-pack.</p></li>
+</ul>
+<p>Esto es coherente con el diseño actual del sistema, donde varias operaciones se
+ejecutan como jobs asíncronos y pueden tardar en reflejarse en la UI.</p>
+</section>
+<hr class="docutils" />
+<section id="flujo-de-trabajo-recomendado">
+<h2>Flujo de trabajo recomendado<a class="headerlink" href="#flujo-de-trabajo-recomendado" title="Link to this heading"></a></h2>
+<p>En la versión actual de NeuroCampus, el flujo recomendado dentro de esta pestaña
+es el siguiente:</p>
+<ol class="arabic simple">
+<li><p>seleccionar el <strong>Semestre</strong> que actuará como identificador lógico;</p></li>
+<li><p>cargar el archivo del dataset;</p></li>
+<li><p>ejecutar <strong>Load and Process</strong>;</p></li>
+<li><p>verificar que el resumen del dataset sea coherente;</p></li>
+<li><p>si aplica, esperar o revisar el estado del job <strong>BETO</strong>;</p></li>
+<li><p>ejecutar <strong>Unificar histórico</strong> cuando se requiera consolidación histórica;</p></li>
+<li><p>ejecutar <strong>Preparar Paquete de Características</strong> cuando se necesiten
+artefactos para modelado.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="alcance-real-de-la-pestana-en-la-version-actual">
+<h2>Alcance real de la pestaña en la versión actual<a class="headerlink" href="#alcance-real-de-la-pestana-en-la-version-actual" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Datos</strong> sí está diseñada para:</p>
+<ul class="simple">
+<li><p>cargar datasets;</p></li>
+<li><p>validar y persistir información;</p></li>
+<li><p>lanzar jobs de procesamiento;</p></li>
+<li><p>construir artefactos reutilizables;</p></li>
+<li><p>alimentar el resto del pipeline.</p></li>
+</ul>
+<p>La pestaña <strong>Datos</strong> no está diseñada para:</p>
+<ul class="simple">
+<li><p>entrenar modelos directamente;</p></li>
+<li><p>seleccionar modelo campeón;</p></li>
+<li><p>ejecutar predicciones finales sobre usuarios específicos;</p></li>
+<li><p>visualizar indicadores institucionales agregados del histórico completo como
+función principal.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="relacion-con-otras-pestanas">
+<h2>Relación con otras pestañas<a class="headerlink" href="#relacion-con-otras-pestanas" title="Link to this heading"></a></h2>
+<p>La pestaña <strong>Datos</strong> tiene un papel fundacional dentro del sistema:</p>
+<ul class="simple">
+<li><p>alimenta a <strong>Modelos</strong> mediante datasets y feature-packs;</p></li>
+<li><p>alimenta a <strong>Predicciones</strong> al dejar datasets disponibles para inferencia;</p></li>
+<li><p>alimenta al <strong>Dashboard</strong> a través de los procesos de unificación histórica.</p></li>
+</ul>
+<p>Por ello, cualquier flujo de trabajo completo dentro de NeuroCampus suele
+comenzar en <strong>Datos</strong>.</p>
 </section>
 </section>
 
@@ -143,7 +706,7 @@ marcado, lanza el job BETO.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
-        <a href="index.html" class="btn btn-neutral float-left" title="Manual de usuario" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="dashboard.html" class="btn btn-neutral float-left" title="Pestaña «Dashboard»" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
         <a href="modelos.html" class="btn btn-neutral float-right" title="Pestaña «Modelos»" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

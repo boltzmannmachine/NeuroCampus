@@ -1,0 +1,920 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Endpoints de predicciones &mdash; documentación de NeuroCampus - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Endpoints de administración" href="admin.html" />
+    <link rel="prev" title="Endpoints de predicción directa" href="prediccion.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            NeuroCampus
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual/index.html">Manual de usuario</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API del backend</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#cobertura-documental-actual">Cobertura documental actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#resumen-de-dominios-expuestos">Resumen de dominios expuestos</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#navegacion-de-esta-seccion">Navegación de esta sección</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="datos.html">Endpoints de datos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html">Endpoints de jobs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preprocesamiento-beto">Jobs de preprocesamiento BETO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-unificacion-historica">Jobs de unificación histórica</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preparacion-de-feature-pack">Jobs de preparación de feature-pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-busqueda-de-hiperparametros-rbm">Jobs de búsqueda de hiperparámetros RBM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modelos.html">Endpoints de modelos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dashboard.html">Endpoints del Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="prediccion.html">Endpoints de predicción directa</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Endpoints de predicciones</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#alcance-funcional-del-router">Alcance funcional del router</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resumen-de-endpoints-principales">Resumen de endpoints principales</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-health"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/health</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-datasets"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/datasets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-runs"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/runs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-teachers"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/teachers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-materias"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/materias</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-predicciones-individual"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/predicciones/individual</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-predicciones-batch-run"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/predicciones/batch/run</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-batch-job-id"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/batch/{job_id}</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-model-info"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/model-info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-predicciones-predict"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/predicciones/predict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-outputs-preview"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/outputs/preview</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-predicciones-outputs-file"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/outputs/file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dependencias-de-artefactos">Dependencias de artefactos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#relacion-con-otras-areas-del-sistema">Relación con otras áreas del sistema</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="admin.html">Endpoints de administración</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_python/index.html">API Python (backend)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devops/index.html">Guía de desarrollo y operación</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">NeuroCampus</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API del backend</a></li>
+      <li class="breadcrumb-item active">Endpoints de predicciones</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_backend/predicciones.md.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="endpoints-de-predicciones">
+<h1>Endpoints de predicciones<a class="headerlink" href="#endpoints-de-predicciones" title="Link to this heading"></a></h1>
+<p>La API de <strong>predicciones</strong> agrupa los endpoints orientados a la explotación de
+modelos ya entrenados y promovidos, especialmente para el flujo de la pestaña
+<strong>Predicciones</strong> del frontend.</p>
+<p>A diferencia del router <code class="docutils literal notranslate"><span class="pre">prediccion</span></code>, que expone una inferencia más directa y
+acotada, este módulo trabaja sobre los artefactos persistidos del sistema:</p>
+<ul class="simple">
+<li><p>feature-packs bajo <code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/</span></code></p></li>
+<li><p>runs de entrenamiento y bundles de inferencia</p></li>
+<li><p>campeones promovidos por dataset/familia</p></li>
+<li><p>salidas persistidas de predicción en <code class="docutils literal notranslate"><span class="pre">artifacts/predictions/</span></code></p></li>
+</ul>
+<p>Todos los endpoints aquí descritos cuelgan del prefijo base:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/predicciones</span></code></p></li>
+</ul>
+<hr class="docutils" />
+<section id="alcance-funcional-del-router">
+<h2>Alcance funcional del router<a class="headerlink" href="#alcance-funcional-del-router" title="Link to this heading"></a></h2>
+<p>Este router cubre cinco bloques principales:</p>
+<ol class="arabic simple">
+<li><p><strong>Salud y disponibilidad del módulo</strong></p></li>
+<li><p><strong>Exploración del dataset para predicción</strong></p></li>
+<li><p><strong>Predicción individual</strong></p></li>
+<li><p><strong>Predicción por lote (job asíncrono)</strong></p></li>
+<li><p><strong>Resolución de modelo y consumo de outputs persistidos</strong></p></li>
+</ol>
+<p>En conjunto, estos endpoints permiten que el frontend:</p>
+<ul class="simple">
+<li><p>liste datasets listos para predicción;</p></li>
+<li><p>consulte docentes y materias disponibles;</p></li>
+<li><p>ejecute predicción individual sobre un par docente–materia;</p></li>
+<li><p>lance una corrida batch sobre todos los pares del dataset;</p></li>
+<li><p>consulte el estado del job;</p></li>
+<li><p>abra vista previa o descargue el archivo de resultados;</p></li>
+<li><p>inspeccione el bundle del modelo campeón o de un run concreto.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="resumen-de-endpoints-principales">
+<h2>Resumen de endpoints principales<a class="headerlink" href="#resumen-de-endpoints-principales" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Método</p></th>
+<th class="head"><p>Ruta</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/health</span></code></p></td>
+<td><p>Health-check del módulo de predicciones</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/datasets</span></code></p></td>
+<td><p>Lista datasets disponibles para predicción</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/runs</span></code></p></td>
+<td><p>Lista runs batch persistidos de un dataset</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/teachers</span></code></p></td>
+<td><p>Lista docentes únicos de un dataset</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/materias</span></code></p></td>
+<td><p>Lista materias únicas de un dataset</p></td>
+</tr>
+<tr class="row-odd"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/individual</span></code></p></td>
+<td><p>Predicción individual para un par docente–materia</p></td>
+</tr>
+<tr class="row-even"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/batch/run</span></code></p></td>
+<td><p>Lanza un job batch de predicción</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/batch/{job_id}</span></code></p></td>
+<td><p>Consulta el estado del job batch</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/model-info</span></code></p></td>
+<td><p>Devuelve metadata del modelo resuelto</p></td>
+</tr>
+<tr class="row-odd"><td><p>POST</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/predict</span></code></p></td>
+<td><p>Resuelve bundle y, opcionalmente, ejecuta inferencia</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/outputs/preview</span></code></p></td>
+<td><p>Vista previa JSON de outputs persistidos</p></td>
+</tr>
+<tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/predicciones/outputs/file</span></code></p></td>
+<td><p>Descarga el archivo parquet persistido</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-health">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/health</span></code><a class="headerlink" href="#get-predicciones-health" title="Link to this heading"></a></h2>
+<section id="descripcion">
+<h3>Descripción<a class="headerlink" href="#descripcion" title="Link to this heading"></a></h3>
+<p>Health-check del módulo de predicciones.</p>
+<p>Se usa para confirmar que el router está activo y que el backend puede resolver
+la carpeta de artefactos donde viven los feature-packs, runs y outputs.</p>
+</section>
+<section id="respuesta">
+<h3>Respuesta<a class="headerlink" href="#respuesta" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>JSON con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code>: normalmente <code class="docutils literal notranslate"><span class="pre">&quot;ok&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts_dir</span></code>: ruta efectiva de trabajo</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="uso-tipico">
+<h3>Uso típico<a class="headerlink" href="#uso-tipico" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>comprobación rápida desde frontend;</p></li>
+<li><p>smoke tests;</p></li>
+<li><p>diagnóstico de despliegue o rutas de artefactos.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-datasets">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/datasets</span></code><a class="headerlink" href="#get-predicciones-datasets" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>Descripción<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Lista los datasets disponibles para predicción del caso de uso principal del
+router, centrado en <strong>score_docente</strong> y pares docente–materia.</p>
+</section>
+<section id="fuente-de-datos">
+<h3>Fuente de datos<a class="headerlink" href="#fuente-de-datos" title="Link to this heading"></a></h3>
+<p>Este endpoint inspecciona los artefactos asociados a cada dataset, en especial:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/pair_meta.json</span></code></p></li>
+<li><p>estado del campeón para ese dataset</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Respuesta<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>Lista de objetos con información tipo:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_pairs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_docentes</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_materias</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">has_champion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">created_at</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="uso-en-frontend">
+<h3>Uso en frontend<a class="headerlink" href="#uso-en-frontend" title="Link to this heading"></a></h3>
+<p>Este endpoint alimenta el selector principal de dataset en la pestaña
+<strong>Predicciones</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-runs">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/runs</span></code><a class="headerlink" href="#get-predicciones-runs" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>Descripción<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<p>Lista los runs batch de predicción persistidos para un dataset.</p>
+<p>Está orientado al bloque <strong>Historial</strong> del frontend, donde el usuario puede:</p>
+<ul class="simple">
+<li><p>revisar ejecuciones anteriores;</p></li>
+<li><p>abrir una vista previa de resultados;</p></li>
+<li><p>descargar el parquet de predicciones.</p></li>
+</ul>
+</section>
+<section id="entrada">
+<h3>Entrada<a class="headerlink" href="#entrada" title="Link to this heading"></a></h3>
+<p>Parámetros de query:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> <strong>requerido</strong></p></li>
+</ul>
+<p>Si no se envía <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>, el endpoint responde con error de validación.</p>
+</section>
+<section id="id4">
+<h3>Respuesta<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>Lista de runs con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">pred_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">created_at</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_pairs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">champion_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="notas-de-compatibilidad">
+<h3>Notas de compatibilidad<a class="headerlink" href="#notas-de-compatibilidad" title="Link to this heading"></a></h3>
+<p>Para runs antiguos cuyo <code class="docutils literal notranslate"><span class="pre">meta.json</span></code> no contiene <code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code>, el backend
+intenta inferirlo a partir de rutas estándar como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predictions.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predicciones.parquet</span></code></p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-teachers">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/teachers</span></code><a class="headerlink" href="#get-predicciones-teachers" title="Link to this heading"></a></h2>
+<section id="id5">
+<h3>Descripción<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>Devuelve la lista de docentes únicos disponibles en un dataset ya preparado para
+predicción.</p>
+</section>
+<section id="id6">
+<h3>Entrada<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<p>Parámetros de query:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> <strong>requerido</strong></p></li>
+</ul>
+</section>
+<section id="dependencias">
+<h3>Dependencias<a class="headerlink" href="#dependencias" title="Link to this heading"></a></h3>
+<p>Este endpoint requiere la existencia de:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/teacher_index.json</span></code></p></li>
+</ul>
+<p>Opcionalmente usa:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pair_matrix.parquet</span></code> para contar encuestas por docente;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta.json</span></code> e <code class="docutils literal notranslate"><span class="pre">input_uri</span></code> para intentar resolver nombres legibles.</p></li>
+</ul>
+</section>
+<section id="id7">
+<h3>Respuesta<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>Lista de objetos con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">teacher_key</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teacher_name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teacher_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_encuestas</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="errores-tipicos">
+<h3>Errores típicos<a class="headerlink" href="#errores-tipicos" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> si no existe <code class="docutils literal notranslate"><span class="pre">teacher_index.json</span></code></p></li>
+</ul>
+</section>
+<section id="id8">
+<h3>Uso en frontend<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<p>Alimenta el selector de docente dentro de la pestaña <strong>Predicciones</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-materias">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/materias</span></code><a class="headerlink" href="#get-predicciones-materias" title="Link to this heading"></a></h2>
+<section id="id9">
+<h3>Descripción<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>Devuelve la lista de materias únicas disponibles para un dataset ya preparado
+para predicción.</p>
+</section>
+<section id="id10">
+<h3>Entrada<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<p>Parámetros de query:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> <strong>requerido</strong></p></li>
+</ul>
+</section>
+<section id="id11">
+<h3>Dependencias<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<p>Este endpoint requiere la existencia de:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/materia_index.json</span></code></p></li>
+</ul>
+<p>Opcionalmente usa:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pair_matrix.parquet</span></code> para conteos por materia;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">meta.json</span></code> e <code class="docutils literal notranslate"><span class="pre">input_uri</span></code> para intentar reconstruir nombres legibles.</p></li>
+</ul>
+</section>
+<section id="id12">
+<h3>Respuesta<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>Lista de objetos con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">materia_key</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">materia_name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">materia_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_encuestas</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id13">
+<h3>Errores típicos<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> si no existe <code class="docutils literal notranslate"><span class="pre">materia_index.json</span></code></p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>Uso en frontend<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<p>Alimenta el selector de asignatura o materia en la pestaña <strong>Predicciones</strong>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-predicciones-individual">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/predicciones/individual</span></code><a class="headerlink" href="#post-predicciones-individual" title="Link to this heading"></a></h2>
+<section id="id15">
+<h3>Descripción<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<p>Ejecuta una predicción individual de score para un par <strong>docente–materia</strong>.</p>
+<p>Este es el endpoint principal de inferencia interactiva de la pestaña
+<strong>Predicciones</strong>.</p>
+</section>
+<section id="id16">
+<h3>Entrada<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<p>Cuerpo JSON con campos requeridos como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teacher_key</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">materia_key</span></code></p></li>
+</ul>
+</section>
+<section id="flujo-funcional">
+<h3>Flujo funcional<a class="headerlink" href="#flujo-funcional" title="Link to this heading"></a></h3>
+<p>El endpoint realiza, en esencia, este proceso:</p>
+<ol class="arabic simple">
+<li><p>valida que exista <code class="docutils literal notranslate"><span class="pre">pair_matrix.parquet</span></code> para el dataset;</p></li>
+<li><p>busca el par <code class="docutils literal notranslate"><span class="pre">(teacher_key,</span> <span class="pre">materia_key)</span></code> en la matriz;</p></li>
+<li><p>si el par existe, usa sus features directamente;</p></li>
+<li><p>si el par no existe, entra en modo <strong>cold_pair</strong>;</p></li>
+<li><p>en modo <code class="docutils literal notranslate"><span class="pre">cold_pair</span></code>, valida que existan <code class="docutils literal notranslate"><span class="pre">teacher_index.json</span></code> y
+<code class="docutils literal notranslate"><span class="pre">materia_index.json</span></code>;</p></li>
+<li><p>imputa variables numéricas usando promedios por docente, materia o globales;</p></li>
+<li><p>resuelve el modelo campeón del dataset;</p></li>
+<li><p>carga el bundle de inferencia;</p></li>
+<li><p>ejecuta la predicción sobre el registro preparado;</p></li>
+<li><p>construye evidencias, radar, comparación y línea temporal.</p></li>
+</ol>
+</section>
+<section id="id17">
+<h3>Respuesta<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>Cuerpo JSON con información tipo:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teacher_key</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">materia_key</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">score_total_pred</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">risk</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">confidence</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cold_pair</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">evidence</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">historical</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">radar</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comparison</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">timeline</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">champion_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_name</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id18">
+<h3>Errores típicos<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code></p>
+<ul>
+<li><p>si no existe <code class="docutils literal notranslate"><span class="pre">pair_matrix.parquet</span></code></p></li>
+<li><p>si no existe <code class="docutils literal notranslate"><span class="pre">teacher_index.json</span></code> o <code class="docutils literal notranslate"><span class="pre">materia_index.json</span></code> cuando hace falta</p></li>
+<li><p>si <code class="docutils literal notranslate"><span class="pre">teacher_key</span></code> o <code class="docutils literal notranslate"><span class="pre">materia_key</span></code> no existen en el dataset</p></li>
+<li><p>si no existe campeón para ese dataset/familia</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code></p>
+<ul>
+<li><p>si el bundle del predictor existe pero no está listo para inferencia</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code></p>
+<ul>
+<li><p>si falla la carga del parquet o la inferencia de forma inesperada</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="observacion-importante">
+<h3>Observación importante<a class="headerlink" href="#observacion-importante" title="Link to this heading"></a></h3>
+<p>Este endpoint no devuelve solo el score predicho. También genera insumos para la
+UI analítica de la pestaña, como radar, comparación y timeline.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-predicciones-batch-run">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/predicciones/batch/run</span></code><a class="headerlink" href="#post-predicciones-batch-run" title="Link to this heading"></a></h2>
+<section id="id19">
+<h3>Descripción<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<p>Lanza un job asíncrono de predicción por lote sobre todos los pares disponibles
+en el dataset.</p>
+</section>
+<section id="id20">
+<h3>Entrada<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<p>Cuerpo JSON con campos como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> <strong>requerido</strong></p></li>
+</ul>
+</section>
+<section id="id21">
+<h3>Flujo funcional<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<p>Antes de crear el job, el backend valida:</p>
+<ul class="simple">
+<li><p>que exista <code class="docutils literal notranslate"><span class="pre">pair_matrix.parquet</span></code> para el dataset;</p></li>
+<li><p>que haya un campeón resoluble para la familia esperada;</p></li>
+<li><p>que el predictor esté listo para inferencia.</p></li>
+</ul>
+<p>Si todo está correcto:</p>
+<ol class="arabic simple">
+<li><p>crea un <code class="docutils literal notranslate"><span class="pre">job_id</span></code>;</p></li>
+<li><p>registra estado inicial <code class="docutils literal notranslate"><span class="pre">queued</span></code>;</p></li>
+<li><p>programa la ejecución en background;</p></li>
+<li><p>devuelve respuesta inmediata al cliente.</p></li>
+</ol>
+</section>
+<section id="id22">
+<h3>Respuesta<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">202</span> <span class="pre">Accepted</span></code></p></li>
+<li><p>JSON con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">job_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code> = <code class="docutils literal notranslate"><span class="pre">queued</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">progress</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id23">
+<h3>Errores típicos<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> si falta <code class="docutils literal notranslate"><span class="pre">pair_matrix.parquet</span></code> o no existe champion</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code> si el predictor no está listo</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-batch-job-id">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/batch/{job_id}</span></code><a class="headerlink" href="#get-predicciones-batch-job-id" title="Link to this heading"></a></h2>
+<section id="id24">
+<h3>Descripción<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>Consulta el estado de un job batch de predicción previamente lanzado.</p>
+</section>
+<section id="id25">
+<h3>Entrada<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">job_id</span></code> en la ruta</p></li>
+</ul>
+</section>
+<section id="id26">
+<h3>Respuesta<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> si el job existe</p></li>
+<li><p>JSON con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">job_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code> (<code class="docutils literal notranslate"><span class="pre">queued</span></code>, <code class="docutils literal notranslate"><span class="pre">running</span></code>, <code class="docutils literal notranslate"><span class="pre">completed</span></code>, <code class="docutils literal notranslate"><span class="pre">failed</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">progress</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pred_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_pairs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">champion_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">error</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id27">
+<h3>Errores típicos<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> si el <code class="docutils literal notranslate"><span class="pre">job_id</span></code> no existe en memoria</p></li>
+</ul>
+</section>
+<section id="resultado-del-job">
+<h3>Resultado del job<a class="headerlink" href="#resultado-del-job" title="Link to this heading"></a></h3>
+<p>Cuando el job termina correctamente, el backend persiste un parquet de
+predicciones bajo <code class="docutils literal notranslate"><span class="pre">artifacts/predictions/...</span></code> y deja la referencia en
+<code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-model-info">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/model-info</span></code><a class="headerlink" href="#get-predicciones-model-info" title="Link to this heading"></a></h2>
+<section id="id28">
+<h3>Descripción<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<p>Retorna metadata del modelo que sería usado por el sistema, sin ejecutar
+inferencia real.</p>
+<p>Sirve como endpoint de <strong>resolución y validación de bundle</strong>.</p>
+</section>
+<section id="id29">
+<h3>Entrada<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<p>Parámetros de query posibles:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use_champion</span></code> (<code class="docutils literal notranslate"><span class="pre">true</span></code>/<code class="docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+</ul>
+</section>
+<section id="reglas-de-resolucion">
+<h3>Reglas de resolución<a class="headerlink" href="#reglas-de-resolucion" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Si <code class="docutils literal notranslate"><span class="pre">use_champion=true</span></code>, el cliente debe enviar <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>.</p></li>
+<li><p>Si <code class="docutils literal notranslate"><span class="pre">use_champion=false</span></code>, el cliente debe enviar <code class="docutils literal notranslate"><span class="pre">run_id</span></code>.</p></li>
+</ul>
+</section>
+<section id="id30">
+<h3>Respuesta<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>JSON con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolved_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolved_from</span></code> (<code class="docutils literal notranslate"><span class="pre">champion</span></code> o <code class="docutils literal notranslate"><span class="pre">run_id</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_dir</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictor</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">preprocess</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">note</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id31">
+<h3>Errores típicos<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> si no existe champion o predictor bundle</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code> si faltan parámetros o el predictor no está listo</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code> ante errores internos de resolución</p></li>
+</ul>
+</section>
+<section id="id32">
+<h3>Uso típico<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>diagnóstico del bundle;</p></li>
+<li><p>inspección desde frontend;</p></li>
+<li><p>validación previa a inferencia.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="post-predicciones-predict">
+<h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/predicciones/predict</span></code><a class="headerlink" href="#post-predicciones-predict" title="Link to this heading"></a></h2>
+<section id="id33">
+<h3>Descripción<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<p>Resuelve y valida el bundle del predictor y, opcionalmente, ejecuta inferencia
+sobre un feature-pack.</p>
+</section>
+<section id="id34">
+<h3>Entrada<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<p>Cuerpo JSON con parámetros como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">use_champion</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">family</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_level</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">offset</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ids</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">return_proba</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">do_inference</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">persist</span></code></p></li>
+</ul>
+</section>
+<section id="comportamiento-por-defecto">
+<h3>Comportamiento por defecto<a class="headerlink" href="#comportamiento-por-defecto" title="Link to this heading"></a></h3>
+<p>Si <code class="docutils literal notranslate"><span class="pre">do_inference=false</span></code>, el endpoint actúa principalmente como resolución y
+validación del bundle, sin ejecutar inferencia.</p>
+</section>
+<section id="inferencia-opt-in">
+<h3>Inferencia opt-in<a class="headerlink" href="#inferencia-opt-in" title="Link to this heading"></a></h3>
+<p>Si <code class="docutils literal notranslate"><span class="pre">do_inference=true</span></code> o si <code class="docutils literal notranslate"><span class="pre">input_uri=&quot;feature_pack&quot;</span></code>, el endpoint:</p>
+<ol class="arabic simple">
+<li><p>resuelve el bundle del predictor;</p></li>
+<li><p>determina el <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> efectivo;</p></li>
+<li><p>ejecuta inferencia desde el feature-pack;</p></li>
+<li><p>retorna predicciones, esquema de salida y advertencias.</p></li>
+</ol>
+</section>
+<section id="persistencia-opt-in">
+<h3>Persistencia opt-in<a class="headerlink" href="#persistencia-opt-in" title="Link to this heading"></a></h3>
+<p>Si además <code class="docutils literal notranslate"><span class="pre">persist=true</span></code>, el endpoint guarda un <code class="docutils literal notranslate"><span class="pre">predictions.parquet</span></code> bajo
+<code class="docutils literal notranslate"><span class="pre">artifacts/predictions/</span></code> y retorna su <code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code>.</p>
+</section>
+<section id="id35">
+<h3>Respuesta<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>JSON con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolved_run_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolved_from</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">run_dir</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictor</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">preprocess</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictions</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_info</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_schema</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warnings</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">note</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id36">
+<h3>Errores típicos<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> si no existe champion o predictor bundle</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code></p>
+<ul>
+<li><p>si faltan parámetros requeridos;</p></li>
+<li><p>si el bundle existe pero no está listo;</p></li>
+<li><p>si <code class="docutils literal notranslate"><span class="pre">persist=true</span></code> sin <code class="docutils literal notranslate"><span class="pre">do_inference=true</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code> ante errores internos no esperados</p></li>
+</ul>
+</section>
+<section id="diferencia-respecto-a-predicciones-individual">
+<h3>Diferencia respecto a <code class="docutils literal notranslate"><span class="pre">/predicciones/individual</span></code><a class="headerlink" href="#diferencia-respecto-a-predicciones-individual" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/predicciones/individual</span></code> trabaja sobre un par docente–materia y devuelve una
+respuesta analítica enriquecida.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/predicciones/predict</span></code> trabaja como endpoint de resolución/inferencia más
+genérico sobre el feature-pack y puede persistir outputs.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-outputs-preview">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/outputs/preview</span></code><a class="headerlink" href="#get-predicciones-outputs-preview" title="Link to this heading"></a></h2>
+<section id="id37">
+<h3>Descripción<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<p>Devuelve una vista previa JSON de un archivo de predicciones persistido.</p>
+</section>
+<section id="id38">
+<h3>Entrada<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
+<p>Parámetros de query:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code> <strong>requerido</strong></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code> opcional</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">offset</span></code> opcional</p></li>
+</ul>
+</section>
+<section id="id39">
+<h3>Respuesta<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code></p></li>
+<li><p>JSON con campos como:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rows</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_schema</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">note</span></code></p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="id40">
+<h3>Errores típicos<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> si el archivo no existe</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code> si la URI o los parámetros no son válidos</p></li>
+</ul>
+</section>
+<section id="id41">
+<h3>Uso en frontend<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<p>Este endpoint alimenta la vista previa tabular del historial de ejecuciones.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-predicciones-outputs-file">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/predicciones/outputs/file</span></code><a class="headerlink" href="#get-predicciones-outputs-file" title="Link to this heading"></a></h2>
+<section id="id42">
+<h3>Descripción<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
+<p>Permite descargar el archivo parquet de predicciones persistido.</p>
+</section>
+<section id="id43">
+<h3>Entrada<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
+<p>Parámetros de query:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predictions_uri</span></code> <strong>requerido</strong></p></li>
+</ul>
+</section>
+<section id="id44">
+<h3>Respuesta<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Respuesta de archivo con <code class="docutils literal notranslate"><span class="pre">application/octet-stream</span></code></p></li>
+<li><p>nombre de archivo tomado desde la ruta resuelta</p></li>
+</ul>
+</section>
+<section id="id45">
+<h3>Errores típicos<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code> si el archivo no existe</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code> si la URI es inválida</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="dependencias-de-artefactos">
+<h2>Dependencias de artefactos<a class="headerlink" href="#dependencias-de-artefactos" title="Link to this heading"></a></h2>
+<p>Este router depende fuertemente de la existencia de artefactos generados en
+etapas previas del pipeline.</p>
+<p>Los más importantes son:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/pair_matrix.parquet</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/teacher_index.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/materia_index.json</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">artifacts/features/&lt;dataset_id&gt;/meta.json</span></code></p></li>
+<li><p>bundles de inferencia asociados al champion o al run seleccionado</p></li>
+<li><p>outputs bajo <code class="docutils literal notranslate"><span class="pre">artifacts/predictions/</span></code></p></li>
+</ul>
+<p>Si estos artefactos no existen, varios endpoints responderán con <code class="docutils literal notranslate"><span class="pre">404</span></code> o <code class="docutils literal notranslate"><span class="pre">422</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="relacion-con-otras-areas-del-sistema">
+<h2>Relación con otras áreas del sistema<a class="headerlink" href="#relacion-con-otras-areas-del-sistema" title="Link to this heading"></a></h2>
+<p>La API de <code class="docutils literal notranslate"><span class="pre">predicciones</span></code> depende de procesos previos de otras áreas:</p>
+<ul class="simple">
+<li><p><strong>Datos</strong></p>
+<ul>
+<li><p>para disponer del dataset y, en muchos casos, del histórico etiquetado;</p></li>
+</ul>
+</li>
+<li><p><strong>Jobs</strong></p>
+<ul>
+<li><p>para la construcción del feature-pack y otros artefactos intermedios;</p></li>
+</ul>
+</li>
+<li><p><strong>Modelos</strong></p>
+<ul>
+<li><p>para entrenar, evaluar y promover un champion utilizable.</p></li>
+</ul>
+</li>
+</ul>
+<p>Por tanto, este router opera en la parte final del pipeline: consume artefactos
+ya preparados y los convierte en resultados de predicción utilizables por la UI.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="prediccion.html" class="btn btn-neutral float-left" title="Endpoints de predicción directa" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="admin.html" class="btn btn-neutral float-right" title="Endpoints de administración" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Daniel Felipe Ramirez Cabrera &amp; Santiago Criollo Bermudez.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

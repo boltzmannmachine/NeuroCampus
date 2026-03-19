@@ -1,11 +1,10 @@
 Modelos BM / RBM / DBM
 ======================
 
-.. autosummary::
-   :toctree: generated
-   :recursive:
+.. toctree::
+   :maxdepth: 1
 
-   neurocampus.models.bm_manual
-   neurocampus.models.rbm_manual
-   neurocampus.models.dbm_manual
-   neurocampus.models.hparam_search
+   bm_manual
+   rbm_manual
+   dbm_manual
+   hparam_search

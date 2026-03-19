@@ -20,7 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Índice" href="../genindex.html" />
     <link rel="search" title="Búsqueda" href="../search.html" />
-    <link rel="next" title="Pestaña «Datos» – Ingesta y análisis" href="datos.html" />
+    <link rel="next" title="Pestaña «Dashboard»" href="dashboard.html" />
     <link rel="prev" title="NeuroCampus" href="../index.html" /> 
 </head>
 
@@ -46,10 +46,21 @@
               <p class="caption" role="heading"><span class="caption-text">Contenido</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Manual de usuario</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="datos.html">Pestaña «Datos» – Ingesta y análisis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modelos.html">Pestaña «Modelos»</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predicciones.html">Pestaña «Predicciones»</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dashboard.html">Pestaña «Dashboard»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datos.html">Pestaña «Datos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html">Pestaña «Modelos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-resumen">Subpestaña «Resumen»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-entrenamiento">Subpestaña «Entrenamiento»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-ejecuciones">Subpestaña «Ejecuciones»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-campeon">Subpestaña «Campeón»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-sweep">Subpestaña «Sweep»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-artefactos">Subpestaña «Artefactos»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#subpestana-diagnostico">Subpestaña «Diagnóstico»</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#comportamiento-transversal-de-la-pestana">Comportamiento transversal de la pestaña</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelos.html#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="predicciones.html">Pestaña «Predicciones»</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
@@ -85,12 +96,28 @@
              
   <section id="manual-de-usuario">
 <h1>Manual de usuario<a class="headerlink" href="#manual-de-usuario" title="Link to this heading"></a></h1>
+<p>Este manual describe el uso funcional de NeuroCampus desde la interfaz principal
+de la aplicación. La navegación actual se organiza en cuatro áreas principales:
+<strong>Dashboard</strong>, <strong>Datos</strong>, <strong>Modelos</strong> y <strong>Predicciones</strong>.</p>
+<p>En las siguientes secciones se documenta el propósito de cada pestaña, los flujos
+de trabajo disponibles y las operaciones principales que el usuario puede ejecutar.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="datos.html">Pestaña «Datos» – Ingesta y análisis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modelos.html">Pestaña «Modelos»</a></li>
-<li class="toctree-l1"><a class="reference internal" href="predicciones.html">Pestaña «Predicciones»</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dashboard.html">Pestaña «Dashboard»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datos.html">Pestaña «Datos»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html">Pestaña «Modelos»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#subpestana-resumen">Subpestaña «Resumen»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#subpestana-entrenamiento">Subpestaña «Entrenamiento»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#subpestana-ejecuciones">Subpestaña «Ejecuciones»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#subpestana-campeon">Subpestaña «Campeón»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#subpestana-sweep">Subpestaña «Sweep»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#subpestana-artefactos">Subpestaña «Artefactos»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#subpestana-diagnostico">Subpestaña «Diagnóstico»</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#comportamiento-transversal-de-la-pestana">Comportamiento transversal de la pestaña</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#flujo-de-trabajo-recomendado">Flujo de trabajo recomendado</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#alcance-real-de-la-pestana-en-la-version-actual">Alcance real de la pestaña en la versión actual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelos.html#relacion-con-otras-pestanas">Relación con otras pestañas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="predicciones.html">Pestaña «Predicciones»</a></li>
 </ul>
 </div>
 </section>
@@ -100,7 +127,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
         <a href="../index.html" class="btn btn-neutral float-left" title="NeuroCampus" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
-        <a href="datos.html" class="btn btn-neutral float-right" title="Pestaña «Datos» – Ingesta y análisis" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="dashboard.html" class="btn btn-neutral float-right" title="Pestaña «Dashboard»" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

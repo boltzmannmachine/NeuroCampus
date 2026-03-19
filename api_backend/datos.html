@@ -49,49 +49,33 @@
 <li class="toctree-l1"><a class="reference internal" href="../arquitectura/index.html">Arquitectura de NeuroCampus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../teoria/index.html">Teoría de modelos</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API del backend</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Endpoints de datos</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#resumen-de-endpoints-principales">Resumen de endpoints principales</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#get-datos-ping"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/ping</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#descripcion">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#respuesta">Respuesta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#cobertura-documental-actual">Cobertura documental actual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#resumen-de-dominios-expuestos">Resumen de dominios expuestos</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#navegacion-de-esta-seccion">Navegación de esta sección</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Endpoints de datos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#resumen-de-endpoints-vigentes">Resumen de endpoints vigentes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-datos-ping"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/ping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-datos-esquema"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/esquema</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-datos-validar"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/datos/validar</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#post-datos-upload"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/datos/upload</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-datos-preview"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/preview</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-datos-resumen"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/resumen</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-datos-sentimientos"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/sentimientos</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#observaciones-de-diseno-de-la-api-de-datos">Observaciones de diseño de la API de datos</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#get-datos-esquema"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/esquema</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id1">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#entrada">Entrada</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id2">Respuesta</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html">Endpoints de jobs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preprocesamiento-beto">Jobs de preprocesamiento BETO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-unificacion-historica">Jobs de unificación histórica</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-preparacion-de-feature-pack">Jobs de preparación de feature-pack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="jobs.html#jobs-de-busqueda-de-hiperparametros-rbm">Jobs de búsqueda de hiperparámetros RBM</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modelos.html">Endpoints de modelos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dashboard.html">Endpoints del Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="prediccion.html">Endpoints de predicción directa</a></li>
+<li class="toctree-l3"><a class="reference internal" href="predicciones.html">Endpoints de predicciones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="admin.html">Endpoints de administración</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#post-datos-validar"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/datos/validar</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id3">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id4">Entrada</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#comportamiento-esperado">Comportamiento esperado</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id5">Respuesta</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#post-datos-upload"><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/datos/upload</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id6">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id7">Entrada</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id8">Comportamiento esperado</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id9">Respuesta</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#get-datos-resumen"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/resumen</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id10">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id11">Entrada</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id12">Respuesta</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#get-datos-sentimientos"><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/sentimientos</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id13">Descripción</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id14">Entrada</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id15">Respuesta</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="jobs.html">Endpoints de jobs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="admin.html">Endpoints de administración</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api_python/index.html">API Python (backend)</a></li>
@@ -125,16 +109,16 @@
              
   <section id="endpoints-de-datos">
 <h1>Endpoints de datos<a class="headerlink" href="#endpoints-de-datos" title="Link to this heading"></a></h1>
-<p>La API de datos agrupa los endpoints relacionados con la <strong>ingesta</strong>,
-<strong>validación</strong>, <strong>preprocesamiento</strong> y <strong>resumen</strong> de los datasets usados por
+<p>La API de datos agrupa los endpoints relacionados con la <strong>validación</strong>,
+<strong>ingesta</strong>, <strong>consulta</strong> y <strong>visualización preliminar</strong> de datasets usados por
 NeuroCampus.</p>
-<p>Todos los endpoints aquí descritos cuelgan del prefijo base:</p>
+<p>Todos los endpoints documentados en esta página cuelgan del prefijo base:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">/datos</span></code></p></li>
 </ul>
 <hr class="docutils" />
-<section id="resumen-de-endpoints-principales">
-<h2>Resumen de endpoints principales<a class="headerlink" href="#resumen-de-endpoints-principales" title="Link to this heading"></a></h2>
+<section id="resumen-de-endpoints-vigentes">
+<h2>Resumen de endpoints vigentes<a class="headerlink" href="#resumen-de-endpoints-vigentes" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Método</p></th>
@@ -145,52 +129,56 @@ NeuroCampus.</p>
 <tbody>
 <tr class="row-even"><td><p>GET</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/datos/ping</span></code></p></td>
-<td><p>Verificación rápida de salud del módulo de datos.</p></td>
+<td><p>Verificación rápida del router de datos</p></td>
 </tr>
 <tr class="row-odd"><td><p>GET</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/datos/esquema</span></code></p></td>
-<td><p>Devuelve el esquema esperado de columnas para los datasets</p></td>
+<td><p>Devuelve el esquema esperado de la plantilla</p></td>
 </tr>
 <tr class="row-even"><td><p>POST</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/datos/validar</span></code></p></td>
-<td><p>Valida un archivo sin persistirlo en el sistema</p></td>
+<td><p>Valida un archivo sin persistirlo</p></td>
 </tr>
 <tr class="row-odd"><td><p>POST</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/datos/upload</span></code></p></td>
-<td><p>Sube y registra un nuevo dataset</p></td>
+<td><p>Sube y registra el dataset del periodo indicado</p></td>
 </tr>
 <tr class="row-even"><td><p>GET</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/datos/resumen</span></code></p></td>
-<td><p>Devuelve el resumen estructural del dataset activo</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/datos/preview</span></code></p></td>
+<td><p>Devuelve una vista tabular del dataset</p></td>
 </tr>
 <tr class="row-odd"><td><p>GET</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/datos/resumen</span></code></p></td>
+<td><p>Devuelve KPIs y resumen estructural del dataset</p></td>
+</tr>
+<tr class="row-even"><td><p>GET</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">/datos/sentimientos</span></code></p></td>
-<td><p>Devuelve agregados de análisis de sentimientos (BETO)</p></td>
+<td><p>Devuelve agregados de sentimientos del dataset etiquetado</p></td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<div><p><strong>Nota</strong>: los nombres concretos de los parámetros pueden variar según la
-implementación, pero esta sección resume la intención funcional de cada ruta.</p>
-</div></blockquote>
 </section>
 <hr class="docutils" />
 <section id="get-datos-ping">
 <h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/ping</span></code><a class="headerlink" href="#get-datos-ping" title="Link to this heading"></a></h2>
 <section id="descripcion">
 <h3>Descripción<a class="headerlink" href="#descripcion" title="Link to this heading"></a></h3>
-<p>Endpoint de comprobación rápida del módulo de datos. Útil para:</p>
+<p>Endpoint de salud mínimo del contexto <strong>datos</strong>.</p>
+<p>Permite verificar rápidamente que:</p>
 <ul class="simple">
-<li><p>Verificar la conectividad entre frontend y backend.</p></li>
-<li><p>Checks básicos en tests automáticos o sistemas de monitorización.</p></li>
+<li><p>el router está registrado correctamente en la API;</p></li>
+<li><p>el prefijo <code class="docutils literal notranslate"><span class="pre">/datos</span></code> responde;</p></li>
+<li><p>la comunicación frontend-backend está disponible para este dominio.</p></li>
 </ul>
 </section>
 <section id="respuesta">
 <h3>Respuesta<a class="headerlink" href="#respuesta" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con un pequeño JSON indicando estado (por ejemplo,
-<code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">&quot;status&quot;:</span> <span class="pre">&quot;ok&quot;</span> <span class="pre">}</span></code>).</p></li>
-</ul>
+<p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con una estructura simple como:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;datos&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pong&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 </section>
 </section>
 <hr class="docutils" />
@@ -198,53 +186,54 @@ implementación, pero esta sección resume la intención funcional de cada ruta.
 <h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/esquema</span></code><a class="headerlink" href="#get-datos-esquema" title="Link to this heading"></a></h2>
 <section id="id1">
 <h3>Descripción<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<p>Devuelve el <strong>esquema esperado de columnas</strong> para los datasets de evaluaciones
-docentes. Esta información se utiliza:</p>
-<ul class="simple">
-<li><p>En la pestaña <strong>Datos</strong> para mostrar la plantilla de columnas.</p></li>
-<li><p>Como referencia al preparar archivos para carga o predicción por lote.</p></li>
-</ul>
+<p>Devuelve el esquema esperado para la plantilla de evaluaciones docentes.</p>
+<p>Este endpoint intenta primero leer el archivo:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>schemas/plantilla_dataset.schema.json
+</pre></div>
+</div>
+<p>Si ese archivo no existe o no puede parsearse, el backend utiliza un
+<strong>esquema de respaldo</strong> incorporado en el router.</p>
 </section>
-<section id="entrada">
-<h3>Entrada<a class="headerlink" href="#entrada" title="Link to this heading"></a></h3>
+<section id="parametros">
+<h3>Parámetros<a class="headerlink" href="#parametros" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Parámetros típicos (opcional):</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code> (opcional)</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">tipo</span></code> o <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> para seleccionar una variante de esquema, si aplica.</p></li>
+<li><p>reservado para futuras extensiones;</p></li>
+<li><p>en la implementación actual no cambia el resultado efectivo.</p></li>
 </ul>
 </li>
 </ul>
 </section>
 <section id="id2">
 <h3>Respuesta<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con un objeto tipado (<code class="docutils literal notranslate"><span class="pre">EsquemaResponse</span></code>) que contiene, al menos:</p>
 <ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
-<li><p>Cuerpo JSON con campos similares a:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code>: versión del esquema.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">columns</span></code>: lista de columnas esperadas con información como:</p>
-<ul>
-<li><p>nombre interno,</p></li>
-<li><p>tipo de dato,</p></li>
-<li><p>si es requerida u opcional,</p></li>
-<li><p>descripción.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></li>
 </ul>
-</li>
+<p>Cada columna puede incluir información como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dtype</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">required</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">range</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_len</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">domain</span></code></p></li>
 </ul>
-</li>
+</section>
+<section id="observaciones-de-implementacion">
+<h3>Observaciones de implementación<a class="headerlink" href="#observaciones-de-implementacion" title="Link to this heading"></a></h3>
+<p>El esquema fallback actual incluye campos como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">codigo_materia</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">grupo</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pregunta_1</span></code> a <code class="docutils literal notranslate"><span class="pre">pregunta_10</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Sugerencias:</span></code></p></li>
 </ul>
-<p>Ejemplo simplificado:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.3.0&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;docente&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;asignatura&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;p1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;number&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;required&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
-<span class="w">    </span><span class="s2">&quot;...&quot;</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
-</pre></div>
-</div>
+<p>Esto permite que la UI siga funcionando incluso si no está disponible el JSON
+formal del esquema.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -252,189 +241,443 @@ docentes. Esta información se utiliza:</p>
 <h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/datos/validar</span></code><a class="headerlink" href="#post-datos-validar" title="Link to this heading"></a></h2>
 <section id="id3">
 <h3>Descripción<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
-<p>Valida un archivo de datos <strong>sin persistirlo</strong> en el sistema. Se utiliza para:</p>
-<ul class="simple">
-<li><p>Comprobar que el archivo cumple con el esquema esperado.</p></li>
-<li><p>Obtener una vista previa de filas y posibles errores antes de cargarlo.</p></li>
-</ul>
+<p>Valida un archivo de datos <strong>sin persistirlo en disco</strong>.</p>
+<p>Este endpoint está diseñado para el flujo previo a la carga definitiva desde la
+pestaña <strong>Datos</strong>.</p>
 </section>
-<section id="id4">
-<h3>Entrada<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<section id="entrada">
+<h3>Entrada<a class="headerlink" href="#entrada" title="Link to this heading"></a></h3>
+<p>Se espera <code class="docutils literal notranslate"><span class="pre">multipart/form-data</span></code> con estos campos:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">multipart/form-data</span></code> con campos típicos:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">file</span></code></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">file</span></code>: archivo a validar (<code class="docutils literal notranslate"><span class="pre">.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">.xlsx</span></code>, <code class="docutils literal notranslate"><span class="pre">.xls</span></code>, <code class="docutils literal notranslate"><span class="pre">.parquet</span></code>, etc.).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (opcional): identificador que se planea asignar al dataset.</p></li>
+<li><p>archivo de entrada;</p></li>
+<li><p>formatos soportados: <code class="docutils literal notranslate"><span class="pre">csv</span></code>, <code class="docutils literal notranslate"><span class="pre">xlsx</span></code>, <code class="docutils literal notranslate"><span class="pre">parquet</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p>
+<ul>
+<li><p>identificador lógico del dataset.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fmt</span></code> (opcional)</p>
+<ul>
+<li><p>fuerza el lector a uno de estos valores:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xlsx</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parquet</span></code></p></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="comportamiento-esperado">
-<h3>Comportamiento esperado<a class="headerlink" href="#comportamiento-esperado" title="Link to this heading"></a></h3>
+<section id="comportamiento-real">
+<h3>Comportamiento real<a class="headerlink" href="#comportamiento-real" title="Link to this heading"></a></h3>
+<p>La implementación actual realiza este flujo:</p>
+<ol class="arabic simple">
+<li><p>lee el archivo en memoria;</p></li>
+<li><p>rechaza archivos vacíos;</p></li>
+<li><p>valida que el formato sea soportado;</p></li>
+<li><p>construye un <code class="docutils literal notranslate"><span class="pre">sample</span></code> auxiliar con las primeras filas;</p></li>
+<li><p>delega la validación al wrapper unificado <code class="docutils literal notranslate"><span class="pre">validar_archivo(...)</span></code>;</p></li>
+<li><p>enriquece la respuesta con <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> y <code class="docutils literal notranslate"><span class="pre">sample</span></code>.</p></li>
+</ol>
+</section>
+<section id="respuestas-posibles">
+<h3>Respuestas posibles<a class="headerlink" href="#respuestas-posibles" title="Link to this heading"></a></h3>
+<section id="ok">
+<h4><code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code><a class="headerlink" href="#ok" title="Link to this heading"></a></h4>
+<p>Cuando el archivo es legible y la validación se ejecuta correctamente.</p>
+<p>La respuesta puede incluir campos como:</p>
 <ul class="simple">
-<li><p>El backend:</p>
-<ul>
-<li><p>Lee el archivo con un adaptador de formato.</p></li>
-<li><p>Aplica la cadena de validación definida en <code class="docutils literal notranslate"><span class="pre">neurocampus.data</span></code> / <code class="docutils literal notranslate"><span class="pre">validation</span></code>.</p></li>
-<li><p>Devuelve un informe de validación y, opcionalmente, una muestra de filas.</p></li>
-</ul>
-</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ok</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">errors</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warnings</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample</span></code></p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Respuesta<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<section id="bad-request">
+<h4><code class="docutils literal notranslate"><span class="pre">400</span> <span class="pre">Bad</span> <span class="pre">Request</span></code><a class="headerlink" href="#bad-request" title="Link to this heading"></a></h4>
+<p>Casos típicos:</p>
 <ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> si el archivo es legible (aunque tenga errores de validación).</p></li>
-<li><p>Cuerpo JSON típico:</p>
-<ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">ok</span></code>: <code class="docutils literal notranslate"><span class="pre">true</span></code> / <code class="docutils literal notranslate"><span class="pre">false</span></code> según el resultado de validación.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">errors</span></code>: lista de errores.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">warnings</span></code>: lista de advertencias.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sample</span></code>: muestra de filas (por ejemplo, primeras 5–10).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>: identificador sugerido o inferido (si aplica).</p></li>
+<li><p>archivo vacío;</p></li>
+<li><p>formato no soportado;</p></li>
+<li><p>error de decodificación del CSV.</p></li>
 </ul>
-</li>
+<p>Ejemplo de detalle posible:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Formato no soportado. Use csv/xlsx/parquet o especifique &#39;fmt&#39;.
+</pre></div>
+</div>
+</section>
+<section id="internal-server-error">
+<h4><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code><a class="headerlink" href="#internal-server-error" title="Link to this heading"></a></h4>
+<p>Si ocurre un error inesperado durante la validación.</p>
+</section>
+</section>
+<section id="notas-importantes">
+<h3>Notas importantes<a class="headerlink" href="#notas-importantes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Este endpoint <strong>no persiste</strong> el archivo.</p></li>
+<li><p>El <code class="docutils literal notranslate"><span class="pre">sample</span></code> es una vista previa auxiliar para frontend y compatibilidad con
+tests.</p></li>
+<li><p>El nombre del parámetro es <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>, aunque en el flujo funcional del
+sistema el identificador operativo final suele alinearse con el periodo.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
 <section id="post-datos-upload">
 <h2><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/datos/upload</span></code><a class="headerlink" href="#post-datos-upload" title="Link to this heading"></a></h2>
-<section id="id6">
-<h3>Descripción<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
-<p>Carga y registra un nuevo dataset en el sistema. Este endpoint suele engancharse
-a la acción <strong>«Cargar y procesar»</strong> de la pestaña <strong>Datos</strong>.</p>
+<section id="id4">
+<h3>Descripción<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<p>Realiza la ingesta real del dataset en el sistema.</p>
+<p>En la implementación actual, este endpoint escribe el dataset en:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;repo_root&gt;/datasets/{periodo}.parquet
+</pre></div>
+</div>
+<p>Si no hay soporte disponible para parquet, el backend hace fallback a:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;repo_root&gt;/datasets/{periodo}.csv
+</pre></div>
+</div>
 </section>
-<section id="id7">
-<h3>Entrada<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<section id="id5">
+<h3>Entrada<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<p>Se espera <code class="docutils literal notranslate"><span class="pre">multipart/form-data</span></code> con estos campos:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">multipart/form-data</span></code> con campos típicos:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">file</span></code></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">file</span></code>: archivo con las evaluaciones docentes.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>: identificador del dataset (por ejemplo, <code class="docutils literal notranslate"><span class="pre">2024-2</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">overwrite</span></code>: booleano que indica si se debe sobrescribir un dataset ya
-existente con el mismo <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>.</p></li>
-<li><p>Flags adicionales (según implementación):</p>
+<li><p>archivo <code class="docutils literal notranslate"><span class="pre">csv</span></code>, <code class="docutils literal notranslate"><span class="pre">xlsx</span></code> o <code class="docutils literal notranslate"><span class="pre">parquet</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodo</span></code></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">run_preproc</span></code>: aplicar preprocesamiento al cargar.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">run_beto</span></code>: lanzar job de análisis de sentimientos tras el preprocesamiento.</p></li>
+<li><p>identificador del periodo, por ejemplo <code class="docutils literal notranslate"><span class="pre">2024-2</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p>
+<ul>
+<li><p>alias mantenido por compatibilidad;</p></li>
+<li><p>actualmente <strong>se ignora</strong> y se usa <code class="docutils literal notranslate"><span class="pre">periodo</span></code> como identificador efectivo.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">overwrite</span></code></p>
+<ul>
+<li><p>booleano opcional;</p></li>
+<li><p>controla si puede reemplazarse un dataset ya existente.</p></li>
 </ul>
 </li>
 </ul>
-</li>
+</section>
+<section id="id6">
+<h3>Comportamiento real<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>valida que <code class="docutils literal notranslate"><span class="pre">periodo</span></code> exista;</p></li>
+<li><p>valida el formato por extensión;</p></li>
+<li><p>resuelve el directorio de salida <code class="docutils literal notranslate"><span class="pre">datasets/</span></code>;</p></li>
+<li><p>verifica si ya existe <code class="docutils literal notranslate"><span class="pre">{periodo}.parquet</span></code> o <code class="docutils literal notranslate"><span class="pre">{periodo}.csv</span></code>;</p></li>
+<li><p>si existe y <code class="docutils literal notranslate"><span class="pre">overwrite=false</span></code>, responde <code class="docutils literal notranslate"><span class="pre">409</span> <span class="pre">Conflict</span></code>;</p></li>
+<li><p>lee el archivo con <code class="docutils literal notranslate"><span class="pre">read_file(...)</span></code>;</p></li>
+<li><p>intenta persistirlo como parquet;</p></li>
+<li><p>si falla el motor parquet, persiste como CSV;</p></li>
+<li><p>devuelve un <code class="docutils literal notranslate"><span class="pre">DatosUploadResponse</span></code>.</p></li>
+</ol>
+</section>
+<section id="respuesta-exitosa">
+<h3>Respuesta exitosa<a class="headerlink" href="#respuesta-exitosa" title="Link to this heading"></a></h3>
+<p>Código <code class="docutils literal notranslate"><span class="pre">201</span> <span class="pre">Created</span></code>.</p>
+<p>Campos relevantes de salida:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rows_ingested</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stored_as</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">warnings</span></code></p></li>
 </ul>
+<p>Ejemplo conceptual:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;dataset_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-2&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;rows_ingested&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">530</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;stored_as&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localfs://neurocampus/datasets/2024-2.parquet&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;warnings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="respuestas-de-error">
+<h3>Respuestas de error<a class="headerlink" href="#respuestas-de-error" title="Link to this heading"></a></h3>
+<section id="id7">
+<h4><code class="docutils literal notranslate"><span class="pre">400</span> <span class="pre">Bad</span> <span class="pre">Request</span></code><a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>falta <code class="docutils literal notranslate"><span class="pre">periodo</span></code>;</p></li>
+<li><p>archivo vacío;</p></li>
+<li><p>formato no soportado.</p></li>
+</ul>
+</section>
+<section id="conflict">
+<h4><code class="docutils literal notranslate"><span class="pre">409</span> <span class="pre">Conflict</span></code><a class="headerlink" href="#conflict" title="Link to this heading"></a></h4>
+<p>Se devuelve si el dataset ya existe y no se activó <code class="docutils literal notranslate"><span class="pre">overwrite</span></code>.</p>
+<p>Detalle típico:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>El dataset &#39;2024-2&#39; ya existe. Activa &#39;overwrite&#39; para reemplazarlo.
+</pre></div>
+</div>
 </section>
 <section id="id8">
-<h3>Comportamiento esperado<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<h4><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code><a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
+<p>Error inesperado durante lectura o escritura.</p>
+</section>
+</section>
+<section id="observacion-funcional-importante">
+<h3>Observación funcional importante<a class="headerlink" href="#observacion-funcional-importante" title="Link to this heading"></a></h3>
+<p>Este endpoint confirma lo que ya se observa en la UI actual: el identificador
+real de persistencia está gobernado por <strong><code class="docutils literal notranslate"><span class="pre">periodo</span></code></strong>, no por el texto libre de
+<code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="get-datos-preview">
+<h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/preview</span></code><a class="headerlink" href="#get-datos-preview" title="Link to this heading"></a></h2>
+<section id="id9">
+<h3>Descripción<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<p>Devuelve una vista tabular del dataset para poblar la tabla de la pestaña
+<strong>Datos</strong>.</p>
+</section>
+<section id="parametros-de-query">
+<h3>Parámetros de query<a class="headerlink" href="#parametros-de-query" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>El backend:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset</span></code> (requerido)</p>
 <ul>
-<li><p>Valida el archivo.</p></li>
-<li><p>Lo transforma al formato interno estándar.</p></li>
-<li><p>Lo guarda en la ubicación configurada (<code class="docutils literal notranslate"><span class="pre">data/</span></code>).</p></li>
-<li><p>Genera y persiste un <strong>resumen de dataset</strong>.</p></li>
-<li><p>Si se indica, lanza el job de BETO.</p></li>
+<li><p>alias del parámetro <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> en el backend.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variant</span></code></p>
+<ul>
+<li><p>valores admitidos:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">processed</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">labeled</span></code></p></li>
+</ul>
+</li>
+<li><p>por defecto: <code class="docutils literal notranslate"><span class="pre">processed</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mode</span></code></p>
+<ul>
+<li><p>valores admitidos:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ui</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">raw</span></code></p></li>
+</ul>
+</li>
+<li><p>por defecto: <code class="docutils literal notranslate"><span class="pre">ui</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code></p>
+<ul>
+<li><p>mínimo <code class="docutils literal notranslate"><span class="pre">1</span></code>, máximo <code class="docutils literal notranslate"><span class="pre">200</span></code>;</p></li>
+<li><p>por defecto <code class="docutils literal notranslate"><span class="pre">25</span></code>.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">offset</span></code></p>
+<ul>
+<li><p>mínimo <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="id9">
-<h3>Respuesta<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<section id="id10">
+<h3>Comportamiento real<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>En caso de éxito, código <code class="docutils literal notranslate"><span class="pre">201</span> <span class="pre">Created</span></code> o <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>.</p></li>
-<li><p>Cuerpo JSON típico:</p>
+<li><p>Si <code class="docutils literal notranslate"><span class="pre">variant=labeled</span></code>, el endpoint intenta cargar el dataset etiquetado.</p></li>
+<li><p>Si <code class="docutils literal notranslate"><span class="pre">variant=processed</span></code>, intenta cargar el dataset procesado.</p></li>
+<li><p>Luego construye una respuesta tipada mediante <code class="docutils literal notranslate"><span class="pre">build_dataset_preview(...)</span></code>.</p></li>
+</ul>
+</section>
+<section id="id11">
+<h3>Respuesta<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con un objeto <code class="docutils literal notranslate"><span class="pre">DatasetPreviewResponse</span></code>.</p>
+<p>Su contenido está pensado para renderizar:</p>
+<ul class="simple">
+<li><p>columnas de la tabla;</p></li>
+<li><p>filas paginadas;</p></li>
+<li><p>metadatos de fuente;</p></li>
+<li><p>modo y variante seleccionados.</p></li>
+</ul>
+</section>
+<section id="errores">
+<h3>Errores<a class="headerlink" href="#errores" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">ok</span></code>: <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>: identificador efectivamente registrado.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rows_ingested</span></code>: número de filas ingestadas.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">stored_as</span></code>: ruta o URI donde quedó almacenado el dataset.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">preproc_job_id</span></code>: id del job de preprocesamiento, si aplica.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">beto_job_id</span></code>: id del job BETO lanzado, si aplica.</p></li>
+<li><p>si el archivo fuente no existe.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code></p>
+<ul>
+<li><p>si falla la construcción del preview.</p></li>
 </ul>
 </li>
 </ul>
+</section>
+<section id="observacion-importante">
+<h3>Observación importante<a class="headerlink" href="#observacion-importante" title="Link to this heading"></a></h3>
+<p>Este endpoint no estaba reflejado en la documentación anterior y hoy es parte
+real del soporte a la tabla de vista previa del frontend.</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="get-datos-resumen">
 <h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/resumen</span></code><a class="headerlink" href="#get-datos-resumen" title="Link to this heading"></a></h2>
-<section id="id10">
-<h3>Descripción<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
-<p>Devuelve un resumen estructural del dataset activo o del <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>
-especificado. Es la base de la sección <strong>«Resumen del dataset»</strong> en la pestaña
+<section id="id12">
+<h3>Descripción<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<p>Devuelve KPIs generales y un resumen estructural del dataset para la pestaña
 <strong>Datos</strong>.</p>
 </section>
-<section id="id11">
-<h3>Entrada<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>Parámetros de query<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Parámetros de query típicos:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset</span></code> (requerido)</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> (opcional): si no se indica, puede usarse un dataset por
-defecto o el último cargado.</p></li>
+<li><p>alias del parámetro lógico <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>.</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="id12">
-<h3>Respuesta<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<section id="fuente-de-datos">
+<h3>Fuente de datos<a class="headerlink" href="#fuente-de-datos" title="Link to this heading"></a></h3>
+<p>El backend intenta leer el dataset procesado asociado al identificador indicado.</p>
+<p>Según la configuración y helpers de dominio, la fuente puede resolverse desde
+rutas equivalentes a:</p>
 <ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> en caso de éxito.</p></li>
-<li><p>Cuerpo JSON con información como:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/processed/{dataset_id}.parquet</span></code></p></li>
+<li><p>o variantes de resolución equivalentes definidas por helpers internos.</p></li>
+</ul>
+</section>
+<section id="id14">
+<h3>Respuesta<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con un <code class="docutils literal notranslate"><span class="pre">DatasetResumenResponse</span></code>.</p>
+<p>Incluye información como:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n_rows</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_cols</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">periodos</span></code></p></li>
+<li><p>número de docentes</p></li>
+<li><p>número de asignaturas</p></li>
+<li><p>resumen de columnas</p></li>
+</ul>
+</section>
+<section id="id15">
+<h3>Errores<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">n_rows</span></code>, <code class="docutils literal notranslate"><span class="pre">n_columns</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">columns</span></code>: lista de columnas con tipos y estadísticas básicas.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">docentes_count</span></code>, <code class="docutils literal notranslate"><span class="pre">asignaturas_count</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">periodos</span></code>: listado o rango de periodos detectados.</p></li>
-<li><p>Otros agregados de interés para el dashboard de datos.</p></li>
+<li><p>si no existe dataset procesado para el identificador dado.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code></p>
+<ul>
+<li><p>si ocurre un error al leer el dataset.</p></li>
 </ul>
 </li>
 </ul>
-<p>Esta información se utiliza para poblar las tarjetas, tablas y gráficos del
-<strong>resumen de dataset</strong>.</p>
+</section>
+<section id="uso-en-la-ui">
+<h3>Uso en la UI<a class="headerlink" href="#uso-en-la-ui" title="Link to this heading"></a></h3>
+<p>Este endpoint soporta los KPIs visibles del resumen del dataset y parte de la
+información que se presenta en la tabla y tarjetas de la pestaña <strong>Datos</strong>.</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="get-datos-sentimientos">
 <h2><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/datos/sentimientos</span></code><a class="headerlink" href="#get-datos-sentimientos" title="Link to this heading"></a></h2>
-<section id="id13">
-<h3>Descripción<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
-<p>Devuelve agregados de <strong>análisis de sentimientos</strong> derivados del preprocesamiento
-con BETO. Se usa tanto en la pestaña <strong>Datos</strong> como, potencialmente, en otras
-vistas analíticas.</p>
+<section id="id16">
+<h3>Descripción<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<p>Devuelve la distribución de sentimientos del dataset etiquetado con BETO.</p>
 </section>
-<section id="id14">
-<h3>Entrada<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>Parámetros de query<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Parámetros de query típicos:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset</span></code> (requerido)</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">dataset_id</span></code>: dataset sobre el que se quiere consultar.</p></li>
-<li><p>Otros filtros opcionales (por ejemplo, <code class="docutils literal notranslate"><span class="pre">docente</span></code>, <code class="docutils literal notranslate"><span class="pre">asignatura</span></code>), según la
-implementación.</p></li>
+<li><p>alias del identificador lógico del dataset.</p></li>
 </ul>
 </li>
 </ul>
 </section>
-<section id="id15">
-<h3>Respuesta<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<section id="id18">
+<h3>Fuente de datos<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<p>El endpoint intenta leer el dataset etiquetado desde helpers de dominio,
+normalmente asociado a salidas como:</p>
 <ul class="simple">
-<li><p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> en caso de éxito.</p></li>
-<li><p>Cuerpo JSON con campos típicos:</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/labeled/{dataset_id}_beto.parquet</span></code></p></li>
+<li><p>o variantes compatibles como datasets <code class="docutils literal notranslate"><span class="pre">teacher</span></code>.</p></li>
+</ul>
+</section>
+<section id="id19">
+<h3>Respuesta<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<p>Código <code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code> con un <code class="docutils literal notranslate"><span class="pre">DatasetSentimientosResponse</span></code>.</p>
+<p>La respuesta está pensada para alimentar visualizaciones como:</p>
+<ul class="simple">
+<li><p>distribución global de polaridad;</p></li>
+<li><p>agregados por docente;</p></li>
+<li><p>agregados por asignatura.</p></li>
+</ul>
+<p>Campos conceptualmente esperados:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">total_comentarios</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">global_counts</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">por_docente</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">por_asignatura</span></code></p></li>
+</ul>
+</section>
+<section id="id20">
+<h3>Errores<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code></p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">global_counts</span></code>: lista de objetos resumen global (pos/neu/neg), con recuentos
-y proporciones.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">top_docentes</span></code>: agregados por docente ordenados según alguna métrica.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">coverage</span></code> y otros indicadores auxiliares (porcentaje de filas con texto,
-tasa de éxito del modelo, etc.).</p></li>
+<li><p>si no existe dataset etiquetado para ese identificador.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code></p>
+<ul>
+<li><p>si falta una columna esperada en el dataset etiquetado.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code></p>
+<ul>
+<li><p>si ocurre un error no controlado en la construcción del resumen.</p></li>
 </ul>
 </li>
 </ul>
-<p>Estos datos alimentan:</p>
-<ul class="simple">
-<li><p>Gráfico de barras global (positivo / neutro / negativo).</p></li>
-<li><p>Tablas y gráficos por docente/asignatura.</p></li>
-</ul>
 </section>
+<section id="uso-funcional">
+<h3>Uso funcional<a class="headerlink" href="#uso-funcional" title="Link to this heading"></a></h3>
+<p>Este endpoint soporta directamente las visualizaciones de sentimiento de la
+pestaña <strong>Datos</strong> y también puede servir de insumo a otras vistas analíticas.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="observaciones-de-diseno-de-la-api-de-datos">
+<h2>Observaciones de diseño de la API de datos<a class="headerlink" href="#observaciones-de-diseno-de-la-api-de-datos" title="Link to this heading"></a></h2>
+<p>La implementación actual revela dos convenciones importantes:</p>
+<ol class="arabic simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">periodo</span></code> gobierna la persistencia real en upload</strong></p>
+<ul class="simple">
+<li><p>aunque <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> siga existiendo por compatibilidad.</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">dataset</span></code> se usa como alias en varios <code class="docutils literal notranslate"><span class="pre">GET</span></code></strong></p>
+<ul class="simple">
+<li><p>para <code class="docutils literal notranslate"><span class="pre">preview</span></code>, <code class="docutils literal notranslate"><span class="pre">resumen</span></code> y <code class="docutils literal notranslate"><span class="pre">sentimientos</span></code>.</p></li>
+</ul>
+</li>
+</ol>
+<p>Esto significa que, al documentar o consumir esta API, conviene distinguir entre:</p>
+<ul class="simple">
+<li><p>el nombre formal del parámetro en cada endpoint,</p></li>
+<li><p>y el identificador lógico efectivo que usa el pipeline.</p></li>
+</ul>
 </section>
 </section>
 

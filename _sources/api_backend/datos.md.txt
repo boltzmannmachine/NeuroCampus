@@ -1,28 +1,26 @@
 # Endpoints de datos
 
-La API de datos agrupa los endpoints relacionados con la **ingesta**, 
-**validación**, **preprocesamiento** y **resumen** de los datasets usados por 
+La API de datos agrupa los endpoints relacionados con la **validación**,
+**ingesta**, **consulta** y **visualización preliminar** de datasets usados por
 NeuroCampus.
 
-Todos los endpoints aquí descritos cuelgan del prefijo base:
+Todos los endpoints documentados en esta página cuelgan del prefijo base:
 
 - `/datos`
 
 ---
 
-## Resumen de endpoints principales
+## Resumen de endpoints vigentes
 
-| Método | Ruta                  | Descripción                                                 |
-| ------ | --------------------- | ----------------------------------------------------------- |
-| GET    | `/datos/ping`         | Verificación rápida de salud del módulo de datos.          |
-| GET    | `/datos/esquema`      | Devuelve el esquema esperado de columnas para los datasets |
-| POST   | `/datos/validar`      | Valida un archivo sin persistirlo en el sistema            |
-| POST   | `/datos/upload`       | Sube y registra un nuevo dataset                           |
-| GET    | `/datos/resumen`      | Devuelve el resumen estructural del dataset activo         |
-| GET    | `/datos/sentimientos` | Devuelve agregados de análisis de sentimientos (BETO)      |
-
-> **Nota**: los nombres concretos de los parámetros pueden variar según la 
-> implementación, pero esta sección resume la intención funcional de cada ruta.
+| Método | Ruta                  | Descripción |
+| ------ | --------------------- | ----------- |
+| GET    | `/datos/ping`         | Verificación rápida del router de datos |
+| GET    | `/datos/esquema`      | Devuelve el esquema esperado de la plantilla |
+| POST   | `/datos/validar`      | Valida un archivo sin persistirlo |
+| POST   | `/datos/upload`       | Sube y registra el dataset del periodo indicado |
+| GET    | `/datos/preview`      | Devuelve una vista tabular del dataset |
+| GET    | `/datos/resumen`      | Devuelve KPIs y resumen estructural del dataset |
+| GET    | `/datos/sentimientos` | Devuelve agregados de sentimientos del dataset etiquetado |
 
 ---
 
@@ -30,15 +28,23 @@ Todos los endpoints aquí descritos cuelgan del prefijo base:
 
 ### Descripción
 
-Endpoint de comprobación rápida del módulo de datos. Útil para:
+Endpoint de salud mínimo del contexto **datos**.
 
-- Verificar la conectividad entre frontend y backend.
-- Checks básicos en tests automáticos o sistemas de monitorización.
+Permite verificar rápidamente que:
+
+- el router está registrado correctamente en la API;
+- el prefijo `/datos` responde;
+- la comunicación frontend-backend está disponible para este dominio.
 
 ### Respuesta
 
-- Código `200 OK` con un pequeño JSON indicando estado (por ejemplo,
-  `{ "status": "ok" }`).
+Código `200 OK` con una estructura simple como:
+
+```json
+{
+  "datos": "pong"
+}
+```
 
 ---
 
@@ -46,42 +52,51 @@ Endpoint de comprobación rápida del módulo de datos. Útil para:
 
 ### Descripción
 
-Devuelve el **esquema esperado de columnas** para los datasets de evaluaciones
-docentes. Esta información se utiliza:
+Devuelve el esquema esperado para la plantilla de evaluaciones docentes.
 
-- En la pestaña **Datos** para mostrar la plantilla de columnas.
-- Como referencia al preparar archivos para carga o predicción por lote.
+Este endpoint intenta primero leer el archivo:
 
-### Entrada
+```text
+schemas/plantilla_dataset.schema.json
+```
 
-- Parámetros típicos (opcional):
-  - `tipo` o `dataset_id` para seleccionar una variante de esquema, si aplica.
+Si ese archivo no existe o no puede parsearse, el backend utiliza un
+**esquema de respaldo** incorporado en el router.
+
+### Parámetros
+
+- `version` (opcional)
+  - reservado para futuras extensiones;
+  - en la implementación actual no cambia el resultado efectivo.
 
 ### Respuesta
 
-- Código `200 OK`.
-- Cuerpo JSON con campos similares a:
+Código `200 OK` con un objeto tipado (`EsquemaResponse`) que contiene, al menos:
 
-  - `version`: versión del esquema.
-  - `columns`: lista de columnas esperadas con información como:
-    - nombre interno,
-    - tipo de dato,
-    - si es requerida u opcional,
-    - descripción.
+- `version`
+- `columns`
 
-Ejemplo simplificado:
+Cada columna puede incluir información como:
 
-```json
-{
-  "version": "0.3.0",
-  "columns": [
-    {"name": "docente", "type": "string", "required": true},
-    {"name": "asignatura", "type": "string", "required": true},
-    {"name": "p1", "type": "number", "required": true},
-    "..."
-  ]
-}
-```
+- `name`
+- `dtype`
+- `required`
+- `range`
+- `max_len`
+- `domain`
+
+### Observaciones de implementación
+
+El esquema fallback actual incluye campos como:
+
+- `periodo`
+- `codigo_materia`
+- `grupo`
+- `pregunta_1` a `pregunta_10`
+- `Sugerencias:`
+
+Esto permite que la UI siga funcionando incluso si no está disponible el JSON
+formal del esquema.
 
 ---
 
@@ -89,35 +104,76 @@ Ejemplo simplificado:
 
 ### Descripción
 
-Valida un archivo de datos **sin persistirlo** en el sistema. Se utiliza para:
+Valida un archivo de datos **sin persistirlo en disco**.
 
-- Comprobar que el archivo cumple con el esquema esperado.
-- Obtener una vista previa de filas y posibles errores antes de cargarlo.
+Este endpoint está diseñado para el flujo previo a la carga definitiva desde la
+pestaña **Datos**.
 
 ### Entrada
 
-- `multipart/form-data` con campos típicos:
+Se espera `multipart/form-data` con estos campos:
 
-  - `file`: archivo a validar (`.csv`, `.xlsx`, `.xls`, `.parquet`, etc.).
-  - `dataset_id` (opcional): identificador que se planea asignar al dataset.
+- `file`
+  - archivo de entrada;
+  - formatos soportados: `csv`, `xlsx`, `parquet`.
+- `dataset_id`
+  - identificador lógico del dataset.
+- `fmt` (opcional)
+  - fuerza el lector a uno de estos valores:
+    - `csv`
+    - `xlsx`
+    - `parquet`
 
-### Comportamiento esperado
+### Comportamiento real
 
-- El backend:
-  - Lee el archivo con un adaptador de formato.
-  - Aplica la cadena de validación definida en `neurocampus.data` / `validation`.
-  - Devuelve un informe de validación y, opcionalmente, una muestra de filas.
+La implementación actual realiza este flujo:
 
-### Respuesta
+1. lee el archivo en memoria;
+2. rechaza archivos vacíos;
+3. valida que el formato sea soportado;
+4. construye un `sample` auxiliar con las primeras filas;
+5. delega la validación al wrapper unificado `validar_archivo(...)`;
+6. enriquece la respuesta con `dataset_id` y `sample`.
 
-- Código `200 OK` si el archivo es legible (aunque tenga errores de validación).
-- Cuerpo JSON típico:
+### Respuestas posibles
 
-  - `ok`: `true` / `false` según el resultado de validación.
-  - `errors`: lista de errores.
-  - `warnings`: lista de advertencias.
-  - `sample`: muestra de filas (por ejemplo, primeras 5–10).
-  - `dataset_id`: identificador sugerido o inferido (si aplica).
+#### `200 OK`
+
+Cuando el archivo es legible y la validación se ejecuta correctamente.
+
+La respuesta puede incluir campos como:
+
+- `ok`
+- `errors`
+- `warnings`
+- `dataset_id`
+- `sample`
+
+#### `400 Bad Request`
+
+Casos típicos:
+
+- archivo vacío;
+- formato no soportado;
+- error de decodificación del CSV.
+
+Ejemplo de detalle posible:
+
+```text
+Formato no soportado. Use csv/xlsx/parquet o especifique 'fmt'.
+```
+
+#### `500 Internal Server Error`
+
+Si ocurre un error inesperado durante la validación.
+
+### Notas importantes
+
+- Este endpoint **no persiste** el archivo.
+- El `sample` es una vista previa auxiliar para frontend y compatibilidad con
+  tests.
+- El nombre del parámetro es `dataset_id`, aunque en el flujo funcional del
+  sistema el identificador operativo final suele alinearse con el periodo.
 
 ---
 
@@ -125,41 +181,154 @@ Valida un archivo de datos **sin persistirlo** en el sistema. Se utiliza para:
 
 ### Descripción
 
-Carga y registra un nuevo dataset en el sistema. Este endpoint suele engancharse
-a la acción **«Cargar y procesar»** de la pestaña **Datos**.
+Realiza la ingesta real del dataset en el sistema.
+
+En la implementación actual, este endpoint escribe el dataset en:
+
+```text
+<repo_root>/datasets/{periodo}.parquet
+```
+
+Si no hay soporte disponible para parquet, el backend hace fallback a:
+
+```text
+<repo_root>/datasets/{periodo}.csv
+```
 
 ### Entrada
 
-- `multipart/form-data` con campos típicos:
+Se espera `multipart/form-data` con estos campos:
 
-  - `file`: archivo con las evaluaciones docentes.
-  - `dataset_id`: identificador del dataset (por ejemplo, `2024-2`).
-  - `overwrite`: booleano que indica si se debe sobrescribir un dataset ya 
-    existente con el mismo `dataset_id`.
-  - Flags adicionales (según implementación):
-    - `run_preproc`: aplicar preprocesamiento al cargar.
-    - `run_beto`: lanzar job de análisis de sentimientos tras el preprocesamiento.
+- `file`
+  - archivo `csv`, `xlsx` o `parquet`.
+- `periodo`
+  - identificador del periodo, por ejemplo `2024-2`.
+- `dataset_id`
+  - alias mantenido por compatibilidad;
+  - actualmente **se ignora** y se usa `periodo` como identificador efectivo.
+- `overwrite`
+  - booleano opcional;
+  - controla si puede reemplazarse un dataset ya existente.
 
-### Comportamiento esperado
+### Comportamiento real
 
-- El backend:
-  - Valida el archivo.
-  - Lo transforma al formato interno estándar.
-  - Lo guarda en la ubicación configurada (`data/`).
-  - Genera y persiste un **resumen de dataset**.
-  - Si se indica, lanza el job de BETO.
+1. valida que `periodo` exista;
+2. valida el formato por extensión;
+3. resuelve el directorio de salida `datasets/`;
+4. verifica si ya existe `{periodo}.parquet` o `{periodo}.csv`;
+5. si existe y `overwrite=false`, responde `409 Conflict`;
+6. lee el archivo con `read_file(...)`;
+7. intenta persistirlo como parquet;
+8. si falla el motor parquet, persiste como CSV;
+9. devuelve un `DatosUploadResponse`.
+
+### Respuesta exitosa
+
+Código `201 Created`.
+
+Campos relevantes de salida:
+
+- `dataset_id`
+- `rows_ingested`
+- `stored_as`
+- `warnings`
+
+Ejemplo conceptual:
+
+```json
+{
+  "dataset_id": "2024-2",
+  "rows_ingested": 530,
+  "stored_as": "localfs://neurocampus/datasets/2024-2.parquet",
+  "warnings": []
+}
+```
+
+### Respuestas de error
+
+#### `400 Bad Request`
+
+- falta `periodo`;
+- archivo vacío;
+- formato no soportado.
+
+#### `409 Conflict`
+
+Se devuelve si el dataset ya existe y no se activó `overwrite`.
+
+Detalle típico:
+
+```text
+El dataset '2024-2' ya existe. Activa 'overwrite' para reemplazarlo.
+```
+
+#### `500 Internal Server Error`
+
+Error inesperado durante lectura o escritura.
+
+### Observación funcional importante
+
+Este endpoint confirma lo que ya se observa en la UI actual: el identificador
+real de persistencia está gobernado por **`periodo`**, no por el texto libre de
+`dataset_id`.
+
+---
+
+## `GET /datos/preview`
+
+### Descripción
+
+Devuelve una vista tabular del dataset para poblar la tabla de la pestaña
+**Datos**.
+
+### Parámetros de query
+
+- `dataset` (requerido)
+  - alias del parámetro `dataset_id` en el backend.
+- `variant`
+  - valores admitidos:
+    - `processed`
+    - `labeled`
+  - por defecto: `processed`.
+- `mode`
+  - valores admitidos:
+    - `ui`
+    - `raw`
+  - por defecto: `ui`.
+- `limit`
+  - mínimo `1`, máximo `200`;
+  - por defecto `25`.
+- `offset`
+  - mínimo `0`.
+
+### Comportamiento real
+
+- Si `variant=labeled`, el endpoint intenta cargar el dataset etiquetado.
+- Si `variant=processed`, intenta cargar el dataset procesado.
+- Luego construye una respuesta tipada mediante `build_dataset_preview(...)`.
 
 ### Respuesta
 
-- En caso de éxito, código `201 Created` o `200 OK`.
-- Cuerpo JSON típico:
+Código `200 OK` con un objeto `DatasetPreviewResponse`.
 
-  - `ok`: `true`.
-  - `dataset_id`: identificador efectivamente registrado.
-  - `rows_ingested`: número de filas ingestadas.
-  - `stored_as`: ruta o URI donde quedó almacenado el dataset.
-  - `preproc_job_id`: id del job de preprocesamiento, si aplica.
-  - `beto_job_id`: id del job BETO lanzado, si aplica.
+Su contenido está pensado para renderizar:
+
+- columnas de la tabla;
+- filas paginadas;
+- metadatos de fuente;
+- modo y variante seleccionados.
+
+### Errores
+
+- `404 Not Found`
+  - si el archivo fuente no existe.
+- `500 Internal Server Error`
+  - si falla la construcción del preview.
+
+### Observación importante
+
+Este endpoint no estaba reflejado en la documentación anterior y hoy es parte
+real del soporte a la tabla de vista previa del frontend.
 
 ---
 
@@ -167,31 +336,48 @@ a la acción **«Cargar y procesar»** de la pestaña **Datos**.
 
 ### Descripción
 
-Devuelve un resumen estructural del dataset activo o del `dataset_id`
-especificado. Es la base de la sección **«Resumen del dataset»** en la pestaña
+Devuelve KPIs generales y un resumen estructural del dataset para la pestaña
 **Datos**.
 
-### Entrada
+### Parámetros de query
 
-- Parámetros de query típicos:
+- `dataset` (requerido)
+  - alias del parámetro lógico `dataset_id`.
 
-  - `dataset_id` (opcional): si no se indica, puede usarse un dataset por 
-    defecto o el último cargado.
+### Fuente de datos
+
+El backend intenta leer el dataset procesado asociado al identificador indicado.
+
+Según la configuración y helpers de dominio, la fuente puede resolverse desde
+rutas equivalentes a:
+
+- `data/processed/{dataset_id}.parquet`
+- o variantes de resolución equivalentes definidas por helpers internos.
 
 ### Respuesta
 
-- Código `200 OK` en caso de éxito.
-- Cuerpo JSON con información como:
+Código `200 OK` con un `DatasetResumenResponse`.
 
-  - `dataset_id`
-  - `n_rows`, `n_columns`
-  - `columns`: lista de columnas con tipos y estadísticas básicas.
-  - `docentes_count`, `asignaturas_count`
-  - `periodos`: listado o rango de periodos detectados.
-  - Otros agregados de interés para el dashboard de datos.
+Incluye información como:
 
-Esta información se utiliza para poblar las tarjetas, tablas y gráficos del
-**resumen de dataset**.
+- `n_rows`
+- `n_cols`
+- `periodos`
+- número de docentes
+- número de asignaturas
+- resumen de columnas
+
+### Errores
+
+- `404 Not Found`
+  - si no existe dataset procesado para el identificador dado.
+- `500 Internal Server Error`
+  - si ocurre un error al leer el dataset.
+
+### Uso en la UI
+
+Este endpoint soporta los KPIs visibles del resumen del dataset y parte de la
+información que se presenta en la tabla y tarjetas de la pestaña **Datos**.
 
 ---
 
@@ -199,30 +385,64 @@ Esta información se utiliza para poblar las tarjetas, tablas y gráficos del
 
 ### Descripción
 
-Devuelve agregados de **análisis de sentimientos** derivados del preprocesamiento
-con BETO. Se usa tanto en la pestaña **Datos** como, potencialmente, en otras
-vistas analíticas.
+Devuelve la distribución de sentimientos del dataset etiquetado con BETO.
 
-### Entrada
+### Parámetros de query
 
-- Parámetros de query típicos:
+- `dataset` (requerido)
+  - alias del identificador lógico del dataset.
 
-  - `dataset_id`: dataset sobre el que se quiere consultar.
-  - Otros filtros opcionales (por ejemplo, `docente`, `asignatura`), según la
-    implementación.
+### Fuente de datos
+
+El endpoint intenta leer el dataset etiquetado desde helpers de dominio,
+normalmente asociado a salidas como:
+
+- `data/labeled/{dataset_id}_beto.parquet`
+- o variantes compatibles como datasets `teacher`.
 
 ### Respuesta
 
-- Código `200 OK` en caso de éxito.
-- Cuerpo JSON con campos típicos:
+Código `200 OK` con un `DatasetSentimientosResponse`.
 
-  - `global_counts`: lista de objetos resumen global (pos/neu/neg), con recuentos 
-    y proporciones.
-  - `top_docentes`: agregados por docente ordenados según alguna métrica.
-  - `coverage` y otros indicadores auxiliares (porcentaje de filas con texto,
-    tasa de éxito del modelo, etc.).
+La respuesta está pensada para alimentar visualizaciones como:
 
-Estos datos alimentan:
+- distribución global de polaridad;
+- agregados por docente;
+- agregados por asignatura.
 
-- Gráfico de barras global (positivo / neutro / negativo).
-- Tablas y gráficos por docente/asignatura.
+Campos conceptualmente esperados:
+
+- `total_comentarios`
+- `global_counts`
+- `por_docente`
+- `por_asignatura`
+
+### Errores
+
+- `404 Not Found`
+  - si no existe dataset etiquetado para ese identificador.
+- `422 Unprocessable Entity`
+  - si falta una columna esperada en el dataset etiquetado.
+- `500 Internal Server Error`
+  - si ocurre un error no controlado en la construcción del resumen.
+
+### Uso funcional
+
+Este endpoint soporta directamente las visualizaciones de sentimiento de la
+pestaña **Datos** y también puede servir de insumo a otras vistas analíticas.
+
+---
+
+## Observaciones de diseño de la API de datos
+
+La implementación actual revela dos convenciones importantes:
+
+1. **`periodo` gobierna la persistencia real en upload**
+   - aunque `dataset_id` siga existiendo por compatibilidad.
+2. **`dataset` se usa como alias en varios `GET`**
+   - para `preview`, `resumen` y `sentimientos`.
+
+Esto significa que, al documentar o consumir esta API, conviene distinguir entre:
+
+- el nombre formal del parámetro en cada endpoint,
+- y el identificador lógico efectivo que usa el pipeline.
