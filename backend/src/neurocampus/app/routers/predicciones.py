@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 import logging
+import math
 import os
 from pathlib import Path
 import re
@@ -155,6 +156,26 @@ def _historical_source_exists() -> bool:
     return abs_artifact_path(_resolve_historical_input_ref(prefer_labeled=False)).exists()
 
 
+def _historical_pair_artifacts_need_refresh(feat_dir: Path) -> bool:
+    """Detecta si ``historico-unificado`` usa un artifact legacy incompatible.
+
+    Versiones antiguas del histórico se construyeron directo desde
+    ``historico/unificado*.parquet``. Esos artifacts preservan la granularidad
+    por periodo, pero colapsan ``n_par`` y degradan la confianza. La versión
+    canónica para Predicciones debe derivarse de ``artifacts/features/<periodo>``.
+    """
+    pair_meta_path = feat_dir / "pair_meta.json"
+    if not pair_meta_path.exists():
+        return True
+
+    try:
+        meta = json.loads(pair_meta_path.read_text(encoding="utf-8"))
+    except Exception:
+        return True
+
+    return not bool(meta.get("derived_from_feature_packs"))
+
+
 def _ensure_historical_pair_dataset_ready(*, force: bool = False) -> None:
     """Construye ``historico-unificado`` desde pair_matrix ya procesados.
 
@@ -170,12 +191,12 @@ def _ensure_historical_pair_dataset_ready(*, force: bool = False) -> None:
         feat_dir / 'teacher_index.json',
         feat_dir / 'materia_index.json',
     ]
-    if all(p.exists() for p in required) and not force:
+    if all(p.exists() for p in required) and not force and not _historical_pair_artifacts_need_refresh(feat_dir):
         return
 
     try:
         build_historical_pair_artifacts_from_feature_packs(
-            base_dir=project_root(),
+            base_dir=artifacts_dir(),
             dataset_id=HISTORICAL_DATASET_ID,
             output_dir=str(feat_dir.resolve()),
         )
@@ -217,7 +238,7 @@ def _ensure_prediction_dataset_ready(dataset_id: str) -> None:
         feat_dir / "teacher_index.json",
         feat_dir / "materia_index.json",
     ]
-    if all(p.exists() for p in required):
+    if all(p.exists() for p in required) and not _historical_pair_artifacts_need_refresh(feat_dir):
         return
 
     _ensure_historical_pair_dataset_ready(force=False)
@@ -266,6 +287,132 @@ def _latest_pair_rows(df_pair: pd.DataFrame) -> pd.DataFrame:
     out = out.sort_values(["teacher_key", "materia_key", "_period_rank"], kind="stable")
     out = out.drop_duplicates(["teacher_key", "materia_key"], keep="last")
     return out.drop(columns=["_period_rank"]).reset_index(drop=True)
+
+
+def _row_evidence_stats(row: pd.Series | Dict[str, Any]) -> Dict[str, float | int]:
+    """Extrae stats de evidencia desde una sola fila de ``pair_matrix``."""
+    return {
+        "n_par": int(row.get("n_par", 0) or 0),
+        "mean_score": float(row.get("mean_score_total_0_50", 0.0) or 0.0),
+        "std_score": float(row.get("std_score_total_0_50", 0.0) or 0.0),
+    }
+
+
+def _merge_grouped_score_stats(rows: pd.DataFrame) -> Dict[str, float | int]:
+    """Combina stats agregadas por periodo en una sola evidencia histórica.
+
+    ``pair_matrix`` puede traer varias filas del mismo par docente-materia cuando
+    el dataset preserva ``periodo``. Para la inferencia seguimos usando la fila
+    operativa más reciente, pero la confianza debe reflejar toda la evidencia
+    histórica disponible del par.
+    """
+    if rows.empty:
+        return {"n_par": 0, "mean_score": 0.0, "std_score": 0.0}
+
+    n = pd.to_numeric(rows.get("n_par"), errors="coerce").fillna(0.0).clip(lower=0.0)
+    mean = pd.to_numeric(rows.get("mean_score_total_0_50"), errors="coerce").fillna(0.0)
+    std = pd.to_numeric(rows.get("std_score_total_0_50"), errors="coerce").fillna(0.0).clip(lower=0.0)
+
+    valid = n > 0
+    if not valid.any():
+        return {"n_par": 0, "mean_score": 0.0, "std_score": 0.0}
+
+    n = n[valid].astype(float)
+    mean = mean[valid].astype(float)
+    std = std[valid].astype(float)
+
+    total_n = int(round(float(n.sum())))
+    if total_n <= 0:
+        return {"n_par": 0, "mean_score": 0.0, "std_score": 0.0}
+
+    weighted_mean = float((n * mean).sum() / n.sum())
+    if total_n <= 1:
+        return {"n_par": total_n, "mean_score": weighted_mean, "std_score": 0.0}
+
+    within = float((((n - 1.0).clip(lower=0.0)) * (std ** 2)).sum())
+    between = float((n * ((mean - weighted_mean) ** 2)).sum())
+    variance = max((within + between) / max(total_n - 1, 1), 0.0)
+
+    return {
+        "n_par": total_n,
+        "mean_score": weighted_mean,
+        "std_score": math.sqrt(variance),
+    }
+
+
+def _build_pair_evidence_lookup(df_pair_raw: pd.DataFrame) -> Dict[tuple[str, str], Dict[str, float | int]]:
+    """Agrega evidencia histórica por par docente-materia.
+
+    Si el ``pair_matrix`` ya tiene una sola fila por par, la evidencia coincide
+    con esa fila. Si trae varios periodos por par, se combinan ``n_par``,
+    ``mean_score_total_0_50`` y ``std_score_total_0_50`` para representar el
+    historial completo.
+    """
+    required = {"teacher_key", "materia_key", "n_par", "mean_score_total_0_50", "std_score_total_0_50"}
+    if df_pair_raw.empty or not required.issubset(df_pair_raw.columns):
+        return {}
+
+    lookup: Dict[tuple[str, str], Dict[str, float | int]] = {}
+    grouped = df_pair_raw.groupby(["teacher_key", "materia_key"], dropna=False, sort=False)
+    for (teacher_key, materia_key), rows in grouped:
+        lookup[(str(teacher_key), str(materia_key))] = _merge_grouped_score_stats(rows)
+    return lookup
+
+
+def _build_entity_evidence_lookups(df_pair_raw: pd.DataFrame) -> tuple[Dict[str, int], Dict[str, int]]:
+    """Agrega evidencia histórica de docente y materia sin duplicar pares por periodo."""
+    if df_pair_raw.empty:
+        return {}, {}
+
+    period_col = "periodo" if "periodo" in df_pair_raw.columns else None
+    teacher_counts: Dict[str, int] = {}
+    materia_counts: Dict[str, int] = {}
+
+    if {"teacher_key", "n_docente"}.issubset(df_pair_raw.columns):
+        tcols = ["teacher_key", "n_docente"] + ([period_col] if period_col else [])
+        tmp = df_pair_raw[tcols].copy()
+        tmp["n_docente"] = pd.to_numeric(tmp["n_docente"], errors="coerce").fillna(0.0).clip(lower=0.0)
+        if period_col:
+            tmp[period_col] = tmp[period_col].fillna("").astype(str).str.strip()
+            teacher_counts = (
+                tmp.groupby(["teacher_key", period_col], dropna=False)["n_docente"].max()
+                .groupby("teacher_key")
+                .sum()
+                .round()
+                .astype(int)
+                .to_dict()
+            )
+        else:
+            teacher_counts = (
+                tmp.groupby("teacher_key", dropna=False)["n_docente"].max()
+                .round()
+                .astype(int)
+                .to_dict()
+            )
+
+    if {"materia_key", "n_materia"}.issubset(df_pair_raw.columns):
+        mcols = ["materia_key", "n_materia"] + ([period_col] if period_col else [])
+        tmp = df_pair_raw[mcols].copy()
+        tmp["n_materia"] = pd.to_numeric(tmp["n_materia"], errors="coerce").fillna(0.0).clip(lower=0.0)
+        if period_col:
+            tmp[period_col] = tmp[period_col].fillna("").astype(str).str.strip()
+            materia_counts = (
+                tmp.groupby(["materia_key", period_col], dropna=False)["n_materia"].max()
+                .groupby("materia_key")
+                .sum()
+                .round()
+                .astype(int)
+                .to_dict()
+            )
+        else:
+            materia_counts = (
+                tmp.groupby("materia_key", dropna=False)["n_materia"].max()
+                .round()
+                .astype(int)
+                .to_dict()
+            )
+
+    return teacher_counts, materia_counts
 
 
 def _pair_matrix_columns(pair_path: Path) -> List[str]:
@@ -767,6 +914,8 @@ def predict_individual(req: IndividualPredictionRequest) -> IndividualPrediction
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error cargando pair_matrix: {e}") from e
 
+    evidence_lookup = _build_pair_evidence_lookup(df_pair_raw)
+    teacher_counts_lookup, materia_counts_lookup = _build_entity_evidence_lookups(df_pair_raw)
     df_pair = _latest_pair_rows(df_pair_raw)
     mask = (df_pair["teacher_key"] == teacher_key) & (df_pair["materia_key"] == materia_key)
     row_df = df_pair[mask]
@@ -821,16 +970,8 @@ def predict_individual(req: IndividualPredictionRequest) -> IndividualPrediction
         teacher_means = teacher_rows.mean(numeric_only=True).to_dict() if len(teacher_rows) > 0 else {}
         materia_means = materia_rows.mean(numeric_only=True).to_dict() if len(materia_rows) > 0 else {}
 
-        n_docente = (
-            int(teacher_rows["n_docente"].iloc[0])
-            if len(teacher_rows) > 0 and "n_docente" in teacher_rows.columns
-            else 0
-        )
-        n_materia = (
-            int(materia_rows["n_materia"].iloc[0])
-            if len(materia_rows) > 0 and "n_materia" in materia_rows.columns
-            else 0
-        )
+        n_docente = int(teacher_counts_lookup.get(teacher_key, 0))
+        n_materia = int(materia_counts_lookup.get(materia_key, 0))
 
         row_dict: Dict[str, Any] = {}
         for col in df_pair.columns:
@@ -888,14 +1029,22 @@ def predict_individual(req: IndividualPredictionRequest) -> IndividualPrediction
 
     score_total_pred = float(np.clip(preds[0]["score_total_pred"], 0.0, 50.0))
 
-    n_par = int(row.get("n_par", 0))
-    n_docente = int(row.get("n_docente", 0))
-    n_materia = int(row.get("n_materia", 0))
-    mean_score = float(row.get("mean_score_total_0_50", 0.0) or 0.0)
-    std_score = float(row.get("std_score_total_0_50", 0.0) or 0.0)
+    evidence_stats = evidence_lookup.get((teacher_key, materia_key), _row_evidence_stats(row))
+
+    n_par = int(evidence_stats["n_par"])
+    n_docente = int(teacher_counts_lookup.get(teacher_key, row.get("n_docente", 0) or 0))
+    n_materia = int(materia_counts_lookup.get(materia_key, row.get("n_materia", 0) or 0))
+    mean_score = float(evidence_stats["mean_score"])
+    std_score = float(evidence_stats["std_score"])
+    latest_mean_score = float(row.get("mean_score_total_0_50", 0.0) or 0.0)
 
     risk = compute_risk(score_total_pred)
-    confidence = compute_confidence(n_par=n_par, std_score=std_score)
+    confidence = compute_confidence(
+        n_par=n_par,
+        n_docente=n_docente,
+        n_materia=n_materia,
+        std_score=std_score,
+    )
 
     calif_means_docente = _get_calif_means(row)
     calif_means_cohorte = _get_cohorte_means(df_pair, materia_key)
@@ -903,7 +1052,7 @@ def predict_individual(req: IndividualPredictionRequest) -> IndividualPrediction
     radar = build_radar(
         calif_means=calif_means_docente,
         score_total_pred=score_total_pred,
-        mean_score_total=mean_score,
+        mean_score_total=latest_mean_score,
     )
     comparison = build_comparison(
         calif_means_docente=calif_means_docente,
@@ -1083,6 +1232,8 @@ def _run_batch_job(job_id: str, dataset_id: str) -> None:
 
     try:
         df_pair_raw = pd.read_parquet(artifacts_dir() / "features" / dataset_id / "pair_matrix.parquet")
+        evidence_lookup = _build_pair_evidence_lookup(df_pair_raw)
+        teacher_counts_lookup, materia_counts_lookup = _build_entity_evidence_lookups(df_pair_raw)
         df_pair = _latest_pair_rows(df_pair_raw)
         st["progress"] = 0.15
 
@@ -1100,23 +1251,34 @@ def _run_batch_job(job_id: str, dataset_id: str) -> None:
         for i, pred in enumerate(preds_raw):
             row = df_pair.iloc[i]
             score = float(np.clip(pred["score_total_pred"], 0.0, 50.0))
-            n_par = int(row.get("n_par", 0))
-            std_score = float(row.get("std_score_total_0_50", 0.0) or 0.0)
+            teacher_key = str(row.get("teacher_key", ""))
+            materia_key = str(row.get("materia_key", ""))
+            evidence_stats = evidence_lookup.get((teacher_key, materia_key), _row_evidence_stats(row))
+            n_par = int(evidence_stats["n_par"])
+            n_docente = int(teacher_counts_lookup.get(teacher_key, row.get("n_docente", 0) or 0))
+            n_materia = int(materia_counts_lookup.get(materia_key, row.get("n_materia", 0) or 0))
+            std_score = float(evidence_stats["std_score"])
+            mean_score = float(evidence_stats["mean_score"])
 
             records.append(
                 {
-                    "teacher_key": str(row.get("teacher_key", "")),
-                    "materia_key": str(row.get("materia_key", "")),
+                    "teacher_key": teacher_key,
+                    "materia_key": materia_key,
                     "teacher_id": int(row.get("teacher_id", -1)),
                     "materia_id": int(row.get("materia_id", -1)),
                     "score_total_pred": round(score, 2),
                     "risk": compute_risk(score),
-                    "confidence": compute_confidence(n_par=n_par, std_score=std_score),
+                    "confidence": compute_confidence(
+                        n_par=n_par,
+                        n_docente=n_docente,
+                        n_materia=n_materia,
+                        std_score=std_score,
+                    ),
                     "n_par": n_par,
-                    "n_docente": int(row.get("n_docente", 0)),
-                    "n_materia": int(row.get("n_materia", 0)),
+                    "n_docente": n_docente,
+                    "n_materia": n_materia,
                     "cold_pair": n_par == 0,
-                    "mean_score_total_0_50": float(row.get("mean_score_total_0_50", 0.0) or 0.0),
+                    "mean_score_total_0_50": round(mean_score, 3),
                     "std_score_total_0_50": round(std_score, 3),
                     "periodo": str(row.get("periodo", dataset_id) or dataset_id),
                 }
@@ -1437,4 +1599,3 @@ def outputs_file(predictions_uri: str):
         raise HTTPException(status_code=404, detail=str(e)) from e
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
-

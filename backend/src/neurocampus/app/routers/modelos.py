@@ -74,7 +74,7 @@ from ...models.strategies.dbm_manual_strategy import DBMManualPlantillaStrategy
 from neurocampus.predictions.bundle import build_predictor_manifest, bundle_paths, write_json
 from ...utils.model_context import fill_context
 from ...utils.warm_start import resolve_warm_start_path
-from ...utils.paths import resolve_champion_json_candidates, first_existing
+from ...utils.paths import artifacts_dir, resolve_champion_json_candidates, first_existing
 from ...models.utils.metrics_contract import standardize_run_metrics, primary_metric_for_family
 
 
@@ -1091,7 +1091,7 @@ def _ensure_historical_pair_feature_pack_from_existing(*, force: bool = False) -
 
     try:
         return build_historical_pair_artifacts_from_feature_packs(
-            base_dir=BASE_DIR,
+            base_dir=artifacts_dir(),
             dataset_id=HISTORICAL_DATASET_ID,
             output_dir=str(out_dir.resolve()),
         )

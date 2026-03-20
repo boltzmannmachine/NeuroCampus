@@ -20,6 +20,8 @@ Constantes configurables
 ------------------------
 ``N_REF``
     Número de encuestas mínimas para que un par alcance confianza plena (1.0).
+``N_DOC_REF`` / ``N_MAT_REF``
+    Referencias mínimas de contexto para docente y materia.
 ``RISK_HIGH_MAX``
     Umbral superior para riesgo "high" (score < este valor).
 ``RISK_MEDIUM_MAX``
@@ -40,6 +42,18 @@ from typing import Dict, List, Literal
 
 #: Encuestas mínimas para que ``cov = 1.0`` (cobertura completa).
 N_REF: int = 15
+
+#: Encuestas mínimas para considerar que el contexto del docente es sólido.
+N_DOC_REF: int = 30
+
+#: Encuestas mínimas para considerar que el contexto de la materia es sólido.
+N_MAT_REF: int = 30
+
+#: Factor máximo del contexto cuando el par ya fue observado al menos una vez.
+PAIR_CONTEXT_FACTOR: float = 0.85
+
+#: Factor conservador del contexto cuando el par es frío.
+COLD_CONTEXT_FACTOR: float = 0.25
 
 #: Score máximo exclusivo para riesgo "high".
 RISK_HIGH_MAX: float = 30.0
@@ -122,32 +136,47 @@ def compute_risk(score: float) -> Literal["low", "medium", "high"]:
     return "low"
 
 
-def compute_confidence(*, n_par: int, std_score: float) -> float:
+def compute_confidence(*, n_par: int, n_docente: int, n_materia: int, std_score: float) -> float:
     """Calcula la tasa de confiabilidad (0–1) para un par docente–materia.
 
-    Combina dos factores derivados del historial del par en ``pair_matrix``:
+    Combina tres señales derivadas del historial en ``pair_matrix``:
 
-    - **Cobertura** (``cov``): proporción de encuestas disponibles respecto al
-      mínimo de referencia :data:`N_REF`. Satura en 1.0.
+    - **Cobertura del par** (``pair_cov``): proporción de encuestas del par
+      docente-materia respecto a :data:`N_REF`.
+    - **Contexto** (``context_cov``): respaldo histórico del docente y/o la
+      materia dentro del dataset. Esto evita castigar en exceso pares observados
+      con poca frecuencia cuando una de las dos entidades sí tiene soporte fuerte.
     - **Estabilidad** (``stability``): penaliza la variabilidad histórica del
       score. Un ``std_score`` alto implica predicciones menos confiables.
       La desviación se normaliza sobre 25.0 (mitad del rango 0–50).
 
-    Fórmula: ``confidence = cov × stability``.
+    Regla:
+    - Si el par ya existe, la cobertura final toma el mejor soporte entre el par
+      y el contexto escalado.
+    - Si el par es frío, el contexto aporta poco y la confianza permanece baja.
 
     Args:
         n_par: Número de encuestas históricas para este par específico
             (campo ``n_par`` en ``pair_matrix.parquet``).
+        n_docente: Encuestas históricas agregadas del docente en el dataset.
+        n_materia: Encuestas históricas agregadas de la materia en el dataset.
         std_score: Desviación estándar del score histórico para este par
             (campo ``std_score_total_0_50`` en ``pair_matrix.parquet``).
 
     Returns:
         Float en [0, 1] redondeado a 4 decimales.
 
-    Note:
-        Si ``n_par == 0`` (par "frío", nunca visto), retorna ``0.0``.
     """
-    cov = min(n_par / N_REF, 1.0)
+    pair_cov = min(max(n_par, 0) / N_REF, 1.0)
+    teacher_cov = min(max(n_docente, 0) / N_DOC_REF, 1.0)
+    materia_cov = min(max(n_materia, 0) / N_MAT_REF, 1.0)
+    context_cov = max(teacher_cov, materia_cov)
+
+    if n_par > 0:
+        cov = max(pair_cov, PAIR_CONTEXT_FACTOR * context_cov)
+    else:
+        cov = COLD_CONTEXT_FACTOR * context_cov
+
     std_norm = min((std_score or 0.0) / 25.0, 1.0)
     stability = 1.0 - std_norm
     return round(float(cov * stability), 4)

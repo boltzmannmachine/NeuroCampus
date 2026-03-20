@@ -237,7 +237,6 @@ class MateriaInfoResponse(BaseModel):
     materia_id: int = Field(description="Índice numérico asignado en materia_index.json.")
     n_encuestas: int = Field(default=0, description="Total de encuestas de la materia en el dataset.")
 
-
 class RadarPoint(BaseModel):
     """Un punto en el radar de indicadores (una dimensión)."""
 
@@ -367,4 +366,3 @@ class PredictionRunInfoResponse(BaseModel):
     )
 
     model_config = ConfigDict(protected_namespaces=())
-

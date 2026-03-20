@@ -849,12 +849,17 @@ def build_historical_pair_artifacts_from_feature_packs(
     - El caller debe usar este helper únicamente cuando el flujo consuma
       ``pair_matrix.parquet`` (por ejemplo, ``family=score_docente``).
     """
+    base_dir = Path(base_dir).expanduser().resolve()
     out_dir = Path(output_dir)
     if not out_dir.is_absolute():
         out_dir = (base_dir / out_dir).resolve()
     _ensure_dir(out_dir)
 
     features_root = (base_dir / 'artifacts' / 'features').resolve()
+    if not features_root.exists():
+        direct_features_root = (base_dir / 'features').resolve()
+        if direct_features_root.exists():
+            features_root = direct_features_root
     if not features_root.exists():
         raise FileNotFoundError(f'No existe la raíz de feature-packs: {features_root}')
 

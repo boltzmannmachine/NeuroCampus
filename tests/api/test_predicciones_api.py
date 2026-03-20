@@ -33,6 +33,20 @@ class DummyPickleModel:
         return ["neu"] * int(len(df))
 
 
+class DummyRegressionPickleModel:
+    """Modelo mínimo de regresión 0-50 para tests de score_docente."""
+
+    task_type = "regression"
+
+    def predict_score_df(self, df):
+        import numpy as np
+
+        return np.full(int(len(df)), 41.0, dtype=float)
+
+    def predict_df(self, df):
+        return [41.0] * int(len(df))
+
+
 def _write_pickled_run_bundle(base: Path, *, run_id: str, dataset_id: str = "ds") -> Path:
     """Crea un run_dir con predictor.json + model.bin pickled (listo para inferencia)."""
     import pickle
@@ -55,6 +69,32 @@ def _write_pickled_run_bundle(base: Path, *, run_id: str, dataset_id: str = "ds"
 
     with open(bp.model_bin, "wb") as fh:
         pickle.dump(DummyPickleModel(), fh)
+
+    return run_dir
+
+
+def _write_pickled_score_run_bundle(base: Path, *, run_id: str, dataset_id: str) -> Path:
+    """Crea un run_dir pickled apto para score_docente (regresión)."""
+    import pickle
+
+    run_dir = base / "runs" / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    bp = bundle_paths(run_dir)
+
+    manifest = build_predictor_manifest(
+        run_id=run_id,
+        dataset_id=dataset_id,
+        model_name="dbm_manual",
+        task_type="regression",
+        input_level="pair",
+        target_col="score_total_0_50",
+        extra={"family": "score_docente"},
+    )
+    write_json(bp.predictor_json, manifest)
+    write_json(bp.preprocess_json, {"schema_version": 1, "notes": "score test"})
+
+    with open(bp.model_bin, "wb") as fh:
+        pickle.dump(DummyRegressionPickleModel(), fh)
 
     return run_dir
 
@@ -654,3 +694,315 @@ def test_predicciones_outputs_invalid_uri_422(client, artifacts_dir: Path, monke
     r = client.get("/predicciones/outputs/preview", params={"predictions_uri": bad_uri})
     assert r.status_code == 422, r.text
 
+
+def test_predicciones_individual_existing_pair_uses_teacher_materia_context_for_high_confidence(
+    client, artifacts_dir: Path, monkeypatch
+):
+    """Un par existente con poco n_par pero fuerte contexto no debe quedar en 7%-13%."""
+
+    monkeypatch.setenv("NC_ARTIFACTS_DIR", str(artifacts_dir))
+    base = artifacts_dir
+
+    import pandas as pd
+
+    run_id = "run_score_context_high"
+    dataset_id = "ds_score_context_high"
+
+    _write_pickled_score_run_bundle(base, run_id=run_id, dataset_id=dataset_id)
+    _write_champion(base, family="score_docente", dataset_id=dataset_id, run_id=run_id)
+
+    feat_dir = base / "features" / dataset_id
+    feat_dir.mkdir(parents=True, exist_ok=True)
+
+    rows = [
+        {
+            "teacher_key": "doc_a",
+            "materia_key": "mat_target",
+            "teacher_id": 1,
+            "materia_id": 10,
+            "periodo": "2025-1",
+            "n_par": 1,
+            "n_docente": 42,
+            "n_materia": 35,
+            "mean_score_total_0_50": 40.0,
+            "std_score_total_0_50": 1.0,
+        },
+        {
+            "teacher_key": "doc_a",
+            "materia_key": "mat_other",
+            "teacher_id": 1,
+            "materia_id": 11,
+            "periodo": "2025-1",
+            "n_par": 12,
+            "n_docente": 42,
+            "n_materia": 8,
+            "mean_score_total_0_50": 38.0,
+            "std_score_total_0_50": 2.0,
+        },
+        {
+            "teacher_key": "doc_b",
+            "materia_key": "mat_target",
+            "teacher_id": 2,
+            "materia_id": 10,
+            "periodo": "2025-1",
+            "n_par": 10,
+            "n_docente": 9,
+            "n_materia": 35,
+            "mean_score_total_0_50": 39.0,
+            "std_score_total_0_50": 1.5,
+        },
+    ]
+    for row in rows:
+        for i in range(10):
+            row[f"mean_calif_{i + 1}"] = 4.0
+
+    pd.DataFrame(rows).to_parquet(feat_dir / "pair_matrix.parquet", index=False)
+    (feat_dir / "teacher_index.json").write_text(json.dumps({"doc_a": 1, "doc_b": 2}, indent=2), encoding="utf-8")
+    (feat_dir / "materia_index.json").write_text(
+        json.dumps({"mat_target": 10, "mat_other": 11}, indent=2),
+        encoding="utf-8",
+    )
+
+    r = client.post(
+        "/predicciones/individual",
+        json={
+            "dataset_id": dataset_id,
+            "teacher_key": "doc_a",
+            "materia_key": "mat_target",
+        },
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+
+    assert body["cold_pair"] is False
+    assert body["evidence"]["n_par"] == 1
+    assert body["evidence"]["n_docente"] == 42
+    assert body["evidence"]["n_materia"] == 35
+    assert body["confidence"] == pytest.approx(0.85, abs=1e-4)
+
+
+def test_predicciones_individual_allows_cold_pair_and_keeps_confidence_low_without_relation(
+    client, artifacts_dir: Path, monkeypatch
+):
+    """Debe seguir permitiendo pares fríos si docente y materia existen, pero con confianza baja."""
+
+    monkeypatch.setenv("NC_ARTIFACTS_DIR", str(artifacts_dir))
+    base = artifacts_dir
+
+    import pandas as pd
+
+    run_id = "run_score_cold_pair"
+    dataset_id = "ds_score_cold_pair"
+
+    _write_pickled_score_run_bundle(base, run_id=run_id, dataset_id=dataset_id)
+    _write_champion(base, family="score_docente", dataset_id=dataset_id, run_id=run_id)
+
+    feat_dir = base / "features" / dataset_id
+    feat_dir.mkdir(parents=True, exist_ok=True)
+
+    rows = [
+        {
+            "teacher_key": "doc_a",
+            "materia_key": "mat_seen",
+            "teacher_id": 1,
+            "materia_id": 10,
+            "periodo": "2025-1",
+            "n_par": 8,
+            "n_docente": 18,
+            "n_materia": 8,
+            "mean_score_total_0_50": 37.0,
+            "std_score_total_0_50": 3.0,
+        },
+        {
+            "teacher_key": "doc_other",
+            "materia_key": "mat_target",
+            "teacher_id": 2,
+            "materia_id": 11,
+            "periodo": "2025-1",
+            "n_par": 9,
+            "n_docente": 9,
+            "n_materia": 16,
+            "mean_score_total_0_50": 39.0,
+            "std_score_total_0_50": 4.0,
+        },
+    ]
+    for row in rows:
+        for i in range(10):
+            row[f"mean_calif_{i + 1}"] = 4.0
+
+    pd.DataFrame(rows).to_parquet(feat_dir / "pair_matrix.parquet", index=False)
+    (feat_dir / "teacher_index.json").write_text(
+        json.dumps({"doc_a": 1, "doc_other": 2}, indent=2),
+        encoding="utf-8",
+    )
+    (feat_dir / "materia_index.json").write_text(
+        json.dumps({"mat_seen": 10, "mat_target": 11}, indent=2),
+        encoding="utf-8",
+    )
+
+    r = client.post(
+        "/predicciones/individual",
+        json={
+            "dataset_id": dataset_id,
+            "teacher_key": "doc_a",
+            "materia_key": "mat_target",
+        },
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+
+    assert body["cold_pair"] is True
+    assert body["evidence"]["n_par"] == 0
+    assert body["evidence"]["n_docente"] == 18
+    assert body["evidence"]["n_materia"] == 16
+    assert 0.10 <= body["confidence"] <= 0.20
+
+
+def test_predicciones_individual_uses_full_pair_history_for_confidence(client, artifacts_dir: Path, monkeypatch):
+    """La confianza debe agregar la evidencia histórica de todos los periodos del par."""
+
+    monkeypatch.setenv("NC_ARTIFACTS_DIR", str(artifacts_dir))
+    base = artifacts_dir
+
+    import pandas as pd
+
+    run_id = "run_score_history_conf"
+    dataset_id = "ds_score_history_conf"
+    teacher_key = "doc_1"
+    materia_key = "mat_1"
+
+    _write_pickled_score_run_bundle(base, run_id=run_id, dataset_id=dataset_id)
+    _write_champion(base, family="score_docente", dataset_id=dataset_id, run_id=run_id)
+
+    feat_dir = base / "features" / dataset_id
+    feat_dir.mkdir(parents=True, exist_ok=True)
+
+    base_row = {
+        "teacher_key": teacher_key,
+        "materia_key": materia_key,
+        "teacher_id": 1,
+        "materia_id": 10,
+        "n_docente": 15,
+        "n_materia": 20,
+        "mean_score_total_0_50": 35.0,
+        "std_score_total_0_50": 8.0,
+    }
+    for i in range(10):
+        base_row[f"mean_calif_{i + 1}"] = 4.0
+
+    rows = [
+        {
+            **base_row,
+            "periodo": "2024-1",
+            "n_par": 14,
+        },
+        {
+            **base_row,
+            "periodo": "2024-2",
+            "n_par": 1,
+        },
+    ]
+    pd.DataFrame(rows).to_parquet(feat_dir / "pair_matrix.parquet", index=False)
+
+    r = client.post(
+        "/predicciones/individual",
+        json={
+            "dataset_id": dataset_id,
+            "teacher_key": teacher_key,
+            "materia_key": materia_key,
+        },
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+
+    assert body["score_total_pred"] == 41.0
+    assert body["evidence"]["n_par"] == 15
+    assert body["historical"]["mean_score"] == 35.0
+    assert body["historical"]["std_score"] == pytest.approx(7.71, abs=1e-2)
+    assert body["confidence"] == pytest.approx(0.6917, abs=1e-4)
+    assert body["timeline"][-1]["semester"] == "2024-2"
+    assert body["timeline"][-1]["predicted"] == 41.0
+
+
+def test_predicciones_historico_refreshes_legacy_pair_artifacts(client, artifacts_dir: Path, monkeypatch):
+    """historico-unificado debe regenerarse desde feature-packs si el artifact es legacy."""
+
+    monkeypatch.setenv("NC_ARTIFACTS_DIR", str(artifacts_dir))
+    base = artifacts_dir
+
+    import pandas as pd
+
+    run_id = "run_score_historico_refresh"
+    dataset_id = "historico-unificado"
+    teacher_key = "doc_hist"
+    materia_key = "mat_hist"
+
+    _write_pickled_score_run_bundle(base, run_id=run_id, dataset_id=dataset_id)
+    _write_champion(base, family="score_docente", dataset_id=dataset_id, run_id=run_id)
+
+    def _pair_row(periodo: str, n_par: int, mean_score: float = 35.0, std_score: float = 2.0) -> dict:
+        row = {
+            "teacher_key": teacher_key,
+            "materia_key": materia_key,
+            "teacher_id": 1,
+            "materia_id": 10,
+            "periodo": periodo,
+            "n_par": n_par,
+            "n_docente": 30,
+            "n_materia": 40,
+            "mean_score_total_0_50": mean_score,
+            "std_score_total_0_50": std_score,
+        }
+        for i in range(10):
+            row[f"mean_calif_{i + 1}"] = 4.0
+        return row
+
+    for ds_name, n_par, mean_score in (("2024-2", 20, 35.0), ("2025-1", 22, 36.0)):
+        feat_dir = base / "features" / ds_name
+        feat_dir.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame([_pair_row(ds_name, n_par=n_par, mean_score=mean_score)]).to_parquet(
+            feat_dir / "pair_matrix.parquet",
+            index=False,
+        )
+        (feat_dir / "pair_meta.json").write_text(
+            json.dumps({"dataset_id": ds_name, "target_col": "score_total_0_50"}, indent=2),
+            encoding="utf-8",
+        )
+
+    # Artifact legacy que antes quedaba "congelado" y aplastaba la confianza.
+    hist_dir = base / "features" / dataset_id
+    hist_dir.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame([_pair_row("2025-1", n_par=1, mean_score=35.5, std_score=0.0)]).to_parquet(
+        hist_dir / "pair_matrix.parquet",
+        index=False,
+    )
+    (hist_dir / "pair_meta.json").write_text(
+        json.dumps(
+            {
+                "dataset_id": dataset_id,
+                "input_uri": "historico/unificado_labeled.parquet",
+                "row_granularity": "teacher-materia-periodo",
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    (hist_dir / "teacher_index.json").write_text(json.dumps({teacher_key: 1}, indent=2), encoding="utf-8")
+    (hist_dir / "materia_index.json").write_text(json.dumps({materia_key: 10}, indent=2), encoding="utf-8")
+
+    r = client.post(
+        "/predicciones/individual",
+        json={
+            "dataset_id": dataset_id,
+            "teacher_key": teacher_key,
+            "materia_key": materia_key,
+        },
+    )
+    assert r.status_code == 200, r.text
+    body = r.json()
+
+    assert body["evidence"]["n_par"] == 42
+    assert body["confidence"] > 0.85
+
+    pair_meta = json.loads((hist_dir / "pair_meta.json").read_text(encoding="utf-8"))
+    assert pair_meta.get("derived_from_feature_packs") is True
