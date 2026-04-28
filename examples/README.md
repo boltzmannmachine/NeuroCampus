@@ -5,7 +5,7 @@ Este directorio contiene datasets y guías rápidas para **probar la validación
 
 ## Archivos
 
-- `dataset_ejemplo.csv` → dataset mínimo (headers “canónicos”).
+- `dataset_ejemplo.xlsx` → dataset mínimo (headers “canónicos”).
 - `plantilla.xlsx` → ejemplo de planilla (estructura base).
 - `requests.http` (opcional) → ejemplos de llamadas a la API local.
 
