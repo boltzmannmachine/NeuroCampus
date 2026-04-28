@@ -1,4 +1,4 @@
-# Ejemplos y datos de prueba (Día 3)
+# Ejemplos y datos de prueba
 
 Este directorio contiene datasets y guías rápidas para **probar la validación** de datos
 (**/datos/validar**) y verificar la **normalización de encabezados** y la **coerción de tipos**.
@@ -6,7 +6,6 @@ Este directorio contiene datasets y guías rápidas para **probar la validación
 ## Archivos
 
 - `dataset_ejemplo.csv` → dataset mínimo (headers “canónicos”).
-- `Evaluacion.csv` → dataset realista (puede traer espacios, acentos o `:` en headers).
 - `plantilla.xlsx` → ejemplo de planilla (estructura base).
 - `requests.http` (opcional) → ejemplos de llamadas a la API local.
 
@@ -41,9 +40,6 @@ export NC_DF_ENGINE="polars"
 ```bash
 # CSV mínimo (headers canónicos)
 curl -X POST http://127.0.0.1:8000/datos/validar -F "file=@examples/dataset_ejemplo.csv"
-
-# CSV “realista” (espacios/acentos/“:”; separadores ; o ,)
-curl -X POST http://127.0.0.1:8000/datos/validar -F "file=@examples/Evaluacion.csv"
 
 # XLSX (requiere openpyxl)
 curl -X POST http://127.0.0.1:8000/datos/validar -F "file=@examples/plantilla.xlsx" -F "fmt=xlsx"
